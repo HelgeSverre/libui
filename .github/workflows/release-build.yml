@@ -1,0 +1,174 @@
+name: Release Build
+
+# Build libui binaries for Linux and Windows and attach to GitHub releases
+#
+# NOTE: macOS darwin libui.dylib is prebuilt and committed in the repo.
+# This workflow only builds Linux and Windows artifacts.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (e.g., v1.0.0)'
+        required: true
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux-x86_64:
+    name: Build Linux x86_64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y meson ninja-build libgtk-3-dev
+
+      - name: Build libui
+        run: bash build-libui.sh
+
+      - name: Verify artifact
+        run: |
+          ls -la lib/linux-x86_64/libui.so
+          file lib/linux-x86_64/libui.so
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libui-linux-x86_64
+          path: lib/linux-x86_64/libui.so
+          retention-days: 7
+
+  build-linux-aarch64:
+    name: Build Linux ARM64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install build dependencies (cross-compile)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson ninja-build libgtk-3-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+
+      - name: Build libui for ARM64
+        env:
+          CC: aarch64-linux-gnu-gcc
+          CXX: aarch64-linux-gnu-g++
+        run: |
+          # Create a cross-file for meson
+          cat > /tmp/aarch64-cross.txt << 'EOF'
+          [binaries]
+          c = 'aarch64-linux-gnu-gcc'
+          cpp = 'aarch64-linux-gnu-g++'
+          ar = 'aarch64-linux-gnu-ar'
+          strip = 'aarch64-linux-gnu-strip'
+          pkgconfig = 'pkg-config'
+          
+          [host_machine]
+          system = 'linux'
+          cpu_family = 'aarch64'
+          cpu = 'aarch64'
+          endian = 'little'
+          
+          [build_machine]
+          system = 'linux'
+          cpu_family = 'x86_64'
+          cpu = 'x86_64'
+          endian = 'little'
+          
+          [properties]
+          needs_exe_wrapper = true
+          EOF
+          
+          meson setup build --cross-file=/tmp/aarch64-cross.txt third_party/libui-ng
+          ninja -C build
+          
+          # Copy the built library
+          mkdir -p lib/linux-aarch64
+          cp build/meson-out/libui.so lib/linux-aarch64/libui.so
+
+      - name: Verify artifact
+        run: |
+          ls -la lib/linux-aarch64/libui.so
+          file lib/linux-aarch64/libui.so
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libui-linux-aarch64
+          path: lib/linux-aarch64/libui.so
+          retention-days: 7
+
+  build-windows-x86_64:
+    name: Build Windows x86_64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install Python and pip
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Meson and Ninja
+        run: pip install meson ninja
+
+      - name: Build libui
+        run: bash build-libui.sh
+
+      - name: Verify artifact
+        run: |
+          ls -la lib/windows-x86_64/libui.dll
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libui-windows-x86_64
+          path: lib/windows-x86_64/libui.dll
+          retention-days: 7
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-linux-x86_64, build-linux-aarch64, build-windows-x86_64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f -name "libui.*" -exec ls -la {} \;
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=${{ github.ref_name }}
+          if [ -z "$TAG" ]; then
+            TAG=${{ inputs.tag }}
+          fi
+          
+          echo "Creating release for tag: $TAG"
+          
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --generate-notes \
+            --verify-tag \
+            artifacts/libui-linux-x86_64/libui.so \
+            artifacts/libui-linux-aarch64/libui.so \
+            artifacts/libui-windows-x86_64/libui.dll
