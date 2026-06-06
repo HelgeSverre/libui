@@ -28,9 +28,12 @@ if [ ! -d "$SRC/.git" ]; then
 fi
 
 echo "==> Configuring (shared library, no tests/examples)…"
-meson setup "$BUILD" --buildtype=release --default-library=shared \
+# Pass both build dir AND source dir explicitly — on a fresh checkout there is no
+# preconfigured build/ to infer the source from, and the script may run from the
+# repo root (e.g. in CI), not from inside $SRC.
+meson setup "$BUILD" "$SRC" --buildtype=release --default-library=shared \
   -Dtests=false -Dexamples=false --reconfigure 2>/dev/null \
-  || meson setup "$BUILD" --buildtype=release --default-library=shared \
+  || meson setup "$BUILD" "$SRC" --buildtype=release --default-library=shared \
        -Dtests=false -Dexamples=false
 
 echo "==> Building…"

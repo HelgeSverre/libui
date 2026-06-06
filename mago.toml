@@ -35,6 +35,10 @@ no-ffi = { enabled = false }
 no-fully-qualified-global-class-like = { enabled = false }
 no-error-control-operator = { enabled = false }
 no-boolean-flag-parameter = { enabled = false }
+# False positive: 'password' is a libui widget-factory name, not a credential.
+no-literal-password = { enabled = false }
+# The generator script (tools/generate.php) uses a top-level `global $ANN`.
+no-global = { enabled = false }
 too-many-methods = { enabled = false }
 excessive-parameter-list = { enabled = false }
 cyclomatic-complexity = { enabled = false }
