@@ -20,6 +20,7 @@ final class TextLayout
 {
     private \FFI\CData $layout;
     private \FFI\CData $params;
+    private bool $freed = false;
 
     public function __construct(
         private readonly AttributedString $string,
@@ -44,8 +45,33 @@ final class TextLayout
         return $this->layout;
     }
 
+    /**
+     * Measure the laid-out text. Returns [width, height] in points — the actual
+     * extents after wrapping at the layout width. (Wraps uiDrawTextLayoutExtents,
+     * whose two `double *` out-params are otherwise awkward to call directly.)
+     *
+     * @return array{float, float}
+     */
+    public function extents(): array
+    {
+        $ffi = Ffi::get();
+        $out = $ffi->new('double[2]');
+        $ffi->uiDrawTextLayoutExtents($this->layout, \FFI::addr($out[0]), \FFI::addr($out[1]));
+        return [$out[0], $out[1]];
+    }
+
+    /** Free the native layout. Idempotent, and runs automatically on destruction. */
     public function free(): void
     {
+        if ($this->freed) {
+            return;
+        }
         Ffi::get()->uiDrawFreeTextLayout($this->layout);
+        $this->freed = true;
+    }
+
+    public function __destruct()
+    {
+        $this->free();
     }
 }

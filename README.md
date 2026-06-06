@@ -11,8 +11,8 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <p align="center">
-  <img src="docs/form.png" width="49%" alt="A native form window">
-  <img src="docs/canvas.png" width="49%" alt="Custom 2D drawing">
+  <img src="docs/flowfield.png" width="49%" alt="Generative flow field">
+  <img src="docs/markdown.png" width="49%" alt="Markdown editor with live preview">
 </p>
 
 ## Install
@@ -74,19 +74,20 @@ can discover the API as you type.
 
 <table>
   <tr>
-    <td width="33%"><img src="docs/gallery.png" alt="Widget gallery"><br><b>Widgets</b> — tabs, forms, sliders, spinboxes, combos, date &amp; colour pickers.</td>
-    <td width="33%"><img src="docs/canvas.png" alt="Custom drawing"><br><b>2D drawing</b> — paths, gradient brushes and strokes on a custom canvas.</td>
-    <td width="33%"><img src="docs/text.png" alt="Attributed text"><br><b>Attributed text</b> — coloured, bold, italic and underlined spans.</td>
+    <td width="33%"><img src="docs/flowfield.png" alt="Generative flow field"><br><b>Generative art</b> — thousands of streamlines through an animated vector field.</td>
+    <td width="33%"><img src="docs/palette.png" alt="Command palette"><br><b>Command palette</b> — a borderless Raycast-style launcher; fuzzy search + keyboard nav, all custom-drawn.</td>
+    <td width="33%"><img src="docs/monitor.png" alt="System monitor"><br><b>Live dashboard</b> — CPU charts, a gauge and sparklines from real load data.</td>
   </tr>
   <tr>
-    <td><img src="docs/table.png" alt="Data grid"><br><b>Data grids</b> — a <code>Table</code> backed by your own row model.</td>
-    <td><img src="docs/clock.png" alt="Animated clock"><br><b>Animation</b> — timer-driven redraws (an analogue clock).</td>
-    <td><img src="docs/menu.png" alt="Menus"><br><b>Menus &amp; dialogs</b> — native menubars, message boxes, file pickers.</td>
+    <td><img src="docs/markdown.png" alt="Markdown editor"><br><b>Markdown editor</b> — a live rich-rendered preview, drawn with the text engine (no web view).</td>
+    <td><img src="docs/ray.png" alt="Ray debug receiver"><br><b>Debug tool</b> — receives <code>ray($var)</code> dumps over a socket from any PHP process, live.</td>
+    <td><img src="docs/gallery.png" alt="Widget gallery"><br><b>Widgets</b> — tabs, forms, sliders, spinboxes, combos, date &amp; colour pickers.</td>
   </tr>
 </table>
 
-The runnable sources live in [`examples/`](examples/) — see
-[Development](#development) to run them.
+…plus 2D drawing, data grids, attributed text, timer animation, and native
+menus &amp; dialogs. All the runnable sources are in [`examples/`](examples/) —
+see [Development](#development) to run them.
 
 ## Features
 
@@ -159,6 +160,15 @@ prebuilt dylib is already committed, so this is only needed to refresh it.
 ### Run the examples
 
 ```sh
+# Showcase
+php examples/flowfield.php  # generative flow field (animated)
+php examples/palette.php    # borderless Raycast-style command palette
+php examples/monitor.php    # live system-monitor dashboard
+php examples/markdown.php   # markdown editor + live rendered preview
+php examples/ray.php        # debug-dump receiver — then, in another shell:
+php examples/ray-helper.php #   fire sample ray() dumps into it
+
+# Basics
 php examples/form.php       # the greeter form
 php examples/gallery.php    # the widget gallery (tabs of controls)
 php examples/canvas.php     # custom 2D drawing — click-drag to paint

@@ -6,6 +6,10 @@ namespace Libui\Draw;
 
 use Libui\Ffi;
 use Libui\Generated\Enum\DrawFillMode;
+use Libui\Generated\Enum\DrawTextAlign;
+use Libui\Text\Attribute;
+use Libui\Text\AttributedString;
+use Libui\Text\FontDescriptor;
 use Libui\Text\TextLayout;
 
 /**
@@ -88,5 +92,29 @@ final class DrawContext
     public function text(TextLayout $layout, float $x, float $y): void
     {
         Ffi::get()->uiDrawText($this->ctx, $layout->handle(), $x, $y);
+    }
+
+    /**
+     * Convenience for the common case: draw a single string in one colour and
+     * font at ($x, $y) — no manual AttributedString / TextLayout dance.
+     *
+     * Pass $width to wrap/align within a box (needed for Center/Right alignment);
+     * leave it null for an un-wrapped single line.
+     *
+     * @param array{float,float,float}|array{float,float,float,float} $color
+     */
+    public function drawString(
+        string $text,
+        FontDescriptor $font,
+        array $color,
+        float $x,
+        float $y,
+        ?float $width = null,
+        DrawTextAlign $align = DrawTextAlign::Left,
+    ): void {
+        $string = new AttributedString();
+        $string->append($text, Attribute::color($color[0], $color[1], $color[2], $color[3] ?? 1.0));
+        $layout = new TextLayout($string, $font, $width ?? 1.0e6, $align);
+        $this->text($layout, $x, $y);
     }
 }

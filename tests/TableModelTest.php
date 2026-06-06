@@ -24,9 +24,17 @@ final class TableModelTest extends TestCase
         // ("…/Application Support/Herd/bin/php85"), which the shell would split.
         $cmd = escapeshellarg(\PHP_BINARY) . ' ' . escapeshellarg(__DIR__ . '/table_lifecycle.php') . ' ' . escapeshellarg($mode);
 
+        // The 'leak' case dies from SIGTRAP (libui's uiUninit() leak-abort). A
+        // bare `2>/dev/null` only redirects php's stderr — the `sh -c` parent
+        // that exec() spawns reaps the signalled child and prints its own
+        // "Trace/BPT trap: 5" diagnostic to *its* stderr, which leaks past the
+        // redirect. Wrapping in a `{ …; }` group runs the command in that same
+        // shell with the redirect covering the reap, silencing the report while
+        // preserving the exit code. (A `( … )` subshell does NOT work: sh
+        // exec-optimises the lone command, so the outer shell still reports.)
         $output = [];
         $code = 0;
-        exec($cmd . ' 2>/dev/null', $output, $code);
+        exec('{ ' . $cmd . ' ; } 2>/dev/null', $output, $code);
 
         return $code;
     }

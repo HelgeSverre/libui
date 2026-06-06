@@ -1753,6 +1753,12 @@ parameters:
 			path: src/Text/TextLayout.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawTextLayoutExtents\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/TextLayout.php
+
+		-
 			message: '#^Property Libui\\Text\\TextLayout\:\:\$params is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
