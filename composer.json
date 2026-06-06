@@ -1,63 +1,65 @@
 {
-    "name": "helgesverre/libui",
-    "description": "Native desktop GUI for PHP 8.5 via libui-ng and FFI.",
-    "version": "0.1.0",
-    "type": "library",
-    "license": "MIT",
-    "keywords": [
-        "gui",
-        "libui",
-        "ffi",
-        "desktop",
-        "native",
-        "cross-platform"
-    ],
-    "authors": [
-        {
-            "name": "Helge Sverre",
-            "email": "helge.sverre@gmail.com"
-        }
-    ],
-    "require": {
-        "php": ">=8.5",
-        "ext-ffi": "*"
-    },
-    "require-dev": {
-        "phpstan/phpstan": "^2.0",
-        "phpunit/phpunit": "^13.2",
-        "carthage-software/mago": "^1.30"
-    },
-    "autoload": {
-        "psr-4": {
-            "Libui\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Libui\\Tests\\": "tests/"
-        }
-    },
-    "scripts": {
-        "build-lib": "bash build-libui.sh",
-        "regen": "php tools/generate.php",
-        "test": "phpunit",
-        "gate": "phpunit --group gate",
-        "smoke": "phpunit --group smoke",
-        "stan": "phpstan analyse",
-        "format": "mago fmt",
-        "format:check": "mago fmt --check",
-        "lint": "mago lint",
-        "style": [
-            "@format",
-            "@stan"
-        ]
-    },
-    "scripts-descriptions": {
-        "build-lib": "Build/refresh lib/libui.dylib from libui-ng source",
-        "regen": "Regenerate src/Native/libui.gen.h and src/Generated/* from ui.h",
-        "test": "Run the full PHPUnit test suite",
-        "gate": "Verify FFI::cdef accepts the full generated header (PHPUnit @group gate)",
-        "smoke": "Construct widgets via the OO layer, no event loop (PHPUnit @group smoke)",
-        "stan": "Run PHPStan static analysis (level 6)"
+  "name": "helgesverre/libui",
+  "description": "Native desktop GUI for PHP 8.5 via libui-ng and FFI.",
+  "version": "0.1.0",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "gui",
+    "libui",
+    "ffi",
+    "desktop",
+    "native",
+    "cross-platform"
+  ],
+  "authors": [
+    {
+      "name": "Helge Sverre",
+      "email": "helge.sverre@gmail.com",
+      "homepage": "https://helgesver.re",
+      "role": "Developer"
     }
+  ],
+  "require": {
+    "php": ">=8.5",
+    "ext-ffi": "*"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.0",
+    "phpunit/phpunit": "^13.2",
+    "carthage-software/mago": "^1.30"
+  },
+  "autoload": {
+    "psr-4": {
+      "Libui\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Libui\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "build-lib": "bash build-libui.sh",
+    "regen": "php tools/generate.php",
+    "test": "phpunit",
+    "gate": "phpunit --group gate",
+    "smoke": "phpunit --group smoke",
+    "stan": "phpstan analyse --memory-limit=512M",
+    "format": "mago fmt",
+    "format:check": "mago fmt --check",
+    "lint": "mago lint",
+    "style": [
+      "@format",
+      "@stan"
+    ]
+  },
+  "scripts-descriptions": {
+    "build-lib": "Build/refresh lib/libui.dylib from libui-ng source",
+    "regen": "Regenerate src/Native/libui.gen.h and src/Generated/* from ui.h",
+    "test": "Run the full PHPUnit test suite",
+    "gate": "Verify FFI::cdef accepts the full generated header (PHPUnit @group gate)",
+    "smoke": "Construct widgets via the OO layer, no event loop (PHPUnit @group smoke)",
+    "stan": "Run PHPStan static analysis (level 6)"
+  }
 }

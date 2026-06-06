@@ -1,0 +1,40 @@
+# EditorConfig — editor-agnostic baseline so every contributor's editor agrees
+# on indentation, line endings, and whitespace. https://editorconfig.org
+#
+# PHP formatting is owned by Mago (mago.toml) and PHPStan; the rules here mirror
+# its settings (4-space, no tabs, 180-col wrap) so editors and the formatter
+# never disagree. Run `composer format` for the authoritative pass.
+root = true
+
+# Defaults for every file: UTF-8, Unix line endings, a trailing newline, no
+# stray trailing whitespace, and 4-space indentation (PSR-12).
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# PHP — PSR-12: 4-space indent, LF, single final newline, no trailing space.
+# (Mago is the source of truth; line wrapping is its job, not the editor's.)
+[*.php]
+indent_size = 4
+
+# JSON — 2-space (composer.json and friends). composer.lock is generator-owned
+# and stays 4-space via the default above (its extension is .lock, not .json).
+[*.json]
+indent_size = 2
+
+# YAML — GitHub workflows and other YAML use the ecosystem-standard 2-space.
+[*.{yml,yaml}]
+indent_size = 2
+
+# Shell scripts — 2-space, matching build-libui.sh.
+[*.sh]
+indent_size = 2
+
+# Markdown — trailing whitespace is significant (two spaces = a hard line break),
+# so don't strip it here.
+[*.md]
+trim_trailing_whitespace = false
