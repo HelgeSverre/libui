@@ -40,6 +40,7 @@ no-literal-password = { enabled = false }
 # The generator script (tools/generate.php) uses a top-level `global $ANN`.
 no-global = { enabled = false }
 too-many-methods = { enabled = false }
+too-many-properties = { enabled = false }
 excessive-parameter-list = { enabled = false }
 cyclomatic-complexity = { enabled = false }
 halstead = { enabled = false }

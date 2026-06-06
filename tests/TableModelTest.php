@@ -8,12 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Regression coverage for the uiTableModel leak: libui's allocation tracker
- * aborts inside uiUninit() (SIGTRAP, exit 133) when a uiTableModel created via
+ * aborts inside uiUninit() (SIGTRAP) when a uiTableModel created via
  * uiNewTableModel() is never freed with uiFreeTableModel().
  *
  * uiUninit() aborts the whole process, so the lifecycle can't run in the shared
  * PHPUnit process — each case is driven through tests/table_lifecycle.php in its
- * own subprocess and asserted by exit code.
+ * own subprocess and asserted by exit code. The 'leak' runner traps the SIGTRAP
+ * and _exit()s with a non-zero code, so the abort stays a clean process exit
+ * instead of an OS-level crash (no ReportCrash .ips, no "quit unexpectedly").
  */
 final class TableModelTest extends TestCase
 {
@@ -24,17 +26,12 @@ final class TableModelTest extends TestCase
         // ("…/Application Support/Herd/bin/php85"), which the shell would split.
         $cmd = escapeshellarg(\PHP_BINARY) . ' ' . escapeshellarg(__DIR__ . '/table_lifecycle.php') . ' ' . escapeshellarg($mode);
 
-        // The 'leak' case dies from SIGTRAP (libui's uiUninit() leak-abort). A
-        // bare `2>/dev/null` only redirects php's stderr — the `sh -c` parent
-        // that exec() spawns reaps the signalled child and prints its own
-        // "Trace/BPT trap: 5" diagnostic to *its* stderr, which leaks past the
-        // redirect. Wrapping in a `{ …; }` group runs the command in that same
-        // shell with the redirect covering the reap, silencing the report while
-        // preserving the exit code. (A `( … )` subshell does NOT work: sh
-        // exec-optimises the lone command, so the outer shell still reports.)
+        // 2>/dev/null swallows libui's "[libui] You have a bug" leak line. The
+        // 'leak' runner converts libui's SIGTRAP into a clean exit itself (see
+        // table_lifecycle.php), so no signal-death noise reaches this shell.
         $output = [];
         $code = 0;
-        exec('{ ' . $cmd . ' ; } 2>/dev/null', $output, $code);
+        exec($cmd . ' 2>/dev/null', $output, $code);
 
         return $code;
     }

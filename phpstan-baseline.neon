@@ -427,6 +427,18 @@ parameters:
 			path: src/Draw/Path.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawPathArcTo\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawPathBezierTo\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
 			message: '#^Call to an undefined method FFI\:\:uiDrawPathCloseFigure\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -446,6 +458,12 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method FFI\:\:uiDrawPathNewFigure\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawPathNewFigureWithArc\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Draw/Path.php
@@ -1769,6 +1787,24 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: tests/WidgetConstructionTest.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:dlopen\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/table_lifecycle.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:dlsym\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/table_lifecycle.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:signal\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/table_lifecycle.php
 
 		-
 			message: '#^Function classify\(\) has parameter \$enums with no value type specified in iterable type array\.$#'

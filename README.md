@@ -80,7 +80,7 @@ can discover the API as you type.
   </tr>
   <tr>
     <td><img src="docs/markdown.png" alt="Markdown editor"><br><b>Markdown editor</b> — a live rich-rendered preview, drawn with the text engine (no web view).</td>
-    <td><img src="docs/ray.png" alt="Ray debug receiver"><br><b>Debug tool</b> — receives <code>ray($var)</code> dumps over a socket from any PHP process, live.</td>
+    <td><img src="docs/colorpicker.png" alt="Colour picker"><br><b>Colour picker</b> — an HSV wheel of arc wedges with a live swatch and hex/RGB readouts.</td>
     <td><img src="docs/gallery.png" alt="Widget gallery"><br><b>Widgets</b> — tabs, forms, sliders, spinboxes, combos, date &amp; colour pickers.</td>
   </tr>
 </table>
@@ -165,8 +165,7 @@ php examples/flowfield.php  # generative flow field (animated)
 php examples/palette.php    # borderless Raycast-style command palette
 php examples/monitor.php    # live system-monitor dashboard
 php examples/markdown.php   # markdown editor + live rendered preview
-php examples/ray.php        # debug-dump receiver — then, in another shell:
-php examples/ray-helper.php #   fire sample ray() dumps into it
+php examples/colorpicker.php # an HSV colour wheel + picker
 
 # Basics
 php examples/form.php       # the greeter form

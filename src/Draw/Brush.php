@@ -51,6 +51,16 @@ final class Brush
         return new self(DrawBrushType::LinearGradient->value, 0, 0, 0, 1, [$x0, $y0, $x1, $y1, 0.0], $stops);
     }
 
+    /**
+     * Radial gradient centred at ($cx, $cy) out to $radius. Stops are [pos,r,g,b,a].
+     *
+     * @param array<int, array{float,float,float,float,float}> $stops
+     */
+    public static function radialGradient(float $cx, float $cy, float $radius, array $stops): self
+    {
+        return new self(DrawBrushType::RadialGradient->value, 0, 0, 0, 1, [$cx, $cy, $cx, $cy, $radius], $stops);
+    }
+
     public function toCData(): \FFI\CData
     {
         $ffi = Ffi::get();

@@ -49,6 +49,12 @@ final class Attribute
         return new self(Ffi::get()->uiNewColorAttribute($r, $g, $b, $a));
     }
 
+    /** Colour from a 0xRRGGBB integer (mirrors Brush::rgb). */
+    public static function rgb(int $hex, float $a = 1.0): self
+    {
+        return self::color((($hex >> 16) & 0xFF) / 255, (($hex >> 8) & 0xFF) / 255, ($hex & 0xFF) / 255, $a);
+    }
+
     public static function background(float $r, float $g, float $b, float $a = 1.0): self
     {
         return new self(Ffi::get()->uiNewBackgroundAttribute($r, $g, $b, $a));

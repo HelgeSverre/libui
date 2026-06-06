@@ -53,6 +53,30 @@ final class Path
         return $this;
     }
 
+    /**
+     * Start a new figure on an arc (angles in radians, clockwise; $negative
+     * sweeps the other way). Combine with closeFigure() for a filled wedge.
+     */
+    public function newFigureWithArc(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): self
+    {
+        Ffi::get()->uiDrawPathNewFigureWithArc($this->path, $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
+        return $this;
+    }
+
+    /** Line from the current point to the arc's start, then the arc itself. */
+    public function arcTo(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): self
+    {
+        Ffi::get()->uiDrawPathArcTo($this->path, $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
+        return $this;
+    }
+
+    /** Cubic Bézier curve to (endX, endY) via the two control points. */
+    public function bezierTo(float $c1x, float $c1y, float $c2x, float $c2y, float $endX, float $endY): self
+    {
+        Ffi::get()->uiDrawPathBezierTo($this->path, $c1x, $c1y, $c2x, $c2y, $endX, $endY);
+        return $this;
+    }
+
     /** Finalise the path; required before it can be drawn. */
     public function end(): self
     {
