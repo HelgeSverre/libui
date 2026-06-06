@@ -28,6 +28,7 @@ use Libui\Draw\StrokeParams;
 use Libui\Ffi;
 use Libui\Generated\Enum\TextWeight;
 use Libui\Text\FontDescriptor;
+use Libui\Utils\Clipboard;
 use Libui\Window;
 
 const FONT = 'Helvetica Neue';
@@ -97,22 +98,6 @@ function rgbToOklch(float $r, float $g, float $b): array
     $C = sqrt(($a * $a) + ($bb * $bb));
     $H = fmod(rad2deg(atan2($bb, $a)) + 360.0, 360.0);
     return [$L, $C, $H];
-}
-
-/** Put $text on the system clipboard (no libui API; shell out per platform). */
-function copyToClipboard(string $text): bool
-{
-    $cmd = match (\PHP_OS_FAMILY) {
-        'Darwin' => 'pbcopy',
-        'Windows' => 'clip',
-        default => 'xclip -selection clipboard 2>/dev/null || xsel -ib 2>/dev/null',
-    };
-    $handle = @popen($cmd, 'w');
-    if ($handle === false) {
-        return false;
-    }
-    fwrite($handle, $text);
-    return pclose($handle) === 0;
 }
 
 $picker = new class extends AreaDelegate {
@@ -262,7 +247,7 @@ $picker = new class extends AreaDelegate {
         foreach ($formats as $i => [$label, $value]) {
             $y = $this->rowY0 + ($i * $this->rowH);
             if ($e->y >= $y && $e->y <= ($y + $this->rowH - 6)) {
-                copyToClipboard($value);
+                Clipboard::copy($value);
                 $this->copied = $label;
                 $this->area?->queueRedrawAll();
                 return;
