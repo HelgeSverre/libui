@@ -8,6 +8,4 @@ namespace Libui;
  * Group widget. Hand-editable — add convenience methods here.
  * Inherits the generated API from Generated\\Group.
  */
-class Group extends Generated\Group
-{
-}
+class Group extends Generated\Group {}

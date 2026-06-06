@@ -7,7 +7,6 @@ declare(strict_types=1);
  * infer from the header's naming convention. Everything else is mechanical.
  */
 return [
-
     // Widget types the generator must NOT emit (handled elsewhere):
     //   uiControl — the hand-written base class (Libui\Control)
     //   uiArea    — the hand-written drawing adapter (Libui\Area)
@@ -19,24 +18,24 @@ return [
     //   type => ['primary' => uiNew*|null, 'factories' => [phpMethod => uiNew*]]
     'constructors' => [
         'uiBox' => [
-            'primary'   => 'uiNewVerticalBox',
+            'primary' => 'uiNewVerticalBox',
             'factories' => ['horizontal' => 'uiNewHorizontalBox'],
         ],
         'uiSeparator' => [
-            'primary'   => 'uiNewHorizontalSeparator',
+            'primary' => 'uiNewHorizontalSeparator',
             'factories' => ['vertical' => 'uiNewVerticalSeparator'],
         ],
         'uiEntry' => [
-            'primary'   => 'uiNewEntry',
+            'primary' => 'uiNewEntry',
             'factories' => ['password' => 'uiNewPasswordEntry', 'search' => 'uiNewSearchEntry'],
         ],
         'uiMultilineEntry' => [
-            'primary'   => 'uiNewMultilineEntry',
+            'primary' => 'uiNewMultilineEntry',
             'factories' => ['nonWrapping' => 'uiNewNonWrappingMultilineEntry'],
         ],
         'uiDateTimePicker' => [
             // 'timeOnly' avoids clashing with the instance time() getter.
-            'primary'   => 'uiNewDateTimePicker',
+            'primary' => 'uiNewDateTimePicker',
             'factories' => ['dateOnly' => 'uiNewDatePicker', 'timeOnly' => 'uiNewTimePicker'],
         ],
     ],
@@ -44,19 +43,32 @@ return [
     // Functions whose `int` is semantically a bool (setter's last arg / getter's
     // return). Cosmetic — anything not listed stays `int` and still works.
     'bool_funcs' => [
-        'uiWindowMargined', 'uiWindowSetMargined',
-        'uiWindowFullscreen', 'uiWindowSetFullscreen',
-        'uiWindowBorderless', 'uiWindowSetBorderless',
-        'uiWindowResizeable', 'uiWindowSetResizeable',
-        'uiBoxPadded', 'uiBoxSetPadded',
-        'uiCheckboxChecked', 'uiCheckboxSetChecked',
-        'uiGroupMargined', 'uiGroupSetMargined',
-        'uiFormPadded', 'uiFormSetPadded',
-        'uiGridPadded', 'uiGridSetPadded',
-        'uiEntryReadOnly', 'uiEntrySetReadOnly',
-        'uiMultilineEntryReadOnly', 'uiMultilineEntrySetReadOnly',
-        'uiSliderHasToolTip', 'uiSliderSetHasToolTip',
-        'uiMenuItemChecked', 'uiMenuItemSetChecked',
+        'uiWindowMargined',
+        'uiWindowSetMargined',
+        'uiWindowFullscreen',
+        'uiWindowSetFullscreen',
+        'uiWindowBorderless',
+        'uiWindowSetBorderless',
+        'uiWindowResizeable',
+        'uiWindowSetResizeable',
+        'uiBoxPadded',
+        'uiBoxSetPadded',
+        'uiCheckboxChecked',
+        'uiCheckboxSetChecked',
+        'uiGroupMargined',
+        'uiGroupSetMargined',
+        'uiFormPadded',
+        'uiFormSetPadded',
+        'uiGridPadded',
+        'uiGridSetPadded',
+        'uiEntryReadOnly',
+        'uiEntrySetReadOnly',
+        'uiMultilineEntryReadOnly',
+        'uiMultilineEntrySetReadOnly',
+        'uiSliderHasToolTip',
+        'uiSliderSetHasToolTip',
+        'uiMenuItemChecked',
+        'uiMenuItemSetChecked',
     ],
 
     // Enums that are bit-flags: emitted as a const class (PHP backed enums
@@ -66,8 +78,11 @@ return [
     // Free (non-widget) functions to expose on the static Libui\Generated\Ui
     // facade. Everything else unmatched stays raw-callable via Ffi::get().
     'facade_funcs' => [
-        'uiMsgBox', 'uiMsgBoxError',
-        'uiOpenFile', 'uiOpenFolder', 'uiSaveFile',
+        'uiMsgBox',
+        'uiMsgBoxError',
+        'uiOpenFile',
+        'uiOpenFolder',
+        'uiSaveFile',
     ],
 
     // Callback functions with a non-standard trampoline shape (not the usual
@@ -75,7 +90,7 @@ return [
     //   'int'        => callback returns int (PHP bool/int coerced; default 1)
     //   'menuitem'   => callback is (uiMenuItem*, uiWindow*, void*)
     'deviating_callbacks' => [
-        'uiWindowOnClosing'   => 'int',
+        'uiWindowOnClosing' => 'int',
         'uiMenuItemOnClicked' => 'menuitem',
     ],
 ];

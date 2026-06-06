@@ -36,13 +36,10 @@ $delegate = new class extends AreaDelegate {
         $h = $p->areaHeight;
 
         // dark background
-        $bg = new Path()->addRectangle(0, 0, $w, $h)->end();
-        $ctx->fill($bg, Brush::rgb(0x0F172A));
-        $bg->free();
+        $ctx->fillPath(Brush::rgb(0x0F172A), fn (Path $p) => $p->addRectangle(0, 0, $w, $h));
 
         // a gradient-filled mountain silhouette
-        $poly = new Path();
-        $poly
+        $mountain = fn (Path $p) => $p
             ->newFigure(0, $h * 0.80)
             ->lineTo($w * 0.20, $h * 0.45)
             ->lineTo($w * 0.40, $h * 0.62)
@@ -51,20 +48,16 @@ $delegate = new class extends AreaDelegate {
             ->lineTo($w, $h * 0.38)
             ->lineTo($w, $h)
             ->lineTo(0, $h)
-            ->closeFigure()
-            ->end();
-        $ctx->fill($poly, Brush::linearGradient(0, 0, 0, $h, [
+            ->closeFigure();
+        $ctx->fillPath(Brush::linearGradient(0, 0, 0, $h, [
             [0.0, 0.31, 0.27, 0.90, 1.0], // indigo
             [1.0, 0.02, 0.71, 0.83, 1.0], // cyan
-        ]));
-        $ctx->stroke($poly, Brush::rgb(0xFFFFFF), StrokeParams::solid(2.0));
-        $poly->free();
+        ]), $mountain);
+        $ctx->strokePath(Brush::rgb(0xFFFFFF), StrokeParams::solid(2.0), $mountain);
 
         // mouse-trail dots
         foreach ($this->dots as [$x, $y]) {
-            $dot = new Path()->addRectangle($x - 3, $y - 3, 6, 6)->end();
-            $ctx->fill($dot, Brush::rgb(0xFACC15));
-            $dot->free();
+            $ctx->fillPath(Brush::rgb(0xFACC15), fn (Path $p) => $p->addRectangle($x - 3, $y - 3, 6, 6));
         }
     }
 
@@ -80,18 +73,10 @@ $delegate = new class extends AreaDelegate {
 $area = new Area($delegate);
 $delegate->area = $area;
 
-$window = new Window('PHP libui — custom canvas', 520, 360, false);
+$window = new Window('PHP libui — custom canvas', 520, 360);
 $box = new Box();
-$box->append($area, 1); // stretchy: fill the window
+$box->appendStretchy($area); // fill the window
 $window->setChild($box);
 
-$window->onClosing(function () {
-    Ffi::quit();
-    return true;
-});
-
-fwrite(STDOUT, "Opening canvas… (click-drag to paint, close to exit)\n");
 $area->queueRedrawAll();
-$window->show();
-Ffi::main();
-Ffi::uninit();
+$window->run();

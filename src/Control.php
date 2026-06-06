@@ -47,7 +47,7 @@ abstract class Control
     /** Build an instance around an existing handle, bypassing the constructor. */
     protected static function wrap(\FFI\CData $handle): static
     {
-        $obj = (new \ReflectionClass(static::class))->newInstanceWithoutConstructor();
+        $obj = new \ReflectionClass(static::class)->newInstanceWithoutConstructor();
         $obj->handle = $handle;
         return $obj;
     }

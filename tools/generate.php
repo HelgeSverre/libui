@@ -17,9 +17,12 @@ declare(strict_types=1);
  * the bulk is mechanical; tools/annotations.php carries the small irregular set.
  */
 
-const ROOT  = __DIR__ . '/..';
-const UI_H  = ROOT . '/third_party/libui-ng/ui.h';
+const ROOT = __DIR__ . '/..';
+
+const UI_H = ROOT . '/third_party/libui-ng/ui.h';
+
 const GEN_H = ROOT . '/src/Native/libui.gen.h';
+
 const GEN_DIR = ROOT . '/src/Generated';
 
 $ANN = require __DIR__ . '/annotations.php';
@@ -42,21 +45,23 @@ function cleanHeader(string $src): string
     $src = preg_replace(
         '/^[ \t]*struct[ \t]+tm[ \t]*;[ \t]*$/m',
         'struct tm { int tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, tm_wday, tm_yday, tm_isdst; };',
-        $src
+        $src,
     );
     // Drop preprocessor lines, the C++ `extern "C"` guard and its lone `}`.
     $out = [];
     foreach (explode("\n", $src) as $line) {
         $t = trim($line);
-        if ($t !== '' && $t[0] === '#') continue;
-        if (preg_match('/^extern\s+"C"\s*\{?$/', $t)) continue;
-        if ($t === '}') continue;
+        if ($t !== '' && $t[0] === '#')
+            continue;
+        if (preg_match('/^extern\s+"C"\s*\{?$/', $t))
+            continue;
+        if ($t === '}')
+            continue;
         $out[] = $line;
     }
     $src = preg_replace("/\n{3,}/", "\n\n", trim(implode("\n", $out)));
 
-    return "// GENERATED from libui-ng ui.h by tools/generate.php — DO NOT EDIT.\n"
-        . "// Re-run `composer regen` to regenerate.\n\n" . $src . "\n";
+    return "// GENERATED from libui-ng ui.h by tools/generate.php — DO NOT EDIT.\n" . "// Re-run `composer regen` to regenerate.\n\n" . $src . "\n";
 }
 
 // =============================================================================
@@ -94,10 +99,12 @@ function harvestDocs(string $uiHRaw): array
         } else {
             continue;
         }
-        if (isset($docs[$name])) continue; // first (declaring) occurrence wins
+        if (isset($docs[$name]))
+            continue; // first (declaring) occurrence wins
 
         $summary = extractSummary($lines, $i);
-        if ($summary !== '') $docs[$name] = $summary;
+        if ($summary !== '')
+            $docs[$name] = $summary;
     }
 
     return $docs;
@@ -111,21 +118,30 @@ function harvestDocs(string $uiHRaw): array
 function extractSummary(array $lines, int $declIndex): string
 {
     $j = $declIndex - 1;
-    if ($j < 0) return '';
+    if ($j < 0)
+        return '';
     $prev = trim($lines[$j]);
-    if ($prev === '') return ''; // a blank line breaks "immediately preceding"
+    if ($prev === '')
+        return ''; // a blank line breaks "immediately preceding"
 
     // --- doxygen block: the line above ends with `*\/` ----------------------
     if (str_ends_with($prev, '*/')) {
         // Walk up to the matching `/**` (or `/*`) that opens this block.
         $start = null;
         for ($k = $j; $k >= 0; $k--) {
-            if (str_contains($lines[$k], '/*')) { $start = $k; break; }
+            if (str_contains($lines[$k], '/*')) {
+                $start = $k;
+                break;
+            }
             // Bail out if we wander past a non-comment line (defensive).
             $t = trim($lines[$k]);
-            if ($t !== '' && $t[0] !== '*' && !str_ends_with($t, '*/')) { $start = null; break; }
+            if ($t !== '' && $t[0] !== '*' && ! str_ends_with($t, '*/')) {
+                $start = null;
+                break;
+            }
         }
-        if ($start === null) return '';
+        if ($start === null)
+            return '';
         return summaryFromBlock(array_slice($lines, $start, $j - $start + 1));
     }
 
@@ -134,7 +150,8 @@ function extractSummary(array $lines, int $declIndex): string
         $block = [];
         for ($k = $j; $k >= 0; $k--) {
             $t = trim($lines[$k]);
-            if (!str_starts_with($t, '//')) break;
+            if (! str_starts_with($t, '//'))
+                break;
             $block[] = $t;
         }
         return summaryFromLineComments(array_reverse($block));
@@ -149,12 +166,14 @@ function summaryFromBlock(array $blockLines): string
     foreach ($blockLines as $raw) {
         $t = trim($raw);
         // Strip the comment scaffolding from this physical line.
-        $t = preg_replace('#^/\*\*?#', '', $t);   // opening /** or /*
-        $t = preg_replace('#\*/\s*$#', '', $t);   // closing */
-        $t = preg_replace('/^\*\s?/', '', $t);    // leading " * "
+        $t = preg_replace('#^/\*\*?#', '', $t); // opening /** or /*
+        $t = preg_replace('#\*/\s*$#', '', $t); // closing */
+        $t = preg_replace('/^\*\s?/', '', $t); // leading " * "
         $t = trim($t);
-        if ($t === '') continue;
-        if ($t[0] === '@') break;                  // reached the @param/@returns tags
+        if ($t === '')
+            continue;
+        if ($t[0] === '@')
+            break; // reached the @param/@returns tags
         return sanitizeSummary($t);
     }
     return '';
@@ -165,17 +184,19 @@ function summaryFromLineComments(array $commentLines): string
 {
     $parts = [];
     foreach ($commentLines as $raw) {
-        $t = ltrim($raw, '/');          // drop the leading slashes
+        $t = ltrim($raw, '/'); // drop the leading slashes
         $t = trim($t);
         // Skip pure TODO/FIXME maintenance notes — they aren't real summaries.
         if ($t === '' || preg_match('/^(TODO|FIXME|XXX|HACK)\b/', $t)) {
             // Once we've started collecting prose, a TODO ends the summary.
-            if ($parts !== []) break;
+            if ($parts !== [])
+                break;
             continue;
         }
         $parts[] = $t;
     }
-    if ($parts === []) return '';
+    if ($parts === [])
+        return '';
 
     $joined = implode(' ', $parts);
     // First sentence: up to the first period that ends it (followed by space/end).
@@ -189,9 +210,10 @@ function summaryFromLineComments(array $commentLines): string
 function sanitizeSummary(string $s): string
 {
     $s = preg_replace('/\s+/', ' ', $s);
-    $s = str_replace('*/', '', $s);   // never let a summary close the docblock early
+    $s = str_replace('*/', '', $s); // never let a summary close the docblock early
     $s = trim($s);
-    if ($s === '') return '';
+    if ($s === '')
+        return '';
     if (mb_strlen($s) > 120) {
         $s = rtrim(mb_substr($s, 0, 117)) . '...';
     }
@@ -209,11 +231,7 @@ function docBlock(string $uiName, array $docs, string $indent): string
     if ($summary === '') {
         return "{$indent}/** @see {$uiName} */\n";
     }
-    return "{$indent}/**\n"
-         . "{$indent} * {$summary}\n"
-         . "{$indent} *\n"
-         . "{$indent} * @see {$uiName}\n"
-         . "{$indent} */\n";
+    return "{$indent}/**\n" . "{$indent} * {$summary}\n" . "{$indent} *\n" . "{$indent} * @see {$uiName}\n" . "{$indent} */\n";
 }
 
 // =============================================================================
@@ -225,21 +243,24 @@ function typeList(string $uiH): array
 {
     preg_match_all('/#define\s+(ui[A-Za-z0-9]+)\(this\)/', $uiH, $m);
     $types = array_values(array_unique($m[1]));
-    usort($types, fn($a, $b) => strlen($b) <=> strlen($a)); // longest first
+    usort($types, fn ($a, $b) => strlen($b) <=> strlen($a)); // longest first
     return $types;
 }
 
 /** Parse function prototypes out of the cleaned header. */
 function parseFunctions(string $cleaned): array
 {
-    $flat  = preg_replace('/\{[^{}]*\}/s', '{}', $cleaned); // collapse struct/enum bodies
+    $flat = preg_replace('/\{[^{}]*\}/s', '{}', $cleaned); // collapse struct/enum bodies
     $funcs = [];
     foreach (explode(';', $flat) as $stmt) {
         $stmt = trim(preg_replace('/\s+/', ' ', $stmt));
-        if ($stmt === '' || preg_match('/^(typedef|struct|enum|union)\b/', $stmt)) continue;
-        if (!preg_match('/^(?<ret>.*)\b(?<name>ui[A-Za-z0-9_]+)\s*\((?<params>.*)\)$/', $stmt, $m)) continue;
+        if ($stmt === '' || preg_match('/^(typedef|struct|enum|union)\b/', $stmt))
+            continue;
+        if (! preg_match('/^(?<ret>.*)\b(?<name>ui[A-Za-z0-9_]+)\s*\((?<params>.*)\)$/', $stmt, $m))
+            continue;
         $ret = trim($m['ret']);
-        if ($ret === '') continue;
+        if ($ret === '')
+            continue;
         $funcs[$m['name']] = ['name' => $m['name'], 'ret' => $ret, 'params' => parseParams($m['params'])];
     }
     return $funcs;
@@ -249,21 +270,29 @@ function parseFunctions(string $cleaned): array
 function parseParams(string $s): array
 {
     $s = trim($s);
-    if ($s === '' || $s === 'void') return [];
+    if ($s === '' || $s === 'void')
+        return [];
     $parts = [];
     $depth = 0;
     $buf = '';
     foreach (str_split($s) as $ch) {
-        if ($ch === '(') $depth++;
-        elseif ($ch === ')') $depth--;
-        if ($ch === ',' && $depth === 0) { $parts[] = trim($buf); $buf = ''; continue; }
+        if ($ch === '(')
+            $depth++;
+        elseif ($ch === ')')
+            $depth--;
+        if ($ch === ',' && $depth === 0) {
+            $parts[] = trim($buf);
+            $buf = '';
+            continue;
+        }
         $buf .= $ch;
     }
-    if (trim($buf) !== '') $parts[] = trim($buf);
+    if (trim($buf) !== '')
+        $parts[] = trim($buf);
 
     $params = [];
     foreach ($parts as $p) {
-        if (str_contains($p, '(*')) {              // function-pointer (callback)
+        if (str_contains($p, '(*')) { // function-pointer (callback)
             $params[] = ['raw' => $p, 'isCallback' => true, 'type' => $p, 'name' => 'cb'];
         } elseif (preg_match('/^(?<type>.*?)(?<name>[A-Za-z_]\w*)$/', $p, $m) && trim($m['type']) !== '') {
             $params[] = ['raw' => $p, 'isCallback' => false, 'type' => trim($m['type']), 'name' => $m['name']];
@@ -285,9 +314,10 @@ function parseEnums(string $cleaned): array
         $counter = 0;
         foreach (explode(',', $set[2]) as $entry) {
             $entry = trim($entry);
-            if ($entry === '') continue;
+            if ($entry === '')
+                continue;
             if (preg_match('/^(\w+)\s*=\s*(.+)$/', $entry, $mm)) {
-                $value   = evalEnumExpr(trim($mm[2]), $members);
+                $value = evalEnumExpr(trim($mm[2]), $members);
                 $members[$mm[1]] = $value;
                 $counter = $value + 1;
             } else {
@@ -302,12 +332,15 @@ function parseEnums(string $cleaned): array
 function evalEnumExpr(string $e, array $prior): int
 {
     $e = trim($e);
-    if (preg_match('/^0x[0-9a-fA-F]+$/', $e)) return (int) hexdec($e);
-    if (preg_match('/^-?\d+$/', $e)) return (int) $e;
+    if (preg_match('/^0x[0-9a-fA-F]+$/', $e))
+        return (int) hexdec($e);
+    if (preg_match('/^-?\d+$/', $e))
+        return (int) $e;
     if (preg_match('/^(\w+)\s*<<\s*(\w+)$/', $e, $m)) {
-        return ((int) $m[1]) << ((int) $m[2]);
+        return (int) $m[1] << (int) $m[2];
     }
-    if (isset($prior[$e])) return $prior[$e];
+    if (isset($prior[$e]))
+        return $prior[$e];
     return 0;
 }
 
@@ -315,7 +348,10 @@ function evalEnumExpr(string $e, array $prior): int
 // 3. Type classification & marshalling
 // =============================================================================
 
-function shortName(string $ui): string { return substr($ui, 2); }   // uiButton -> Button
+function shortName(string $ui): string
+{
+    return substr($ui, 2);
+} // uiButton -> Button
 
 function classify(string $type, array $enums, array $types): array
 {
@@ -326,14 +362,20 @@ function classify(string $type, array $enums, array $types): array
     $base = trim(preg_replace(['/\*/', '/\bstruct\b/', '/\s+/'], ['', '', ' '], $t));
 
     if ($stars === 0) {
-        if ($base === 'void')   return ['kind' => 'void'];
-        if ($base === 'double') return ['kind' => 'double'];
-        if (isset($enums[$base])) return ['kind' => 'enum', 'name' => $base];
+        if ($base === 'void')
+            return ['kind' => 'void'];
+        if ($base === 'double')
+            return ['kind' => 'double'];
+        if (isset($enums[$base]))
+            return ['kind' => 'enum', 'name' => $base];
         return ['kind' => 'int']; // int, unsigned int, size_t, uintptr_t, ...
     }
-    if ($base === 'char')      return ['kind' => $isConst ? 'string_borrow' : 'string_owned'];
-    if ($base === 'uiControl') return ['kind' => 'control'];
-    if (in_array($base, $types, true)) return ['kind' => 'widget', 'name' => $base];
+    if ($base === 'char')
+        return ['kind' => $isConst ? 'string_borrow' : 'string_owned'];
+    if ($base === 'uiControl')
+        return ['kind' => 'control'];
+    if (in_array($base, $types, true))
+        return ['kind' => 'widget', 'name' => $base];
     return ['kind' => 'cdata'];
 }
 
@@ -353,10 +395,10 @@ function marshalArg(array $c, string $var): string
 {
     // NB: braces required — "$var->handle()" would interpolate $var->handle.
     return match ($c['kind']) {
-        'enum'    => "{$var}->value",
+        'enum' => "{$var}->value",
         'control' => "\\Libui\\Ffi::control({$var}->handle())",
-        'widget'  => "{$var}->handle()",
-        default   => $var,
+        'widget' => "{$var}->handle()",
+        default => $var,
     };
 }
 
@@ -384,16 +426,18 @@ function phpReturnType(array $c, array $generatedTypes): string
 
 function returnStmt(array $c, string $call, array $generatedTypes, bool $asBool): string
 {
-    if ($c['kind'] === 'void') return "        $call;";
-    if ($asBool && $c['kind'] === 'int') return "        return $call !== 0;";
+    if ($c['kind'] === 'void')
+        return "        $call;";
+    if ($asBool && $c['kind'] === 'int')
+        return "        return $call !== 0;";
     return match ($c['kind']) {
-        'string_owned'  => "        return \\Libui\\Ffi::ownedString($call);",
+        'string_owned' => "        return \\Libui\\Ffi::ownedString($call);",
         'string_borrow' => "        return \\Libui\\Ffi::borrowedString($call);",
-        'enum'   => "        return \\Libui\\Generated\\Enum\\" . enumClass($c['name']) . "::from($call);",
+        'enum' => "        return \\Libui\\Generated\\Enum\\" . enumClass($c['name']) . "::from($call);",
         'widget' => in_array($c['name'], $generatedTypes, true)
             ? "        return \\Libui\\Generated\\" . shortName($c['name']) . "::wrap($call);"
             : "        return $call;",
-        default  => "        return $call;",
+        default => "        return $call;",
     };
 }
 
@@ -403,9 +447,11 @@ function returnStmt(array $c, string $call, array $generatedTypes, bool $asBool)
 
 function rrmdir(string $dir): void
 {
-    if (!is_dir($dir)) return;
+    if (! is_dir($dir))
+        return;
     foreach (scandir($dir) as $f) {
-        if ($f === '.' || $f === '..') continue;
+        if ($f === '.' || $f === '..')
+            continue;
         $p = "$dir/$f";
         is_dir($p) ? rrmdir($p) : unlink($p);
     }
@@ -424,32 +470,36 @@ function emitMethod(array $fn, string $type, array $ctx): ?string
     ['enums' => $enums, 'types' => $types, 'gen' => $gen, 'ann' => $ANN, 'docs' => $docs] = $ctx;
 
     $name = $fn['name'];
-    $rest = substr($name, strlen($type));            // e.g. SetText, OnClicked, Text
-    if ($rest === '') return null;
+    $rest = substr($name, strlen($type)); // e.g. SetText, OnClicked, Text
+    if ($rest === '')
+        return null;
     $method = lcfirst($rest);
     $params = $fn['params'];
-    $self   = array_shift($params);                  // drop the uiType* self
+    $self = array_shift($params); // drop the uiType* self
     $isBool = in_array($name, $ANN['bool_funcs'], true);
 
     // --- event handlers ------------------------------------------------------
-    $hasCallback = (bool) array_filter($params, fn($p) => $p['isCallback']);
+    $hasCallback = (bool) array_filter($params, fn ($p) => $p['isCallback']);
     if (str_starts_with($rest, 'On') && $hasCallback) {
         $dev = $ANN['deviating_callbacks'][$name] ?? null;
         if ($dev === 'int') {
-            $body = "        \$fn = static::keep(function (\$sender, \$data) use (\$cb) {\n"
-                  . "            \$r = \$cb(\$this);\n"
-                  . "            return \$r === false ? 0 : (\\is_int(\$r) ? \$r : 1);\n"
-                  . "        });";
+            $body =
+                "        \$fn = static::keep(function (\$sender, \$data) use (\$cb) {\n"
+                . "            \$r = \$cb(\$this);\n"
+                . "            return \$r === false ? 0 : (\\is_int(\$r) ? \$r : 1);\n"
+                . '        });';
         } elseif ($dev === 'menuitem') {
             $body = "        \$fn = static::keep(function (\$sender, \$window, \$data) use (\$cb) { \$cb(\$this, \$window); });";
         } else {
             $body = "        \$fn = static::keep(function (\$sender, \$data) use (\$cb) { \$cb(\$this); });";
         }
-        return docBlock($name, $docs, '    ')
-             . "    public function {$method}(callable \$cb): static\n    {\n"
-             . "$body\n"
-             . "        \\Libui\\Ffi::get()->{$name}(\$this->handle, \$fn, null);\n"
-             . "        return \$this;\n    }\n";
+        return (
+            docBlock($name, $docs, '    ')
+            . "    public function {$method}(callable \$cb): static\n    {\n"
+            . "$body\n"
+            . "        \\Libui\\Ffi::get()->{$name}(\$this->handle, \$fn, null);\n"
+            . "        return \$this;\n    }\n"
+        );
     }
 
     // --- ordinary methods ----------------------------------------------------
@@ -457,27 +507,32 @@ function emitMethod(array $fn, string $type, array $ctx): ?string
     $args = ['$this->handle'];
     foreach ($params as $i => $p) {
         $c = classify($p['type'], $enums, $types);
-        $pt = ($isBool && $c['kind'] === 'int' && str_starts_with($rest, 'Set') && $i === count($params) - 1)
-            ? 'bool' : phpParamType($c);
+        $pt =
+            $isBool && $c['kind'] === 'int' && str_starts_with($rest, 'Set') && $i === (count($params) - 1)
+                ? 'bool'
+                : phpParamType($c);
         $var = '$' . ($p['name'] ?: "a$i");
         $sig[] = "$pt $var";
-        $args[] = ($pt === 'bool') ? "(int) $var" : marshalArg($c, $var);
+        $args[] = $pt === 'bool' ? "(int) $var" : marshalArg($c, $var);
     }
-    $call = "\\Libui\\Ffi::get()->{$name}(" . implode(', ', $args) . ")";
-    $ret  = classify($fn['ret'], $enums, $types);
+    $call = "\\Libui\\Ffi::get()->{$name}(" . implode(', ', $args) . ')';
+    $ret = classify($fn['ret'], $enums, $types);
 
     $isSetter = str_starts_with($rest, 'Set');
     if ($isSetter || $ret['kind'] === 'void') {
         // fluent
-        return docBlock($name, $docs, '    ')
-             . "    public function {$method}(" . implode(', ', $sig) . "): static\n    {\n"
-             . "        $call;\n        return \$this;\n    }\n";
+        return docBlock($name, $docs, '    ') . "    public function {$method}(" . implode(', ', $sig) . "): static\n    {\n" . "        $call;\n        return \$this;\n    }\n";
     }
 
-    $rt = ($isBool && $ret['kind'] === 'int') ? 'bool' : phpReturnType($ret, $gen);
-    return docBlock($name, $docs, '    ')
-         . "    public function {$method}(" . implode(', ', $sig) . "): $rt\n    {\n"
-         . returnStmt($ret, $call, $gen, $isBool && $ret['kind'] === 'int') . "\n    }\n";
+    $rt = $isBool && $ret['kind'] === 'int' ? 'bool' : phpReturnType($ret, $gen);
+    return (
+        docBlock($name, $docs, '    ')
+        . "    public function {$method}("
+        . implode(', ', $sig)
+        . "): $rt\n    {\n"
+        . returnStmt($ret, $call, $gen, $isBool && $ret['kind'] === 'int')
+        . "\n    }\n"
+    );
 }
 
 /** Emit one widget class. */
@@ -491,51 +546,70 @@ function emitWidget(string $type, array $members, array $ctor, array $ctx): stri
     $primaryFn = $ctor['primary'] ?? null;
     if ($primaryFn && isset($funcs[$primaryFn])) {
         $params = $funcs[$primaryFn]['params'];
-        $sig = []; $args = [];
+        $sig = [];
+        $args = [];
         foreach ($params as $i => $p) {
             $c = classify($p['type'], $enums, $types);
             $isHas = str_starts_with($p['name'], 'has') && $c['kind'] === 'int';
-            $pt  = $isHas ? 'bool' : phpParamType($c);
+            $pt = $isHas ? 'bool' : phpParamType($c);
             $var = '$' . ($p['name'] ?: "a$i");
             $sig[] = "$pt $var";
             $args[] = $isHas ? "(int) $var" : marshalArg($c, $var);
         }
-        $methods[] = docBlock($primaryFn, $docs, '    ')
-                   . "    public function __construct(" . implode(', ', $sig) . ")\n    {\n"
-                   . "        \$this->handle = \\Libui\\Ffi::get()->{$primaryFn}(" . implode(', ', $args) . ");\n    }\n";
+        $methods[] =
+            docBlock($primaryFn, $docs, '    ')
+            . '    public function __construct('
+            . implode(', ', $sig)
+            . ")\n    {\n"
+            . "        \$this->handle = \\Libui\\Ffi::get()->{$primaryFn}("
+            . implode(', ', $args)
+            . ");\n    }\n";
     }
-    foreach (($ctor['factories'] ?? []) as $fm => $fnName) {
-        if (!isset($funcs[$fnName])) continue;
+    foreach ($ctor['factories'] ?? [] as $fm => $fnName) {
+        if (! isset($funcs[$fnName]))
+            continue;
         $params = $funcs[$fnName]['params'];
-        $sig = []; $args = [];
+        $sig = [];
+        $args = [];
         foreach ($params as $i => $p) {
             $c = classify($p['type'], $enums, $types);
             $var = '$' . ($p['name'] ?: "a$i");
             $sig[] = phpParamType($c) . " $var";
             $args[] = marshalArg($c, $var);
         }
-        $methods[] = docBlock($fnName, $docs, '    ')
-                   . "    public static function {$fm}(" . implode(', ', $sig) . "): static\n    {\n"
-                   . "        return static::wrap(\\Libui\\Ffi::get()->{$fnName}(" . implode(', ', $args) . "));\n    }\n";
+        $methods[] =
+            docBlock($fnName, $docs, '    ')
+            . "    public static function {$fm}("
+            . implode(', ', $sig)
+            . "): static\n    {\n"
+            . "        return static::wrap(\\Libui\\Ffi::get()->{$fnName}("
+            . implode(', ', $args)
+            . "));\n    }\n";
     }
 
     // member methods (skip names already taken by the constructor or factories)
     $seen = ['__construct' => true] + array_fill_keys(array_keys($ctor['factories'] ?? []), true);
     foreach ($members as $fn) {
         $m = emitMethod($fn, $type, $ctx);
-        if ($m === null) continue;
+        if ($m === null)
+            continue;
         if (preg_match('/function (\w+)\(/', $m, $mm)) {
-            if (isset($seen[$mm[1]])) continue;        // skip duplicate method names
+            if (isset($seen[$mm[1]]))
+                continue; // skip duplicate method names
             $seen[$mm[1]] = true;
         }
         $methods[] = $m;
     }
 
-    return "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated;\n\n"
+    return (
+        "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated;\n\n"
         . "use Libui\\Control;\n\n"
         . "/**\n * GENERATED wrapper for libui `{$type}`. DO NOT EDIT — run `composer regen`.\n"
         . " * Add convenience methods in a hand-written Libui\\\\{$class} subclass instead.\n */\n"
-        . "class {$class} extends Control\n{\n" . implode("\n", $methods) . "}\n";
+        . "class {$class} extends Control\n{\n"
+        . implode("\n", $methods)
+        . "}\n"
+    );
 }
 
 /** Emit a PHP backed enum. */
@@ -553,9 +627,7 @@ function emitEnum(string $name, array $members, array $docs = []): string
         $usedNames[strtolower($case)] = true;
         $cases[] = "    case {$case} = {$value};";
     }
-    return "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated\\Enum;\n\n"
-        . enumDocBlock($name, $docs)
-        . "enum {$class}: int\n{\n" . implode("\n", $cases) . "\n}\n";
+    return "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated\\Enum;\n\n" . enumDocBlock($name, $docs) . "enum {$class}: int\n{\n" . implode("\n", $cases) . "\n}\n";
 }
 
 /** Render the class docblock for an enum, folding in any harvested summary. */
@@ -578,11 +650,15 @@ function emitFlags(string $name, array $members): string
         $const = substr($member, strlen($prefix)) ?: shortName($member);
         $consts[] = "    public const int {$const} = {$value};";
     }
-    return "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated\\Flags;\n\n"
+    return (
+        "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated\\Flags;\n\n"
         . "/** GENERATED bit-flags from libui `{$name}`. DO NOT EDIT. */\n"
-        . "final class {$class}\n{\n" . implode("\n", $consts) . "\n\n"
+        . "final class {$class}\n{\n"
+        . implode("\n", $consts)
+        . "\n\n"
         . "    public static function has(int \$mask, int \$flag): bool\n    {\n"
-        . "        return (\$mask & \$flag) === \$flag;\n    }\n}\n";
+        . "        return (\$mask & \$flag) === \$flag;\n    }\n}\n"
+    );
 }
 
 /** Emit the static facade of free (non-widget) functions. */
@@ -592,34 +668,38 @@ function emitFacade(array $fns, array $ctx): string
     $methods = [];
     foreach ($fns as $fn) {
         $method = lcfirst(shortName($fn['name']));
-        $sig = []; $args = [];
+        $sig = [];
+        $args = [];
         foreach ($fn['params'] as $i => $p) {
             $c = classify($p['type'], $enums, $types);
             $var = '$' . ($p['name'] ?: "a$i");
             $sig[] = phpParamType($c) . " $var";
             $args[] = marshalArg($c, $var);
         }
-        $call = "\\Libui\\Ffi::get()->{$fn['name']}(" . implode(', ', $args) . ")";
-        $ret  = classify($fn['ret'], $enums, $types);
-        $rt   = phpReturnType($ret, $gen);
+        $call = "\\Libui\\Ffi::get()->{$fn['name']}(" . implode(', ', $args) . ')';
+        $ret = classify($fn['ret'], $enums, $types);
+        $rt = phpReturnType($ret, $gen);
         $body = returnStmt($ret, $call, $gen, false);
-        $methods[] = docBlock($fn['name'], $docs, '    ')
-                   . "    public static function {$method}(" . implode(', ', $sig) . "): $rt\n    {\n"
-                   . "$body\n    }\n";
+        $methods[] = docBlock($fn['name'], $docs, '    ') . "    public static function {$method}(" . implode(', ', $sig) . "): $rt\n    {\n" . "$body\n    }\n";
     }
-    return "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated;\n\n"
+    return (
+        "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated;\n\n"
         . "/**\n * GENERATED facade for libui free functions (dialogs, etc.). DO NOT EDIT.\n */\n"
-        . "final class Ui\n{\n" . implode("\n", $methods) . "}\n";
+        . "final class Ui\n{\n"
+        . implode("\n", $methods)
+        . "}\n"
+    );
 }
 
 // --- small helpers -----------------------------------------------------------
 
 function longestCommonPrefix(array $strings): string
 {
-    if ($strings === []) return '';
+    if ($strings === [])
+        return '';
     $prefix = $strings[0];
     foreach ($strings as $s) {
-        while ($prefix !== '' && !str_starts_with($s, $prefix)) {
+        while ($prefix !== '' && ! str_starts_with($s, $prefix)) {
             $prefix = substr($prefix, 0, -1);
         }
     }
@@ -628,10 +708,54 @@ function longestCommonPrefix(array $strings): string
 
 function isReservedWord(string $w): bool
 {
-    static $rw = ['continue','default','list','class','function','for','do','else','new','print',
-        'exit','echo','and','or','xor','match','fn','enum','try','catch','goto','global','static',
-        'abstract','final','const','case','switch','break','return','throw','yield','clone','trait',
-        'interface','namespace','use','as','if','while','foreach','endif','array','unset','isset','empty'];
+    static $rw = [
+        'continue',
+        'default',
+        'list',
+        'class',
+        'function',
+        'for',
+        'do',
+        'else',
+        'new',
+        'print',
+        'exit',
+        'echo',
+        'and',
+        'or',
+        'xor',
+        'match',
+        'fn',
+        'enum',
+        'try',
+        'catch',
+        'goto',
+        'global',
+        'static',
+        'abstract',
+        'final',
+        'const',
+        'case',
+        'switch',
+        'break',
+        'return',
+        'throw',
+        'yield',
+        'clone',
+        'trait',
+        'interface',
+        'namespace',
+        'use',
+        'as',
+        'if',
+        'while',
+        'foreach',
+        'endif',
+        'array',
+        'unset',
+        'isset',
+        'empty',
+    ];
     return in_array(strtolower($w), $rw, true);
 }
 
@@ -643,8 +767,8 @@ function main(): void
 {
     global $ANN;
 
-    if (!is_file(UI_H)) {
-        fwrite(STDERR, "ui.h not found at " . UI_H . " (run composer build-lib first)\n");
+    if (! is_file(UI_H)) {
+        fwrite(STDERR, 'ui.h not found at ' . UI_H . " (run composer build-lib first)\n");
         exit(1);
     }
 
@@ -653,14 +777,14 @@ function main(): void
     writeFile(GEN_H, $cleaned);
 
     // --- parse ---
-    $uiH    = file_get_contents(UI_H);
-    $types  = typeList($uiH);
-    $funcs  = parseFunctions($cleaned);
-    $enums  = parseEnums($cleaned);
-    $docs   = harvestDocs($uiH); // human-readable summaries from the RAW header
+    $uiH = file_get_contents(UI_H);
+    $types = typeList($uiH);
+    $funcs = parseFunctions($cleaned);
+    $enums = parseEnums($cleaned);
+    $docs = harvestDocs($uiH); // human-readable summaries from the RAW header
 
     $skipTypes = $ANN['skip_types'];
-    $genTypes  = array_values(array_diff($types, $skipTypes)); // types that get a class
+    $genTypes = array_values(array_diff($types, $skipTypes)); // types that get a class
 
     // --- build constructor map: fn => [type, role, method] ---
     $ctorMap = [];
@@ -668,24 +792,31 @@ function main(): void
     foreach ($genTypes as $T) {
         $cfg = $ANN['constructors'][$T] ?? ['primary' => 'uiNew' . shortName($T), 'factories' => []];
         $ctorFor[$T] = $cfg;
-        if ($cfg['primary']) $ctorMap[$cfg['primary']] = true;
-        foreach ($cfg['factories'] ?? [] as $fn) $ctorMap[$fn] = true;
+        if ($cfg['primary'])
+            $ctorMap[$cfg['primary']] = true;
+        foreach ($cfg['factories'] ?? [] as $fn)
+            $ctorMap[$fn] = true;
     }
 
     // --- group member functions by widget type ---
     $byType = array_fill_keys($genTypes, []);
-    $free   = [];
+    $free = [];
     foreach ($funcs as $name => $fn) {
-        if (isset($ctorMap[$name])) continue;                 // handled as constructor
+        if (isset($ctorMap[$name]))
+            continue; // handled as constructor
         $owner = null;
-        foreach ($types as $T) {                               // types sorted longest-first
+        foreach ($types as $T) { // types sorted longest-first
             if (str_starts_with($name, $T) && strlen($name) > strlen($T) && ctype_upper($name[strlen($T)])) {
                 $owner = $T;
                 break;
             }
         }
-        if ($owner === null) { $free[$name] = $fn; continue; }
-        if (in_array($owner, $skipTypes, true)) continue;      // uiControl/uiArea/uiTable members
+        if ($owner === null) {
+            $free[$name] = $fn;
+            continue;
+        }
+        if (in_array($owner, $skipTypes, true))
+            continue; // uiControl/uiArea/uiTable members
         $byType[$owner][] = $fn;
     }
 
@@ -704,12 +835,14 @@ function main(): void
         // Scaffold a hand-editable public sugar class ONLY if absent, so the
         // generator never clobbers convenience methods you add later.
         $stubPath = ROOT . '/src/' . $class . '.php';
-        if (!file_exists($stubPath)) {
-            writeFile($stubPath,
+        if (! file_exists($stubPath)) {
+            writeFile(
+                $stubPath,
                 "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui;\n\n"
                 . "/**\n * {$class} widget. Hand-editable — add convenience methods here.\n"
                 . " * Inherits the generated API from Generated\\\\{$class}.\n */\n"
-                . "class {$class} extends Generated\\{$class}\n{\n}\n");
+                . "class {$class} extends Generated\\{$class}\n{\n}\n",
+            );
             $stubCount++;
         }
     }
@@ -729,16 +862,24 @@ function main(): void
 
     // Doc-harvest coverage across everything that gets an @see-style docblock.
     $emittedSymbols = array_keys($funcs);
-    foreach ($enums as $enumName => $_) $emittedSymbols[] = $enumName;
+    foreach ($enums as $enumName => $_)
+        $emittedSymbols[] = $enumName;
     $emittedSymbols = array_values(array_unique($emittedSymbols));
     $withSummary = count(array_intersect($emittedSymbols, array_keys($docs)));
-    $fellBack    = count($emittedSymbols) - $withSummary;
+    $fellBack = count($emittedSymbols) - $withSummary;
 
     printf(
         "generated:\n  header   %s\n  widgets  %d classes, ~%d methods (+%d new sugar stubs)\n  enums    %d (+%d flags)\n  facade   %d functions\n  docs     %d/%d symbols got a summary (%d fell back to bare @see)\n",
-        basename(GEN_H), $widgetCount, $methodCount, $stubCount,
-        $enumCount - count($ANN['flag_enums']), count($ANN['flag_enums']), count($facadeFns),
-        $withSummary, count($emittedSymbols), $fellBack
+        basename(GEN_H),
+        $widgetCount,
+        $methodCount,
+        $stubCount,
+        $enumCount - count($ANN['flag_enums']),
+        count($ANN['flag_enums']),
+        count($facadeFns),
+        $withSummary,
+        count($emittedSymbols),
+        $fellBack,
     );
 }
 

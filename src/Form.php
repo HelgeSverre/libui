@@ -8,6 +8,4 @@ namespace Libui;
  * Form widget. Hand-editable — add convenience methods here.
  * Inherits the generated API from Generated\\Form.
  */
-class Form extends Generated\Form
-{
-}
+class Form extends Generated\Form {}

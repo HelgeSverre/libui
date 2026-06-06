@@ -37,59 +37,47 @@ $delegate = new class extends AreaDelegate {
         $h = $p->areaHeight;
 
         // dark background
-        $bg = new Path()->addRectangle(0, 0, $w, $h)->end();
-        $ctx->fill($bg, Brush::rgb(0x0F172A));
-        $bg->free();
+        $ctx->fillPath(Brush::rgb(0x0F172A), fn (Path $p) => $p->addRectangle(0, 0, $w, $h));
 
         $cx = $w / 2;
         $cy = $h / 2;
         $radius = min($w, $h) * 0.40;
 
         // clock face
-        $face = new Path()->newFigure($cx + $radius, $cy);
-        for ($i = 1; $i <= 64; $i++) {
-            $a = ($i / 64) * 2 * M_PI;
-            $face->lineTo($cx + (cos($a) * $radius), $cy + (sin($a) * $radius));
-        }
-        $face->closeFigure()->end();
-        $ctx->fill($face, Brush::rgb(0x1E293B));
-        $ctx->stroke($face, Brush::rgb(0x38BDF8), StrokeParams::solid(3.0));
-        $face->free();
+        $face = function (Path $p) use ($cx, $cy, $radius) {
+            $p->newFigure($cx + $radius, $cy);
+            for ($i = 1; $i <= 64; $i++) {
+                $a = ($i / 64) * 2 * M_PI;
+                $p->lineTo($cx + (cos($a) * $radius), $cy + (sin($a) * $radius));
+            }
+            $p->closeFigure();
+        };
+        $ctx->fillPath(Brush::rgb(0x1E293B), $face);
+        $ctx->strokePath(Brush::rgb(0x38BDF8), StrokeParams::solid(3.0), $face);
 
         // hour ticks around the rim
         for ($i = 0; $i < 12; $i++) {
             $a = ($i / 12) * 2 * M_PI;
-            $tick = new Path()
+            $ctx->strokePath(Brush::rgb(0x64748B), StrokeParams::solid(2.0), fn (Path $p) => $p
                 ->newFigure($cx + (cos($a) * $radius * 0.86), $cy + (sin($a) * $radius * 0.86))
-                ->lineTo($cx + (cos($a) * $radius * 0.96), $cy + (sin($a) * $radius * 0.96))
-                ->end();
-            $ctx->stroke($tick, Brush::rgb(0x64748B), StrokeParams::solid(2.0));
-            $tick->free();
+                ->lineTo($cx + (cos($a) * $radius * 0.96), $cy + (sin($a) * $radius * 0.96)));
         }
 
         // sweeping hand — angle depends on the frame counter so it rotates.
         // -M_PI/2 puts angle 0 at the top (12 o'clock), then sweep clockwise.
         $angle = (($this->frame / 120) * 2 * M_PI) - (M_PI / 2);
-        $hand = new Path()
+        $ctx->strokePath(Brush::rgb(0xFACC15), StrokeParams::solid(4.0), fn (Path $p) => $p
             ->newFigure($cx, $cy)
-            ->lineTo($cx + (cos($angle) * $radius * 0.78), $cy + (sin($angle) * $radius * 0.78))
-            ->end();
-        $ctx->stroke($hand, Brush::rgb(0xFACC15), StrokeParams::solid(4.0));
-        $hand->free();
+            ->lineTo($cx + (cos($angle) * $radius * 0.78), $cy + (sin($angle) * $radius * 0.78)));
 
         // a shorter, faster second indicator for extra motion
         $angle2 = (($this->frame / 30) * 2 * M_PI) - (M_PI / 2);
-        $hand2 = new Path()
+        $ctx->strokePath(Brush::rgb(0xF87171), StrokeParams::solid(2.0), fn (Path $p) => $p
             ->newFigure($cx, $cy)
-            ->lineTo($cx + (cos($angle2) * $radius * 0.55), $cy + (sin($angle2) * $radius * 0.55))
-            ->end();
-        $ctx->stroke($hand2, Brush::rgb(0xF87171), StrokeParams::solid(2.0));
-        $hand2->free();
+            ->lineTo($cx + (cos($angle2) * $radius * 0.55), $cy + (sin($angle2) * $radius * 0.55)));
 
         // center hub
-        $hub = new Path()->addRectangle($cx - 4, $cy - 4, 8, 8)->end();
-        $ctx->fill($hub, Brush::rgb(0xFFFFFF));
-        $hub->free();
+        $ctx->fillPath(Brush::rgb(0xFFFFFF), fn (Path $p) => $p->addRectangle($cx - 4, $cy - 4, 8, 8));
     }
 };
 
@@ -103,18 +91,10 @@ Ffi::timer(33, function () use ($delegate, $area) {
     return true;
 });
 
-$window = new Window('PHP libui — animated clock', 420, 420, false);
+$window = new Window('PHP libui — animated clock', 420, 420);
 $box = new Box();
-$box->append($area, 1); // stretchy: fill the window
+$box->appendStretchy($area); // fill the window
 $window->setChild($box);
 
-$window->onClosing(function () {
-    Ffi::quit();
-    return true;
-});
-
-fwrite(STDOUT, "Opening animated clock… (close the window to exit)\n");
 $area->queueRedrawAll();
-$window->show();
-Ffi::main();
-Ffi::uninit();
+$window->run();

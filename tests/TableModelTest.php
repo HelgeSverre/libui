@@ -22,9 +22,7 @@ final class TableModelTest extends TestCase
     {
         // PHP_BINARY must be escaped too — e.g. Herd's path has spaces
         // ("…/Application Support/Herd/bin/php85"), which the shell would split.
-        $cmd = escapeshellarg(\PHP_BINARY) . ' '
-            . escapeshellarg(__DIR__ . '/table_lifecycle.php') . ' '
-            . escapeshellarg($mode);
+        $cmd = escapeshellarg(\PHP_BINARY) . ' ' . escapeshellarg(__DIR__ . '/table_lifecycle.php') . ' ' . escapeshellarg($mode);
 
         $output = [];
         $code = 0;

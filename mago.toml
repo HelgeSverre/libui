@@ -1,0 +1,46 @@
+# Mago — PHP formatter + linter (https://mago.carthage.software).
+# Usage: `composer format` (write), `composer format:check`, `composer lint`.
+php-version = "8.5.0"
+
+[source]
+paths = ["src", "tests", "examples", "tools"]
+# Generated code is owned by tools/generate.php's emitter — formatting it here
+# would just churn against the next `composer regen`.
+excludes = ["src/Generated", "src/Native"]
+
+[formatter]
+print-width = 180
+tab-width = 4
+use-tabs = false
+space-after-logical-not-unary-prefix-operator = true
+null-type-hint = "question"
+space-before-arrow-function-parameter-list-parenthesis = true
+preserve-breaking-member-access-chain = true
+preserve-breaking-argument-list = true
+preserve-breaking-array-like = true
+preserve-breaking-parameter-list = true
+preserve-breaking-attribute-list = true
+preserve-breaking-conditional-expression = true
+empty-line-after-opening-tag = false
+
+[linter]
+integrations = ["php-unit"]
+
+[linter.rules]
+# This library's entire premise is PHP FFI — the FFI rules would fire everywhere.
+no-ffi = { enabled = false }
+# CRITICAL: never auto-import the global \FFI class. Our \Libui\Ffi collides with
+# it case-insensitively, so \FFI must stay fully qualified. (Function/constant
+# auto-import stays on — those are harmless and tidy.)
+no-fully-qualified-global-class-like = { enabled = false }
+no-error-control-operator = { enabled = false }
+no-boolean-flag-parameter = { enabled = false }
+too-many-methods = { enabled = false }
+excessive-parameter-list = { enabled = false }
+cyclomatic-complexity = { enabled = false }
+halstead = { enabled = false }
+kan-defect = { enabled = false }
+no-else-clause = { enabled = false }
+strict-types = { enabled = false }
+assertion-style = { style = "this" }
+strict-behavior = { allow-loose-behavior = true }

@@ -26,9 +26,20 @@ $mode = $argv[1] ?? 'freed';
 Ffi::init();
 
 $delegate = new class extends TableModelDelegate {
-    public function numColumns(): int { return 1; }
-    public function numRows(): int { return 1; }
-    public function cellValue(int $row, int $column): string { return 'x'; }
+    public function numColumns(): int
+    {
+        return 1;
+    }
+
+    public function numRows(): int
+    {
+        return 1;
+    }
+
+    public function cellValue(int $row, int $column): string
+    {
+        return 'x';
+    }
 };
 
 $table = Table::fromDelegate($delegate)->appendTextColumn('A', 0);

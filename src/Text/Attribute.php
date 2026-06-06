@@ -20,7 +20,9 @@ use Libui\Generated\Enum\Underline;
  */
 final class Attribute
 {
-    private function __construct(private readonly \FFI\CData $attr) {}
+    private function __construct(
+        private readonly \FFI\CData $attr,
+    ) {}
 
     public static function family(string $family): self
     {

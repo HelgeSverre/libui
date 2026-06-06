@@ -7,6 +7,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Code style — Mago formatter check + linter.
+  style:
+    name: code style · mago
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ffi
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Check formatting
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: composer format:check
+      - name: Lint
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: composer lint
+
   # Static analysis + generator/header gate (no GUI needed).
   static:
     name: phpstan + gate

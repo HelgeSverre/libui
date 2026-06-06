@@ -8,6 +8,4 @@ namespace Libui;
  * Combobox widget. Hand-editable — add convenience methods here.
  * Inherits the generated API from Generated\\Combobox.
  */
-class Combobox extends Generated\Combobox
-{
-}
+class Combobox extends Generated\Combobox {}

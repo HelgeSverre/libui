@@ -163,9 +163,3 @@ edit, see **[CONTRIBUTING.md](CONTRIBUTING.md)**.
   columns**, `uiTableSelection*` and the table `On*` callbacks, image/OpenGL
   areas, and the less-common drawing primitives (arcs/bézier). All remain
   reachable through `Ffi::get()`.
-
-## Legacy
-
-`app.php`, `src/Ui.php`, and `src/libui.h` are the original 23-function proof of
-concept, kept for reference. `examples/form.php` is the same app on the real
-library.

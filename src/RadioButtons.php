@@ -8,6 +8,4 @@ namespace Libui;
  * RadioButtons widget. Hand-editable — add convenience methods here.
  * Inherits the generated API from Generated\\RadioButtons.
  */
-class RadioButtons extends Generated\RadioButtons
-{
-}
+class RadioButtons extends Generated\RadioButtons {}

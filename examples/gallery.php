@@ -33,7 +33,7 @@ use Libui\Window;
 
 Ffi::init();
 
-$window = new Window('PHP libui — control gallery', 640, 480, false);
+$window = new Window('PHP libui — control gallery', 640, 480);
 $window->setMargined(true);
 
 $tab = new Tab();
@@ -68,7 +68,7 @@ $inputs
 $tab->append('Inputs', $inputs);
 
 // --- Page 2: Ranges -------------------------------------------------------
-$ranges = new Box()->setPadded(true);
+$ranges = new Box(padded: true);
 
 $slider = new Slider(0, 100);
 $slider->setValue(25);
@@ -84,15 +84,15 @@ $slider->onChanged(function (Slider $s) use ($progress, $readout): void {
 });
 
 $ranges
-    ->append(new Label('Drag the slider to drive the progress bar:'), 0)
-    ->append($slider, 0)
-    ->append($progress, 0)
-    ->append($readout, 0);
+    ->append(new Label('Drag the slider to drive the progress bar:'))
+    ->append($slider)
+    ->append($progress)
+    ->append($readout);
 
 $tab->append('Ranges', $ranges);
 
 // --- Page 3: Choosers -----------------------------------------------------
-$choosers = new Box()->setPadded(true);
+$choosers = new Box(padded: true);
 
 $color = new ColorButton();
 $color->setColor(0.2, 0.5, 0.9, 1.0);
@@ -110,15 +110,15 @@ $notes = new MultilineEntry();
 $notes->setText("Multiline notes…\nType something here.");
 
 $choosers
-    ->append(new Label('Pick a color:'), 0)
-    ->append($color, 0)
-    ->append(new Label('Pick a font:'), 0)
-    ->append($font, 0)
-    ->append($subscribe, 0)
-    ->append(new Label('Plan:'), 0)
-    ->append($plan, 0)
-    ->append(new Label('Notes:'), 0)
-    ->append($notes, 1);
+    ->append(new Label('Pick a color:'))
+    ->append($color)
+    ->append(new Label('Pick a font:'))
+    ->append($font)
+    ->append($subscribe)
+    ->append(new Label('Plan:'))
+    ->append($plan)
+    ->append(new Label('Notes:'))
+    ->appendStretchy($notes);
 
 $tab->append('Choosers', $choosers);
 
@@ -129,13 +129,4 @@ for ($i = 0, $n = $tab->numPages(); $i < $n; $i++) {
 
 $window->setChild($tab);
 
-$window->onClosing(function () {
-    fwrite(STDOUT, "[close] quitting\n");
-    Ffi::quit();
-    return true;
-});
-
-fwrite(STDOUT, "Opening control gallery… (close it to exit)\n");
-$window->show();
-Ffi::main();
-Ffi::uninit();
+$window->run();

@@ -51,22 +51,13 @@ $table = Table::fromDelegate($delegate)
     ->appendTextColumn('Language', 1)
     ->appendTextColumn('Year', 2);
 
-$window = new Window('PHP libui — data grid', 480, 240, false);
+$window = new Window('PHP libui — data grid', 480, 240);
 $box = new Box();
-$box->append($table, 1); // stretchy: fill the window
+$box->appendStretchy($table); // fill the window
 $window->setChild($box);
 
-$window->onClosing(function () {
-    Ffi::quit();
-    return true;
-});
-
-fwrite(STDOUT, "Opening table… (close the window to exit)\n");
-$window->show();
-Ffi::main();
-
-// Closing the window destroyed it (and its child table) — see onClosing above —
-// so the model is now detached and must be freed before uiUninit(), otherwise
-// libui's leak checker aborts on the orphaned uiTableModel.
-$table->model()->free();
-Ffi::uninit();
+// A uiTableModel can only be freed once its table is gone, and libui's leak
+// checker aborts in uiUninit() if it never is. run()'s afterClose hook fires
+// after the loop returns and the window (with its table) has been destroyed —
+// the one safe moment to free the model.
+$window->run(afterClose: fn () => $table->model()->free());

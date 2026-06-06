@@ -60,7 +60,7 @@ final class Ffi
         $isArm = str_contains($arch, 'aarch64') || str_contains($arch, 'arm');
 
         $candidates = match (\PHP_OS_FAMILY) {
-            'Darwin'  => [
+            'Darwin' => [
                 $root . '/lib/darwin/libui.dylib', // universal: arm64 + x86_64
                 $root . '/lib/libui.dylib',
             ],
@@ -68,7 +68,7 @@ final class Ffi
                 $root . '/lib/windows-x86_64/libui.dll',
                 $root . '/lib/libui.dll',
             ],
-            default   => $isArm
+            default => $isArm
                 ? [$root . '/lib/linux-aarch64/libui.so', $root . '/lib/libui.so']
                 : [$root . '/lib/linux-x86_64/libui.so', $root . '/lib/libui.so'],
         };
@@ -88,15 +88,15 @@ final class Ffi
     {
         if (self::$ffi === null) {
             $header = self::root() . '/src/Native/libui.gen.h';
-            $lib    = self::libPath();
+            $lib = self::libPath();
 
-            if (!\extension_loaded('FFI')) {
+            if (! \extension_loaded('FFI')) {
                 throw new \RuntimeException('The FFI extension is required (it ships enabled on PHP 8.5 CLI).');
             }
-            if (!is_file($header)) {
+            if (! is_file($header)) {
                 throw new \RuntimeException("Generated header missing at $header (run: composer regen).");
             }
-            if (!is_file($lib)) {
+            if (! is_file($lib)) {
                 throw new \RuntimeException("libui library missing at $lib (run: composer build-lib).");
             }
 
@@ -117,7 +117,7 @@ final class Ffi
             return;
         }
 
-        $ffi  = self::get();
+        $ffi = self::get();
         $opts = $ffi->new('uiInitOptions');
         $opts->Size = \FFI::sizeof($opts);
 

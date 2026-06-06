@@ -35,7 +35,7 @@ final class FontDescriptor
 
         // Allocate a NUL-terminated C copy of the family name and point at it.
         $bytes = \strlen($family);
-        $buffer = $ffi->new("char[" . ($bytes + 1) . "]");
+        $buffer = $ffi->new('char[' . ($bytes + 1) . ']');
         \FFI::memcpy($buffer, $family, $bytes);
         $buffer[$bytes] = "\0";
 

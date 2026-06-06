@@ -24,7 +24,8 @@
     },
     "require-dev": {
         "phpstan/phpstan": "^2.0",
-        "phpunit/phpunit": "^13.2"
+        "phpunit/phpunit": "^13.2",
+        "carthage-software/mago": "^1.30"
     },
     "autoload": {
         "psr-4": {
@@ -42,7 +43,14 @@
         "test": "phpunit",
         "gate": "phpunit --group gate",
         "smoke": "phpunit --group smoke",
-        "stan": "phpstan analyse"
+        "stan": "phpstan analyse",
+        "format": "mago fmt",
+        "format:check": "mago fmt --check",
+        "lint": "mago lint",
+        "style": [
+            "@format",
+            "@stan"
+        ]
     },
     "scripts-descriptions": {
         "build-lib": "Build/refresh lib/libui.dylib from libui-ng source",

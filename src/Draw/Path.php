@@ -17,6 +17,8 @@ final class Path
 {
     private \FFI\CData $path;
 
+    private bool $freed = false;
+
     public function __construct(DrawFillMode $fillMode = DrawFillMode::Winding)
     {
         $this->path = Ffi::get()->uiDrawNewPath($fillMode->value);
@@ -58,8 +60,18 @@ final class Path
         return $this;
     }
 
+    /** Free the native path. Idempotent, and runs automatically on destruction. */
     public function free(): void
     {
+        if ($this->freed) {
+            return;
+        }
         Ffi::get()->uiDrawFreePath($this->path);
+        $this->freed = true;
+    }
+
+    public function __destruct()
+    {
+        $this->free();
     }
 }

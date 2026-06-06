@@ -23,11 +23,11 @@ final class WidgetConstructionTest extends LibuiTestCase
 {
     public function testConstructorsProduceLiveHandles(): void
     {
-        $this->assertFalse(\FFI::isNull((new Window('Smoke', 320, 200, false))->handle()));
-        $this->assertFalse(\FFI::isNull((new Button('Click'))->handle()));
-        $this->assertFalse(\FFI::isNull((new Checkbox('Toggle'))->handle()));
-        $this->assertFalse(\FFI::isNull((new Slider(0, 100))->handle()));
-        $this->assertFalse(\FFI::isNull((new Box())->handle()));
+        $this->assertFalse(\FFI::isNull(new Window('Smoke', 320, 200, false)->handle()));
+        $this->assertFalse(\FFI::isNull(new Button('Click')->handle()));
+        $this->assertFalse(\FFI::isNull(new Checkbox('Toggle')->handle()));
+        $this->assertFalse(\FFI::isNull(new Slider(0, 100)->handle()));
+        $this->assertFalse(\FFI::isNull(new Box()->handle()));
     }
 
     public function testStaticFactoriesProduceLiveHandles(): void

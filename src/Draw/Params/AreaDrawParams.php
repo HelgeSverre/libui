@@ -19,8 +19,12 @@ final class AreaDrawParams
     public static function fromCData(\FFI\CData $p): self
     {
         return new self(
-            $p->AreaWidth, $p->AreaHeight,
-            $p->ClipX, $p->ClipY, $p->ClipWidth, $p->ClipHeight,
+            $p->AreaWidth,
+            $p->AreaHeight,
+            $p->ClipX,
+            $p->ClipY,
+            $p->ClipWidth,
+            $p->ClipHeight,
         );
     }
 }

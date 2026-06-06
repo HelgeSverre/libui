@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Libui\Draw;
 
 use Libui\Ffi;
+use Libui\Generated\Enum\DrawFillMode;
 use Libui\Text\TextLayout;
 
 /**
@@ -13,7 +14,9 @@ use Libui\Text\TextLayout;
  */
 final class DrawContext
 {
-    public function __construct(private readonly \FFI\CData $ctx) {}
+    public function __construct(
+        private readonly \FFI\CData $ctx,
+    ) {}
 
     public function fill(Path $path, Brush $brush): void
     {
@@ -29,6 +32,32 @@ final class DrawContext
             \FFI::addr($brush->toCData()),
             \FFI::addr($stroke->toCData()),
         );
+    }
+
+    /**
+     * Build a path with $build, fill it, and free it — no manual end()/free().
+     *
+     *   $ctx->fillPath(Brush::rgb(0x0F172A), fn (Path $p) => $p->addRectangle(0, 0, $w, $h));
+     */
+    public function fillPath(Brush $brush, callable $build, DrawFillMode $fillMode = DrawFillMode::Winding): void
+    {
+        $path = new Path($fillMode);
+        $build($path);
+        $path->end();
+        $this->fill($path, $brush);
+    }
+
+    /** Build a path with $build, stroke it, and free it. */
+    public function strokePath(
+        Brush $brush,
+        StrokeParams $stroke,
+        callable $build,
+        DrawFillMode $fillMode = DrawFillMode::Winding,
+    ): void {
+        $path = new Path($fillMode);
+        $build($path);
+        $path->end();
+        $this->stroke($path, $brush, $stroke);
     }
 
     /** Push the current clip/transform state onto libui's stack. */

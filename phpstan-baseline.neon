@@ -1,6 +1,108 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$DragBroken\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Area.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Draw\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Area.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$KeyEvent\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Area.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$MouseCrossed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Area.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$MouseEvent\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Area.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiAreaQueueRedrawAll\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Area.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiAreaSetSize\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Area.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewArea\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Area.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewScrollingArea\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Area.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiControlDestroy\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Control.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiControlDisable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Control.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiControlEnable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Control.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiControlEnabled\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Control.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiControlHide\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Control.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiControlShow\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Control.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiControlToplevel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Control.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiControlVisible\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Control.php
+
+		-
 			message: '#^Property Libui\\Control\:\:\$callbacks type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -11,6 +113,78 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: src/Control.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$A\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$B\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$G\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$NumStops\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$OuterRadius\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$R\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Stops\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$X0\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$X1\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Y0\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Y1\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Brush.php
 
 		-
 			message: '#^Default value of the parameter \#6 \$gradient \(array\{\}\) of method Libui\\Draw\\Brush\:\:__construct\(\) is incompatible with type array\{float, float, float, float, float\}\.$#'
@@ -37,6 +211,288 @@ parameters:
 			path: src/Draw/Brush.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawClip\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/DrawContext.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawFill\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/DrawContext.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawRestore\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/DrawContext.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawSave\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/DrawContext.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawStroke\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/DrawContext.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/DrawContext.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawTransform\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/DrawContext.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixMultiply\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Matrix.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixRotate\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Matrix.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixScale\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Matrix.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixSetIdentity\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Matrix.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixSkew\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Matrix.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixTranslate\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Matrix.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$AreaHeight\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaDrawParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$AreaWidth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaDrawParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$ClipHeight\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaDrawParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$ClipWidth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaDrawParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$ClipX\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaDrawParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$ClipY\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaDrawParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$ExtKey\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaKeyEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Key\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaKeyEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Modifier\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaKeyEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Modifiers\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaKeyEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Up\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaKeyEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$AreaHeight\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$AreaWidth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Down\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Held1To64\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Modifiers\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Up\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$X\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Y\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawFreePath\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawNewPath\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawPathAddRectangle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawPathCloseFigure\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawPathEnd\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawPathLineTo\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawPathNewFigure\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Path.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Cap\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/StrokeParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$DashPhase\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/StrokeParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Dashes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/StrokeParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Join\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/StrokeParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$MiterLimit\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/StrokeParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$NumDashes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/StrokeParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Thickness\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/StrokeParams.php
+
+		-
 			message: '#^Property Libui\\Draw\\StrokeParams\:\:\$cdata is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -47,6 +503,66 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: src/Draw/StrokeParams.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Size\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Ffi.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFreeInitError\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Ffi.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFreeText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Ffi.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiInit\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Ffi.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMain\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Ffi.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiOnShouldQuit\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Ffi.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiQueueMain\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Ffi.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiQuit\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Ffi.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTimer\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Ffi.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiUninit\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Ffi.php
 
 		-
 			message: '#^Property Libui\\Ffi\:\:\$retained type has no value type specified in iterable type array\.$#'
@@ -61,10 +577,1138 @@ parameters:
 			path: src/Ffi.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiBoxAppend\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Box.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiBoxDelete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Box.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiBoxNumChildren\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Box.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiBoxPadded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Box.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiBoxSetPadded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Box.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewHorizontalBox\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Box.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewVerticalBox\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Box.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiButtonOnClicked\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Button.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiButtonSetText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Button.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiButtonText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Button.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewButton\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Button.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiCheckboxChecked\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Checkbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiCheckboxOnToggled\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Checkbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiCheckboxSetChecked\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Checkbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiCheckboxSetText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Checkbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiCheckboxText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Checkbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewCheckbox\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Checkbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiColorButtonColor\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/ColorButton.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiColorButtonOnChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/ColorButton.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiColorButtonSetColor\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/ColorButton.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewColorButton\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/ColorButton.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiComboboxAppend\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Combobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiComboboxClear\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Combobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiComboboxDelete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Combobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiComboboxInsertAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Combobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiComboboxNumItems\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Combobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiComboboxOnSelected\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Combobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiComboboxSelected\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Combobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiComboboxSetSelected\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Combobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewCombobox\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Combobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDateTimePickerOnChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/DateTimePicker.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDateTimePickerSetTime\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/DateTimePicker.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDateTimePickerTime\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/DateTimePicker.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewDatePicker\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/DateTimePicker.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewDateTimePicker\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/DateTimePicker.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewTimePicker\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/DateTimePicker.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiEditableComboboxAppend\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/EditableCombobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiEditableComboboxOnChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/EditableCombobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiEditableComboboxSetText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/EditableCombobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiEditableComboboxText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/EditableCombobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewEditableCombobox\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/EditableCombobox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiEntryOnChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Entry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiEntryReadOnly\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Entry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiEntrySetReadOnly\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Entry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiEntrySetText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Entry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiEntryText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Entry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewEntry\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Entry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewPasswordEntry\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Entry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewSearchEntry\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Entry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFontButtonFont\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/FontButton.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFontButtonOnChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/FontButton.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewFontButton\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/FontButton.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFormAppend\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Form.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFormDelete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Form.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFormNumChildren\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Form.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFormPadded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Form.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFormSetPadded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Form.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewForm\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Form.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiGridAppend\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Grid.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiGridInsertAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Grid.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiGridPadded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Grid.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiGridSetPadded\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Grid.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewGrid\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Grid.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiGroupMargined\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Group.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiGroupSetChild\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Group.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiGroupSetMargined\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Group.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiGroupSetTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Group.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiGroupTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Group.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewGroup\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Group.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiLabelSetText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Label.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiLabelText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Label.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewLabel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Label.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuAppendAboutItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Menu.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuAppendCheckItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Menu.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuAppendItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Menu.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuAppendPreferencesItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Menu.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuAppendQuitItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Menu.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuAppendSeparator\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Menu.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewMenu\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Menu.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuItemChecked\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MenuItem.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuItemDisable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MenuItem.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuItemEnable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MenuItem.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuItemOnClicked\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MenuItem.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMenuItemSetChecked\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MenuItem.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMultilineEntryAppend\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MultilineEntry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMultilineEntryOnChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MultilineEntry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMultilineEntryReadOnly\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MultilineEntry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMultilineEntrySetReadOnly\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MultilineEntry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMultilineEntrySetText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MultilineEntry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMultilineEntryText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MultilineEntry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewMultilineEntry\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MultilineEntry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewNonWrappingMultilineEntry\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/MultilineEntry.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewProgressBar\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/ProgressBar.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiProgressBarSetValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/ProgressBar.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiProgressBarValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/ProgressBar.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewRadioButtons\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/RadioButtons.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiRadioButtonsAppend\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/RadioButtons.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiRadioButtonsOnSelected\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/RadioButtons.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiRadioButtonsSelected\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/RadioButtons.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiRadioButtonsSetSelected\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/RadioButtons.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewHorizontalSeparator\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Separator.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewVerticalSeparator\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Separator.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewSlider\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Slider.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSliderHasToolTip\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Slider.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSliderOnChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Slider.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSliderOnReleased\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Slider.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSliderSetHasToolTip\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Slider.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSliderSetRange\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Slider.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSliderSetValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Slider.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSliderValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Slider.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewSpinbox\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Spinbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSpinboxOnChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Spinbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSpinboxSetValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Spinbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSpinboxValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Spinbox.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewTab\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTabAppend\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTabDelete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTabInsertAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTabMargined\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTabNumPages\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTabOnSelected\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTabSelected\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTabSetMargined\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTabSetSelected\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Tab.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMsgBox\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Ui.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiMsgBoxError\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Ui.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiOpenFile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Ui.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiOpenFolder\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Ui.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiSaveFile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Ui.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewWindow\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowBorderless\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowContentSize\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowFocused\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowFullscreen\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowMargined\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowOnClosing\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowOnContentSizeChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowOnFocusChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowOnPositionChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowPosition\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowResizeable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowSetBorderless\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowSetChild\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowSetContentSize\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowSetFullscreen\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowSetMargined\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowSetPosition\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowSetResizeable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowSetTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiWindowTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Generated/Window.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Model\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$RowBackgroundColorModelColumn\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewTable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableAppendTextColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableColumnSetWidth\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableHeaderSetVisible\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableHeaderVisible\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$CellValue\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$ColumnType\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$NumColumns\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$NumRows\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$SetCellValue\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFreeTableModel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewTableModel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewTableValueInt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewTableValueString\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableModelRowChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableModelRowDeleted\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableModelRowInserted\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableValueGetType\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableValueInt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableValueString\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/TableModel.php
+
+		-
 			message: '#^Property Libui\\TableModel\:\:\$callbacks type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/TableModel.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewBackgroundAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/Attribute.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewColorAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/Attribute.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewFamilyAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/Attribute.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewItalicAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/Attribute.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewSizeAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/Attribute.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewUnderlineAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/Attribute.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewWeightAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/Attribute.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiAttributedStringAppendUnattributed\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/AttributedString.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiAttributedStringLen\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/AttributedString.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiAttributedStringSetAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/AttributedString.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewAttributedString\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/AttributedString.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Family\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Text/FontDescriptor.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Italic\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Text/FontDescriptor.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Size\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Text/FontDescriptor.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Stretch\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Text/FontDescriptor.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Weight\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Text/FontDescriptor.php
 
 		-
 			message: '#^Property Libui\\Text\\FontDescriptor\:\:\$familyBuffer is never read, only written\.$#'
@@ -73,28 +1717,46 @@ parameters:
 			path: src/Text/FontDescriptor.php
 
 		-
-			message: '#^Property Libui\\Text\\TextLayout\:\:\$params is never read, only written\.$#'
-			identifier: property.onlyWritten
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Align\.$#'
+			identifier: property.notFound
 			count: 1
 			path: src/Text/TextLayout.php
 
 		-
-			message: '#^Method Ui\:\:__call\(\) has parameter \$args with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
+			message: '#^Access to an undefined property FFI\\CData\:\:\$DefaultFont\.$#'
+			identifier: property.notFound
 			count: 1
-			path: src/Ui.php
+			path: src/Text/TextLayout.php
 
 		-
-			message: '#^Property Ui\:\:\$callbacks is never read, only written\.$#'
+			message: '#^Access to an undefined property FFI\\CData\:\:\$String\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Text/TextLayout.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Width\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Text/TextLayout.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawFreeTextLayout\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/TextLayout.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawNewTextLayout\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/TextLayout.php
+
+		-
+			message: '#^Property Libui\\Text\\TextLayout\:\:\$params is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
-			path: src/Ui.php
-
-		-
-			message: '#^Property Ui\:\:\$callbacks type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Ui.php
+			path: src/Text/TextLayout.php
 
 		-
 			message: '#^Call to function method_exists\(\) with ''Libui\\\\Generated\\\\Ui'' and ''msgBox'' will always evaluate to true\.$#'

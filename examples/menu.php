@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use Libui\App;
 use Libui\Box;
 use Libui\Ffi;
 use Libui\Generated\Ui;
@@ -46,12 +47,11 @@ $about = $helpMenu->appendAboutItem();
 
 // --- 2. NOW create the window (menus are locked in) ----------------------
 
-$window = new Window('Menu demo', 480, 300, true);
+$window = new Window('Menu demo', 480, 300, hasMenubar: true);
 $window->setMargined(true);
 
-$box = new Box();
-$box->setPadded(true);
-$box->append(new Label('Use the menu bar at the top of the screen.'), 0);
+$box = new Box(padded: true);
+$box->append(new Label('Use the menu bar at the top of the screen.'));
 
 $window->setChild($box);
 
@@ -74,17 +74,10 @@ $about->onClicked(function ($item, $win) use ($window) {
 
 foreach (['Cut' => $cut, 'Copy' => $copy, 'Paste' => $paste] as $name => $entry) {
     $entry->onClicked(function ($item, $win) use ($name) {
-        fwrite(STDOUT, "[menu] {$name}\n");
+        // wire your edit actions here
     });
 }
 
-$window->onClosing(function () {
-    fwrite(STDOUT, "[close] quitting\n");
-    Ffi::quit();
-    return true;
-});
+// --- 4. Run via the App facade -------------------------------------------
 
-fwrite(STDOUT, "Opening menu demo… (close the window to exit)\n");
-$window->show();
-Ffi::main();
-Ffi::uninit();
+App::new()->window($window)->run();

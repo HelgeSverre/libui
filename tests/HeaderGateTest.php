@@ -49,11 +49,21 @@ final class HeaderGateTest extends LibuiTestCase
     public static function representativeSymbols(): iterable
     {
         $symbols = [
-            'uiInit', 'uiMain', 'uiQuit',
-            'uiNewWindow', 'uiNewButton', 'uiNewCheckbox', 'uiNewSlider',
-            'uiNewCombobox', 'uiNewMultilineEntry', 'uiNewDatePicker',
-            'uiMsgBox', 'uiOpenFile',
-            'uiNewArea', 'uiDrawNewPath', 'uiNewTableModel',
+            'uiInit',
+            'uiMain',
+            'uiQuit',
+            'uiNewWindow',
+            'uiNewButton',
+            'uiNewCheckbox',
+            'uiNewSlider',
+            'uiNewCombobox',
+            'uiNewMultilineEntry',
+            'uiNewDatePicker',
+            'uiMsgBox',
+            'uiOpenFile',
+            'uiNewArea',
+            'uiDrawNewPath',
+            'uiNewTableModel',
             'uiDateTimePickerTime',
         ];
 

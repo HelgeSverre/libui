@@ -39,9 +39,7 @@ $delegate = new class extends AreaDelegate {
         $h = $p->areaHeight;
 
         // Light background rectangle behind the text.
-        $bg = new Path()->addRectangle(0, 0, $w, $h)->end();
-        $ctx->fill($bg, Brush::rgb(0xF8FAFC));
-        $bg->free();
+        $ctx->fillPath(Brush::rgb(0xF8FAFC), fn (Path $p) => $p->addRectangle(0, 0, $w, $h));
 
         // Build a multi-styled paragraph. Each append() applies its attributes
         // to exactly the span just added.
@@ -60,9 +58,7 @@ $delegate = new class extends AreaDelegate {
         $string->appendUnattributed(' and ');
         $string->append('this one is underlined.', Attribute::underline(), Attribute::color(0.55, 0.10, 0.60));
         $string->appendUnattributed(
-            "\n\nThe rest wraps as ordinary body text "
-            . 'across the full width of the drawing area, demonstrating '
-            . 'the default font and left alignment.',
+            "\n\nThe rest wraps as ordinary body text " . 'across the full width of the drawing area, demonstrating ' . 'the default font and left alignment.',
         );
 
         $font = new FontDescriptor('Georgia', 18.0);
@@ -75,18 +71,10 @@ $delegate = new class extends AreaDelegate {
 
 $area = new Area($delegate);
 
-$window = new Window('PHP libui — styled text', 560, 320, false);
+$window = new Window('PHP libui — styled text', 560, 320);
 $box = new Box();
-$box->append($area, 1); // stretchy: fill the window
+$box->appendStretchy($area); // fill the window
 $window->setChild($box);
 
-$window->onClosing(function () {
-    Ffi::quit();
-    return true;
-});
-
-fwrite(STDOUT, "Opening styled-text window… (close to exit)\n");
 $area->queueRedrawAll();
-$window->show();
-Ffi::main();
-Ffi::uninit();
+$window->run();

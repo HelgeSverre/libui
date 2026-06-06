@@ -31,16 +31,16 @@ final class EnumValuesTest extends TestCase
      */
     public static function enumValues(): iterable
     {
-        yield 'TextWeight::Minimum'           => [TextWeight::Minimum->value, 0];
-        yield 'TextWeight::Normal'            => [TextWeight::Normal->value, 400];
-        yield 'TextWeight::Bold'              => [TextWeight::Bold->value, 700];
-        yield 'TextWeight::Maximum'           => [TextWeight::Maximum->value, 1000];
-        yield 'Align::Fill'                   => [Align::Fill->value, 0];
-        yield 'DrawBrushType::Solid'          => [DrawBrushType::Solid->value, 0];
+        yield 'TextWeight::Minimum' => [TextWeight::Minimum->value, 0];
+        yield 'TextWeight::Normal' => [TextWeight::Normal->value, 400];
+        yield 'TextWeight::Bold' => [TextWeight::Bold->value, 700];
+        yield 'TextWeight::Maximum' => [TextWeight::Maximum->value, 1000];
+        yield 'Align::Fill' => [Align::Fill->value, 0];
+        yield 'DrawBrushType::Solid' => [DrawBrushType::Solid->value, 0];
         yield 'DrawBrushType::LinearGradient' => [DrawBrushType::LinearGradient->value, 1];
-        yield 'DrawLineCap::Flat'             => [DrawLineCap::Flat->value, 0];
-        yield 'DrawFillMode::Winding'         => [DrawFillMode::Winding->value, 0];
-        yield 'Modifiers::Ctrl (1 << 0)'      => [Modifiers::Ctrl, 1];
-        yield 'Modifiers::Shift (1 << 2)'     => [Modifiers::Shift, 4];
+        yield 'DrawLineCap::Flat' => [DrawLineCap::Flat->value, 0];
+        yield 'DrawFillMode::Winding' => [DrawFillMode::Winding->value, 0];
+        yield 'Modifiers::Ctrl (1 << 0)' => [Modifiers::Ctrl, 1];
+        yield 'Modifiers::Shift (1 << 2)' => [Modifiers::Shift, 4];
     }
 }
