@@ -51,6 +51,12 @@ final class TableModelTest extends TestCase
 
     public function testUnfreedModelAbortsInUninit(): void
     {
+        // libui's leak-abort for an unfreed uiTableModel lives in darwin/table.m;
+        // the GTK/Windows backends free quietly, so this negative control is macOS-only.
+        if (\PHP_OS_FAMILY !== 'Darwin') {
+            $this->markTestSkipped('uiTableModel leak-abort in uiUninit() is macOS-only.');
+        }
+
         // Negative control: without free() libui's leak checker must still fire,
         // otherwise the passing cases above would prove nothing.
         $this->assertNotSame(
