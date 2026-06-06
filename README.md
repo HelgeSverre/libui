@@ -1,28 +1,92 @@
-# Libui for PHP — native desktop GUI via libui-ng + FFI
+# Libui for PHP
 
-A typed, object-oriented PHP binding for [`libui-ng`](https://github.com/libui-ng/libui-ng),
-generated from the C header and driven through PHP 8.5's built-in **FFI**. Real
-native windows, widgets, menus, dialogs, custom 2D drawing and attributed text —
-no compiled PHP extension, no C toolchain on the user's machine.
+> Native desktop GUIs in PHP — a typed, object-oriented binding to
+> [`libui-ng`](https://github.com/libui-ng/libui-ng) driven by PHP's built-in
+> **FFI**. Real native windows, widgets, dialogs, 2D drawing and text. No
+> compiled PHP extension, no C toolchain on the user's machine.
 
-| Form widgets (generated OO layer) | Custom 2D drawing (hand-written adapter) |
-|---|---|
-| ![form](docs/form.png) | ![canvas](docs/canvas.png) |
+[![CI](https://github.com/HelgeSverre/libui/actions/workflows/ci.yml/badge.svg)](https://github.com/HelgeSverre/libui/actions/workflows/ci.yml)
+[![Packagist Version](https://img.shields.io/packagist/v/helgesverre/libui)](https://packagist.org/packages/helgesverre/libui)
+![PHP](https://img.shields.io/badge/php-8.5%2B-777bb3)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+<p align="center">
+  <img src="docs/form.png" width="49%" alt="A native form window">
+  <img src="docs/canvas.png" width="49%" alt="Custom 2D drawing">
+</p>
+
+## Install
+
+```sh
+composer require helgesverre/libui
+```
+
+Requires **PHP 8.5** with the **FFI** extension (enabled by default on the CLI).
+On macOS a prebuilt universal `libui` ships inside the package — there's nothing
+else to install. Linux and Windows need a `libui` shared library for your
+platform; see [Platform support](#platform-support).
+
+## Quick start
 
 ```php
-use Libui\{Ffi, Window, Box, Entry, Button};
+<?php
+
+require 'vendor/autoload.php';
+
+use Libui\Ffi;
+use Libui\Window;
+use Libui\Box;
+use Libui\Entry;
+use Libui\Button;
 
 Ffi::init();
-$window = new Window('Hello', 460, 200, false);
-$box    = (new Box())->setPadded(true);
+
 $entry  = new Entry();
-$button = (new Button('Greet'))->onClicked(fn() => print("hi {$entry->text()}\n"));
-$box->append($entry, 0)->append($button, 0);
-$window->setChild($box);
-$window->onClosing(function () { Ffi::quit(); return true; });
-$window->show();
-Ffi::main();
+$button = (new Button('Greet'))->onClicked(fn () => print("Hi, {$entry->text()}!\n"));
+
+(new Window('Greeter'))
+    ->setChild(
+        (new Box(padded: true))
+            ->append($entry)
+            ->append($button),
+    )
+    ->run();
 ```
+
+`Window::run()` shows the window, runs the event loop, and tears everything down
+when it closes — so a single-window app is one call. For multiple windows or an
+app-level quit handler, use the `App` facade:
+
+```php
+use Libui\App;
+
+App::new()
+    ->window($mainWindow)
+    ->onShouldQuit(fn () => $document->isSaved())
+    ->run();
+```
+
+Every widget is a typed class with fluent setters and IDE autocompletion
+(`$slider->setValue(50)`, `$entry->text()`, `$button->onClicked(...)`), so you
+can discover the API as you type.
+
+## What you can build
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/gallery.png" alt="Widget gallery"><br><b>Widgets</b> — tabs, forms, sliders, spinboxes, combos, date &amp; colour pickers.</td>
+    <td width="33%"><img src="docs/canvas.png" alt="Custom drawing"><br><b>2D drawing</b> — paths, gradient brushes and strokes on a custom canvas.</td>
+    <td width="33%"><img src="docs/text.png" alt="Attributed text"><br><b>Attributed text</b> — coloured, bold, italic and underlined spans.</td>
+  </tr>
+  <tr>
+    <td><img src="docs/table.png" alt="Data grid"><br><b>Data grids</b> — a <code>Table</code> backed by your own row model.</td>
+    <td><img src="docs/clock.png" alt="Animated clock"><br><b>Animation</b> — timer-driven redraws (an analogue clock).</td>
+    <td><img src="docs/menu.png" alt="Menus"><br><b>Menus &amp; dialogs</b> — native menubars, message boxes, file pickers.</td>
+  </tr>
+</table>
+
+The runnable sources live in [`examples/`](examples/) — see
+[Development](#development) to run them.
 
 ## Features
 
@@ -30,84 +94,94 @@ Ffi::main();
   buttons, checkboxes, radio buttons, entries (plain/password/search), multiline
   entries, labels, spinboxes, sliders, progress bars, combos, editable combos,
   date/time pickers, colour & font buttons, separators, menus and menu items.
-  Each is a thin OO class with IDE-friendly types and fluent setters.
-- **19 PHP enums + bit-flags** — `Align`, `TextWeight`, `TableValueType`,
-  `DrawFillMode`, … generated 1:1 from libui's C enums (and `uiModifiers` as a
-  bit-flag const class).
-- **Native dialogs** — message boxes and open/save/folder pickers via the
-  `Libui\Generated\Ui` facade.
-- **Custom 2D drawing** — a hand-written `Area` surface plus a `Draw\*` layer:
-  vector `Path`s, solid/gradient `Brush`es, `StrokeParams`, affine `Matrix`,
-  clip/save/restore, and a `DrawContext` to fill/stroke/transform into.
-- **Attributed text** — a `Text\*` layer: `AttributedString` with per-range
-  colour/weight/italic/underline `Attribute`s, a `FontDescriptor`, and a
-  `TextLayout` you can draw straight onto a `DrawContext`.
-- **Data-grid table** — `Table` backed by a `TableModel`/`TableModelDelegate`
-  (libui's `uiTableModelHandler` vtable, wrapped so you just return cell values).
-- **Lifecycle / timer / async helpers** — `Ffi::main()`, `quit()`, `uninit()`,
-  plus `queueMain()`, `timer()` and `onShouldQuit()` for the event loop.
-- **Cross-platform library resolution** — picks `libui.dylib`/`.so`/`.dll` by OS,
-  overridable with `LIBUI_LIB` (or legacy `LIBUI_DYLIB`).
-- **All 299 libui functions callable** — even the ones without a sugar wrapper
-  are reachable raw via `Ffi::get()->ui…()`.
+- **19 PHP enums + bit-flags** (`Align`, `TextWeight`, `DrawFillMode`, …),
+  generated 1:1 from libui's C enums.
+- **Native dialogs** — message boxes and open/save/folder pickers.
+- **Custom 2D drawing** — vector `Path`s, solid/gradient `Brush`es,
+  `StrokeParams`, affine `Matrix`, clipping, and a `DrawContext` to draw into.
+- **Attributed text** — `AttributedString` with per-range colour/weight/italic/
+  underline attributes, a `FontDescriptor`, and a drawable `TextLayout`.
+- **Data-grid table** — `Table` backed by a `TableModelDelegate` you implement.
+- **Event loop helpers** — `queueMain()`, `timer()`, `onShouldQuit()`.
+- **All 299 libui functions callable** — anything without a sugar wrapper is
+  still reachable raw via `Ffi::get()->ui…()`.
 
-## Examples
+## Platform support
 
-Each demo runs standalone (`composer install` first for the autoloader).
+The loader resolves the right binary for the current OS + architecture from
+`lib/<platform>/`, overridable with the `$LIBUI_LIB` environment variable.
 
-| Demo | Screenshot | What it shows | Run |
-|---|---|---|---|
-| **Form** | <img src="docs/form.png" width="220"> | The greeter form on the generated OO layer: label, entry, button, click handler. | `php examples/form.php` |
-| **Canvas** | <img src="docs/canvas.png" width="220"> | Custom 2D drawing — a gradient-filled mountain; click-drag paints dots. | `php examples/canvas.php` |
-| **Gallery** | <img src="docs/gallery.png" width="220"> | A tabbed tour of the input/range/chooser widgets; the slider live-drives a progress bar. | `php examples/gallery.php` |
-| **Menu** | <img src="docs/menu.png" width="220"> | A File/Edit/Help menubar wired to dialogs (menus appear in the macOS system bar). | `php examples/menu.php` |
-| **Clock** | <img src="docs/clock.png" width="220"> | An animated canvas: a `Ffi::timer` sweeps clock hands ~30×/sec. | `php examples/clock.php` |
-| **Table** | <img src="docs/table.png" width="220"> | A read-only data grid fed by a `TableModelDelegate`. | `php examples/table.php` |
-| **Text** | <img src="docs/text.png" width="220"> | Attributed text — coloured, bold, italic and underlined spans, laid out and drawn. | `php examples/text.php` |
+| Platform | Status | Notes |
+|---|---|---|
+| **macOS** (arm64 + x86_64) | Prebuilt, ships in the package | Universal `lib/darwin/libui.dylib`; works out of the box. |
+| **Linux** (x86_64 / aarch64) | Build it | Needs **GTK 3** at runtime; build `libui.so` (see [Development](#development)) and point `$LIBUI_LIB` at it. |
+| **Windows** (x86_64) | Build it | Build `libui.dll` and point `$LIBUI_LIB` at it. |
 
 ## Why not the `ext-ui` from php.net?
 
 The PHP manual still documents a [UI extension](https://www.php.net/manual/en/book.ui.php)
-(`pecl/ui`). It is **abandoned and PHP 7-only**: latest release `2.0.0` (July 2018),
-its C targets PHP 7's Zend API so it won't compile on PHP 8.x, and `pecl install ui`
-fails at `configure` here. This project reaches the same goal a different way —
-load the maintained `libui-ng` dylib at runtime and call it via FFI.
+(`pecl/ui`). It is **abandoned and PHP 7-only**: the last release is `2.0.0`
+(July 2018), its C targets PHP 7's Zend API so it won't compile on PHP 8.x, and
+`pecl install ui` fails at `configure` on a modern machine. This package reaches
+the same goal a different way — it loads the maintained `libui-ng` library at
+runtime and calls it through FFI, so there's no extension to compile.
 
-## Requirements
+## Coverage & limits
 
-- PHP 8.5 with the **FFI** extension (enabled by default on the CLI).
-- A prebuilt libui for your platform under `lib/<platform>/`. macOS ships in the
-  repo (`lib/darwin/libui.dylib`, universal arm64 + x86_64). On Linux/Windows run
-  `composer build-lib` (needs `meson` + `ninja`, plus **GTK 3** dev headers on
-  Linux); the loader resolves `lib/{darwin,linux-x86_64,linux-aarch64,windows-x86_64}/`
-  by OS + arch, overridable via `$LIBUI_LIB`.
-- Linux runtime: the **GTK 3** shared libraries must be installed (libui links them).
+- **All 299 libui functions** are callable (raw, via `Ffi::get()->ui…()`).
+- **23 of 26 widget types** have typed classes. The other three are hand-written:
+  `uiControl` is the base class, `uiArea` is the drawing adapter, and `uiTable`
+  is the data grid.
+- Custom drawing covers paths, gradients, stroking, clipping and transforms;
+  attributed text has a full sugar layer.
+- Still raw-only (no sugar yet): editable / checkbox / image / progress / button
+  **table columns**, table selection and row callbacks, image/OpenGL areas, and
+  the less-common drawing primitives (arcs/béziers).
 
-## Use
+---
+
+## Development
+
+For working on the library itself — clone it, build the native library, and run
+the tests:
 
 ```sh
-composer install            # autoloader (no runtime deps)
-php examples/form.php       # the form, on the generated OO layer
-php examples/gallery.php    # the full widget gallery
-php examples/canvas.php     # custom 2D drawing (click-drag to paint)
+git clone https://github.com/HelgeSverre/libui
+cd libui
+composer install
+composer build-lib   # build lib/<platform>/libui.* from libui-ng
 ```
 
-## Composer scripts
+`build-lib` needs `meson` + `ninja` (`brew install meson ninja`), plus the
+**GTK 3** dev headers on Linux (`apt install libgtk-3-dev`). On macOS the
+prebuilt dylib is already committed, so this is only needed to refresh it.
+
+### Run the examples
 
 ```sh
-composer build-lib   # build/refresh lib/libui.* from third_party/libui-ng
-composer regen       # regenerate src/Native/libui.gen.h + src/Generated/**
-composer test        # run the full PHPUnit suite
-composer gate        # PHPUnit @group gate — FFI::cdef accepts the generated header
-composer smoke       # PHPUnit @group smoke — construct widgets, no event loop
-composer stan        # PHPStan (level 6, FFI-dynamic errors baselined)
+php examples/form.php       # the greeter form
+php examples/gallery.php    # the widget gallery (tabs of controls)
+php examples/canvas.php     # custom 2D drawing — click-drag to paint
+php examples/clock.php      # a timer-animated analogue clock
+php examples/table.php      # a data grid
+php examples/text.php       # attributed text
+php examples/menu.php       # a menubar wired to dialogs
 ```
 
-Tests are [PHPUnit](https://phpunit.de) (`tests/`, the `Libui\Tests` namespace);
-`gate`/`smoke` just filter the suite by group. Pipeline order from a clean
-checkout: `composer build-lib` → `composer regen` → `composer test`.
+### Composer scripts
 
-## Architecture
+```sh
+composer test        # the full PHPUnit suite
+composer gate        # @group gate — FFI::cdef accepts the generated header
+composer smoke       # @group smoke — construct widgets, no event loop
+composer stan        # PHPStan (level 6)
+composer format      # Mago formatter
+composer lint        # Mago linter
+composer regen       # regenerate src/Native/libui.gen.h + src/Generated/** from ui.h
+composer build-lib   # (re)build the native library
+```
+
+### How it's built
 
 A single generator parses libui-ng's `ui.h` (299 functions, ~98% regular naming)
 **once** and emits both the FFI header and the typed OO classes — "one parse,
@@ -115,51 +189,23 @@ three tiers":
 
 ```
 tools/generate.php  ──parses third_party/libui-ng/ui.h──▶
-  src/Native/libui.gen.h     cleaned header, all 299 fns callable   (generated)
-  src/Generated/<Widget>.php  23 typed widget classes               (generated)
-  src/Generated/Enum/*.php     19 PHP enums  + Flags/Modifiers       (generated)
-  src/Generated/Ui.php         dialog facade (msgBox, openFile, …)   (generated)
-  src/<Widget>.php             hand-editable sugar (extends Generated\<Widget>)
+  src/Native/libui.gen.h      cleaned header, all 299 fns callable   (generated)
+  src/Generated/<Widget>.php   23 typed widget classes               (generated)
+  src/Generated/Enum/*.php      19 PHP enums + Flags/Modifiers        (generated)
+  src/Generated/Ui.php          dialog facade (msgBox, openFile, …)   (generated)
+  src/<Widget>.php              hand-editable sugar (extends Generated\<Widget>)
 hand-written runtime + hard subsystems (never regenerated):
-  src/Ffi.php  src/Control.php          singleton FFI, base class, callback retention
-  src/Area.php src/AreaDelegate.php     custom-draw surface (uiAreaHandler vtable)
-  src/Draw/*  src/Text/*                paths/brushes/strokes + attributed text
-  src/Table.php src/TableModel*.php     data grid (uiTableModelHandler vtable)
+  src/Ffi.php  src/Control.php           singleton FFI, base class, callback retention
+  src/Area.php src/Draw/*  src/Text/*    custom-draw surface + paths/brushes/text
+  src/Table.php src/TableModel*.php       data grid (uiTableModelHandler vtable)
 ```
 
-`tools/annotations.php` carries the ~2% the convention can't express
-(multi-constructor types, the callback deviations, bit-flag enums, the dialog
-facade list).
+`tools/annotations.php` carries the ~2% the convention can't express. For the
+full design — the header transform, the runtime FFI rules, and the
+generated-vs-hand-written split — see **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
+and **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
-The convention drives the mapping mechanically:
+## License
 
-| C function | PHP |
-|---|---|
-| `uiNewButton(text)` | `new Button($text)` |
-| `uiButtonText(b)` / `uiButtonSetText(b, t)` | `$b->text()` / `$b->setText($t)` |
-| `uiButtonOnClicked(b, cb, _)` | `$b->onClicked($cb)` |
-| `uiNewHorizontalBox()` | `Box::horizontal()` |
-| `uiBoxAppend(box, uiControl*, n)` | `$box->append(Control $c, int $n)` |
-
-For the full design — the `cleanHeader` transform, longest-prefix grouping, the
-critical FFI runtime rules (the `\FFI` vs `Libui\Ffi` collision, callback
-retention, struct lifetimes, owned/borrowed strings, never throwing out of a C
-callback), and the generated-vs-hand-written split — see
-**[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**. For what you may and may not
-edit, see **[CONTRIBUTING.md](CONTRIBUTING.md)**.
-
-## Coverage & limits
-
-- **All 299 libui functions** are callable (raw, via `Ffi::get()->ui…()`), even
-  those without a sugar wrapper.
-- **23 of 26 widget types** have typed OO classes. The other three are
-  hand-written, not generated: `uiControl` is the base class (`Libui\Control`),
-  `uiArea` is the drawing adapter (`Libui\Area`), and `uiTable` is the data-grid
-  adapter (`Libui\Table`).
-- **Custom drawing** covers paths, solid/gradient brushes, stroking, clipping and
-  transforms. **Attributed text** (strings, attributes, font descriptors, layout)
-  has a sugar layer and is screenshot-verified (`examples/text.php`).
-- Still raw-only (no sugar yet): editable/checkbox/image/progress/button **table
-  columns**, `uiTableSelection*` and the table `On*` callbacks, image/OpenGL
-  areas, and the less-common drawing primitives (arcs/bézier). All remain
-  reachable through `Ffi::get()`.
+MIT — see [LICENSE](LICENSE). Bundles [libui-ng](https://github.com/libui-ng/libui-ng)
+(MIT); see [THIRD_PARTY.md](THIRD_PARTY.md).
