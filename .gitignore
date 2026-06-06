@@ -1,0 +1,23 @@
+# Composer dependencies (re-installable via `composer install`)
+/vendor/
+
+# libui-ng source checkout. NOT vendored — build-libui.sh re-clones it on demand,
+# so it is intentionally untracked and safe to delete.
+/third_party/libui-ng/
+
+# IDE / editor config
+/.idea/
+/.vscode/
+*.swp
+
+# Tooling caches
+/.phpunit.cache
+/.phpunit.result.cache
+
+# Logs, OS cruft, scratch space
+*.log
+.DS_Store
+/tmp
+
+# Note: lib/libui.dylib is the vendored native binary and IS tracked on purpose
+# (it is the prebuilt artifact consumers load at runtime). Do not ignore it.

@@ -1,0 +1,45 @@
+name: Build native libs
+
+# Manually-triggered: build libui on each platform's native runner and upload the
+# shared libraries as artifacts. Download them and commit into lib/<platform>/ so
+# consumers get a prebuilt binary with no compiler. (libui can't be cross-compiled
+# from one host like a self-contained C lib — it links the platform GUI stack.)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build · ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-latest,     label: darwin,        out: lib/darwin/libui.dylib }
+          - { os: ubuntu-latest,    label: linux-x86_64,  out: lib/linux-x86_64/libui.so }
+          - { os: ubuntu-24.04-arm, label: linux-aarch64, out: lib/linux-aarch64/libui.so }
+          - { os: windows-latest,   label: windows-x86_64, out: lib/windows-x86_64/libui.dll }
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build toolchain (macOS)
+        if: runner.os == 'macOS'
+        run: brew install meson ninja
+
+      - name: Build toolchain + GTK 3 (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y meson ninja-build libgtk-3-dev
+
+      - name: Build toolchain (Windows)
+        if: runner.os == 'Windows'
+        run: pip install meson ninja
+
+      - name: Build libui
+        run: bash build-libui.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libui-${{ matrix.label }}
+          path: ${{ matrix.out }}
+          if-no-files-found: error

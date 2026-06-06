@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # Static analysis + generator/header gate (no GUI needed).
+  static:
+    name: phpstan + gate
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ffi
+          ini-values: ffi.enable=1
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHPStan
+        run: composer stan
+      - name: Header gate (FFI::cdef accepts the generated header)
+        run: composer gate
+
+  # Build libui on each real OS/arch and run the full suite against it. macOS
+  # uses the committed universal dylib; Linux/Windows build from source. GUI
+  # tests run headless on Linux via xvfb.
+  test:
+    name: test · ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental || false }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-latest,     label: darwin-arm64 }
+          - { os: ubuntu-latest,    label: linux-x86_64 }
+          - { os: ubuntu-24.04-arm, label: linux-aarch64 }
+          - { os: windows-latest,   label: windows-x86_64, experimental: true }
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ffi
+          ini-values: ffi.enable=1
+          coverage: none
+
+      - name: Build toolchain + GTK 3 (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y meson ninja-build libgtk-3-dev xvfb
+
+      - name: Build toolchain (Windows)
+        if: runner.os == 'Windows'
+        run: pip install meson ninja
+
+      - name: Build libui from source (Linux/Windows)
+        if: runner.os != 'macOS'
+        run: bash build-libui.sh
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Test suite
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run -a composer test
+          else
+            composer test
+          fi

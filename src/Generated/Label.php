@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Libui\Generated;
+
+use Libui\Control;
+
+/**
+ * GENERATED wrapper for libui `uiLabel`. DO NOT EDIT — run `composer regen`.
+ * Add convenience methods in a hand-written Libui\\Label subclass instead.
+ */
+class Label extends Control
+{
+    /**
+     * Creates a new label.
+     *
+     * @see uiNewLabel
+     */
+    public function __construct(string $text)
+    {
+        $this->handle = \Libui\Ffi::get()->uiNewLabel($text);
+    }
+
+    /**
+     * Returns the label text.
+     *
+     * @see uiLabelText
+     */
+    public function text(): string
+    {
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiLabelText($this->handle));
+    }
+
+    /**
+     * Sets the label text.
+     *
+     * @see uiLabelSetText
+     */
+    public function setText(string $text): static
+    {
+        \Libui\Ffi::get()->uiLabelSetText($this->handle, $text);
+        return $this;
+    }
+}

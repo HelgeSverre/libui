@@ -1,0 +1,20 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 6
+    paths:
+        - src
+        - tools
+        - tests
+
+    # This codebase drives libui-ng through PHP's FFI. `\Libui\Ffi::get()` returns
+    # a `\FFI` object whose `uiXxx()` methods and the property accesses on the
+    # `\FFI\CData` values it returns are entirely dynamic — they exist only in the
+    # C header bound at runtime, so PHPStan cannot see them and reports them as
+    # undefined. These are correct calls; suppress the FFI-dynamic noise.
+    ignoreErrors:
+        # Dynamic uiXxx() calls on the shared \FFI handle.
+        - '#Call to an undefined method FFI::#'
+        # Dynamic struct field reads/writes on \FFI\CData values.
+        - '#Access to an undefined property FFI\\CData::#'
