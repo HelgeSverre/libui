@@ -7,7 +7,7 @@
 
 [![CI](https://github.com/HelgeSverre/libui/actions/workflows/ci.yml/badge.svg)](https://github.com/HelgeSverre/libui/actions/workflows/ci.yml)
 [![Packagist Version](https://img.shields.io/packagist/v/helgesverre/libui)](https://packagist.org/packages/helgesverre/libui)
-![PHP](https://img.shields.io/badge/php-8.5%2B-777bb3)
+![PHP](https://img.shields.io/badge/php-8.3%2B-777bb3)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <p align="center">
@@ -21,7 +21,7 @@
 composer require helgesverre/libui
 ```
 
-Requires **PHP 8.5** with the **FFI** extension (enabled by default on the CLI).
+Requires **PHP 8.3+** with the **FFI** extension (enabled by default on the CLI).
 On macOS a prebuilt universal `libui` ships inside the package — there's nothing
 else to install. Linux and Windows need a `libui` shared library for your
 platform; see [Platform support](#platform-support).
@@ -107,6 +107,25 @@ see [Development](#development) to run them.
 - **All 299 libui functions callable** — anything without a sugar wrapper is
   still reachable raw via `Ffi::get()->ui…()`.
 
+## Async I/O
+
+Non-blocking operations are fully supported. Use the `Loop` class to schedule
+callbacks on the event loop without freezing the GUI:
+
+```php
+use Libui\Loop;
+use Libui\Window;
+use Libui\Button;
+
+Loop::delay(1000, fn() => echo "This runs after 1 second\n");
+Loop::repeat(100, fn() => echo "This runs every 100ms\n");
+Loop::defer(fn() => echo "This runs on the next tick\n");
+```
+
+For HTTP requests, use an async HTTP client (ReactPHP, Amp, Guzzle) and marshal
+callbacks onto the main loop with `Loop::defer()`. See `examples/async_http.php`
+for a complete example.
+
 ## Platform support
 
 The loader resolves the right binary for the current OS + architecture from
@@ -115,8 +134,8 @@ The loader resolves the right binary for the current OS + architecture from
 | Platform | Status | Notes |
 |---|---|---|
 | **macOS** (arm64 + x86_64) | Prebuilt, ships in the package | Universal `lib/darwin/libui.dylib`; works out of the box. |
-| **Linux** (x86_64 / aarch64) | Build it | Needs **GTK 3** at runtime; build `libui.so` (see [Development](#development)) and point `$LIBUI_LIB` at it. |
-| **Windows** (x86_64) | Build it | Build `libui.dll` and point `$LIBUI_LIB` at it. |
+| **Linux** (x86_64 / aarch64) | Build it (prebuilt coming soon) | Needs **GTK 3** at runtime; build `libui.so` (see [Development](#development)) and point `$LIBUI_LIB` at it, or set `$LIBUI_LIB` to a system-installed `libui.so`. |
+| **Windows** (x86_64) | Build it (prebuilt coming soon) | Build `libui.dll` and point `$LIBUI_LIB` at it, or use a prebuilt DLL. |
 
 ## Why not the `ext-ui` from php.net?
 

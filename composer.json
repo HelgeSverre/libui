@@ -1,6 +1,6 @@
 {
   "name": "helgesverre/libui",
-  "description": "Native desktop GUI for PHP 8.5 via libui-ng and FFI.",
+  "description": "Native desktop GUI for PHP 8.3+ via libui-ng and FFI.",
   "version": "0.1.0",
   "type": "library",
   "license": "MIT",
@@ -21,7 +21,7 @@
     }
   ],
   "require": {
-    "php": ">=8.5",
+    "php": ">=8.3",
     "ext-ffi": "*"
   },
   "require-dev": {
@@ -45,10 +45,25 @@
     "test": "phpunit",
     "gate": "phpunit --group gate",
     "smoke": "phpunit --group smoke",
+    "test:unit": "phpunit --exclude-group integration",
+    "test:all": "phpunit",
+    "test:coverage": "phpunit --coverage-text",
     "stan": "phpstan analyse --memory-limit=512M",
     "format": "mago fmt",
     "format:check": "mago fmt --check",
     "lint": "mago lint",
+    "lint:check": "mago lint --check",
+    "check": [
+      "@lint",
+      "@stan",
+      "@test"
+    ],
+    "analyse": [
+      "@lint:check",
+      "@format:check",
+      "@stan",
+      "@test"
+    ],
     "style": [
       "@format",
       "@stan"
@@ -58,8 +73,18 @@
     "build-lib": "Build/refresh lib/libui.dylib from libui-ng source",
     "regen": "Regenerate src/Native/libui.gen.h and src/Generated/* from ui.h",
     "test": "Run the full PHPUnit test suite",
+    "test:unit": "Run unit tests (excludes integration tests)",
+    "test:all": "Run all tests including integration",
+    "test:coverage": "Run tests with code coverage reporting",
     "gate": "Verify FFI::cdef accepts the full generated header (PHPUnit @group gate)",
     "smoke": "Construct widgets via the OO layer, no event loop (PHPUnit @group smoke)",
-    "stan": "Run PHPStan static analysis (level 6)"
+    "stan": "Run PHPStan static analysis (level 6)",
+    "format": "Format code with Mago formatter",
+    "format:check": "Check code formatting without making changes",
+    "lint": "Lint code with Mago linter",
+    "lint:check": "Check code style without making changes",
+    "check": "Run lint, stan, and tests",
+    "analyse": "Run full code analysis (lint, format, stan, tests)",
+    "style": "Format and analyse code"
   }
 }

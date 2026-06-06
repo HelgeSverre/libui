@@ -11,11 +11,14 @@ jobs:
   style:
     name: code style · mago
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.3', '8.4', '8.5']
     steps:
       - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.5'
+          php-version: ${{ matrix.php }}
           extensions: ffi
           coverage: none
       - run: composer install --no-interaction --prefer-dist --no-progress
@@ -32,11 +35,14 @@ jobs:
   static:
     name: phpstan + gate
     runs-on: macos-latest
+    strategy:
+      matrix:
+        php: ['8.3', '8.4', '8.5']
     steps:
       - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.5'
+          php-version: ${{ matrix.php }}
           extensions: ffi
           ini-values: ffi.enable=1
           coverage: none
@@ -50,23 +56,38 @@ jobs:
   # uses the committed universal dylib; Linux/Windows build from source. GUI
   # tests run headless on Linux via xvfb.
   test:
-    name: test · ${{ matrix.label }}
+    name: test · ${{ matrix.label }} · PHP ${{ matrix.php }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-latest,     label: darwin-arm64 }
-          - { os: ubuntu-latest,    label: linux-x86_64 }
-          - { os: ubuntu-24.04-arm, label: linux-aarch64 }
-          - { os: windows-latest,   label: windows-x86_64, experimental: true }
+          - { os: macos-latest,     label: darwin-arm64,      php: '8.3' }
+          - { os: macos-latest,     label: darwin-arm64,      php: '8.4' }
+          - { os: macos-latest,     label: darwin-arm64,      php: '8.5' }
+          - { os: ubuntu-latest,    label: linux-x86_64,     php: '8.3' }
+          - { os: ubuntu-latest,    label: linux-x86_64,     php: '8.4' }
+          - { os: ubuntu-latest,    label: linux-x86_64,     php: '8.5' }
+          - { os: ubuntu-24.04-arm, label: linux-aarch64,     php: '8.3' }
+          - { os: ubuntu-24.04-arm, label: linux-aarch64,     php: '8.4' }
+          - { os: ubuntu-24.04-arm, label: linux-aarch64,     php: '8.5' }
+          - { os: windows-latest,   label: windows-x86_64,   php: '8.3', experimental: true }
+          - { os: windows-latest,   label: windows-x86_64,   php: '8.4', experimental: true }
+          - { os: windows-latest,   label: windows-x86_64,   php: '8.5', experimental: true }
     steps:
       - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.5'
+          php-version: ${{ matrix.php }}
+          extensions: ffi
+          ini-values: ffi.enable=1
+          coverage: none
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
           extensions: ffi
           ini-values: ffi.enable=1
           coverage: none

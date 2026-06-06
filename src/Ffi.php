@@ -29,7 +29,14 @@ final class Ffi
     /** Whether uiInit() has already run (it must run exactly once per process). */
     private static bool $initialized = false;
 
-    /** The package root (works both in-repo and as an installed dependency). */
+    /**
+     * Returns the absolute path to the package root directory.
+     *
+     * This works both when running from the repository itself and when
+     * the library is installed as a Composer dependency.
+     *
+     * @return string The absolute path to the package root (directory containing src/)
+     */
     public static function root(): string
     {
         return \dirname(__DIR__);
@@ -79,11 +86,36 @@ final class Ffi
             }
         }
 
-        // Name a real, buildable location so the FFI failure is actionable.
-        return $candidates[array_key_last($candidates)];
+        // Provide helpful guidance on how to obtain the library
+        $platform = match (\PHP_OS_FAMILY) {
+            'Darwin' => 'macOS (universal)',
+            'Windows' => 'Windows x86_64',
+            default => $isArm ? 'Linux ARM64' : 'Linux x86_64',
+        };
+
+        throw new \RuntimeException(
+            "libui shared library not found.\n\n"
+            . "Expected: lib/{$platform}/libui."
+            . (\PHP_OS_FAMILY === 'Darwin' ? 'dylib' : (\PHP_OS_FAMILY === 'Windows' ? 'dll' : 'so'))
+            . "\n\n"
+            . "Options:\n"
+            . "  1. Build from source: composer build-lib\n"
+            . "  2. Override path: LIBUI_LIB=/path/to/libui.so composer test\n"
+            . '  3. Install prebuilt: see README.md Platform support section',
+        );
     }
 
-    /** Lazily load the cleaned header + shared library and return the shared handle. */
+    /**
+     * Returns the singleton FFI instance bound to libui-ng.
+     *
+     * Lazily loads the cleaned FFI header and shared library on first call.
+     * The returned \FFI instance has all 299 libui functions bound and callable.
+     *
+     * @return \FFI The singleton FFI handle
+     * @throws \RuntimeException If FFI extension is not loaded
+     * @throws \RuntimeException If generated header is missing (run: composer regen)
+     * @throws \RuntimeException If libui library is missing (run: composer build-lib)
+     */
     public static function get(): \FFI
     {
         if (self::$ffi === null) {
@@ -107,9 +139,13 @@ final class Ffi
     }
 
     /**
-     * Initialise libui. Idempotent — libui's uiInit() may only run once per
-     * process, so repeat calls (e.g. from each test case) are no-ops.
-     * Throws the libui error message on failure.
+     * Initializes the libui library.
+     *
+     * This must be called exactly once per process before using any libui widgets.
+     * It is idempotent - repeat calls are no-ops, which is safe for test suites
+     * where multiple test cases may call init().
+     *
+     * @throws \RuntimeException If libui initialization fails (includes the error message)
      */
     public static function init(): void
     {
@@ -132,22 +168,47 @@ final class Ffi
         self::$initialized = true;
     }
 
-    /** Whether libui has been initialised in this process. */
+    /**
+     * Checks whether libui has been initialized in the current process.
+     *
+     * @return bool True if libui is initialized, false otherwise
+     */
     public static function isInitialized(): bool
     {
         return self::$initialized;
     }
 
+    /**
+     * Runs the libui event loop.
+     *
+     * This blocks until Ffi::quit() is called or all windows are closed.
+     * For a complete application lifecycle, use App::run() instead.
+     *
+     * @see App::run() for a higher-level application lifecycle
+     */
     public static function main(): void
     {
         self::get()->uiMain();
     }
 
+    /**
+     * Requests that the event loop quit.
+     *
+     * This causes Ffi::main() to return. Safe to call from any thread.
+     */
     public static function quit(): void
     {
         self::get()->uiQuit();
     }
 
+    /**
+     * Shuts down the libui library.
+     *
+     * This uninitializes libui and frees all resources. Must be called after
+     * Ffi::main() returns, typically via App::run() which handles this automatically.
+     *
+     * Note: After calling uninit(), you must call init() again before using libui.
+     */
     public static function uninit(): void
     {
         self::get()->uiUninit();
@@ -212,19 +273,48 @@ final class Ffi
         self::get()->uiOnShouldQuit($cb, null);
     }
 
-    /** Upcast any libui object pointer to the generic `uiControl *`. */
+    /**
+     * Upcasts any libui widget handle to the generic uiControl pointer type.
+     *
+     * This is used internally by the generated widget classes for operations
+     * that work on any control, such as adding to containers.
+     *
+     * @param \FFI\CData $handle The widget-specific handle (e.g., uiButton *)
+     * @return \FFI\CData The upcast handle as uiControl *
+     */
     public static function control(\FFI\CData $handle): \FFI\CData
     {
         return self::get()->cast('uiControl *', $handle);
     }
 
-    /** Allocate a C value of the given type (e.g. 'uiAreaHandler', 'double[4]'). */
+    /**
+     * Allocates a C value or struct of the given type.
+     *
+     * This is a convenience wrapper around \FFI::new() that uses the singleton FFI handle.
+     * Use this to create C structs, arrays, or primitive values.
+     *
+     * @param string $type The C type to allocate (e.g., 'uiAreaHandler', 'double[4]', 'int')
+     * @param bool $owned Whether the C memory is owned by PHP (default: true)
+     * @return \FFI\CData The allocated C data
+     *
+     * @see \FFI::new() for the underlying FFI allocation
+     */
     public static function new(string $type, bool $owned = true): \FFI\CData
     {
         return self::get()->new($type, $owned);
     }
 
-    /** Copy an owned C string into PHP and free it with uiFreeText. */
+    /**
+     * Copies an owned C string into PHP and frees it with uiFreeText.
+     *
+     * Use this for C functions that return a heap-allocated char * that libui owns.
+     * The string is copied into PHP memory and the C memory is freed.
+     *
+     * @param \FFI\CData|null $ptr Pointer to the C string, or null
+     * @return string The copied string content, or empty string if $ptr is null
+     *
+     * @see Ffi::borrowedString() for strings that should NOT be freed
+     */
     public static function ownedString(?\FFI\CData $ptr): string
     {
         if ($ptr === null) {
@@ -235,7 +325,17 @@ final class Ffi
         return $value;
     }
 
-    /** Copy a borrowed C string into PHP without freeing it. */
+    /**
+     * Copies a borrowed C string into PHP without freeing it.
+     *
+     * Use this for C functions that return a const char * or a pointer to static/stack
+     * memory that libui does NOT own. The string is copied but the C memory is not freed.
+     *
+     * @param \FFI\CData|null $ptr Pointer to the C string, or null
+     * @return string The copied string content, or empty string if $ptr is null
+     *
+     * @see Ffi::ownedString() for strings that should be freed
+     */
     public static function borrowedString(?\FFI\CData $ptr): string
     {
         return $ptr === null ? '' : \FFI::string($ptr);
