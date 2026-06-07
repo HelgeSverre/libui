@@ -67,7 +67,7 @@ final class Attribute
                     $params[0] ?? 0.0,
                     $params[1] ?? 0.0,
                     $params[2] ?? 0.0,
-                    $params[3] ?? 1.0
+                    $params[3] ?? 1.0,
                 );
                 break;
             case AttributeType::Background:
@@ -75,7 +75,7 @@ final class Attribute
                     $params[0] ?? 0.0,
                     $params[1] ?? 0.0,
                     $params[2] ?? 0.0,
-                    $params[3] ?? 1.0
+                    $params[3] ?? 1.0,
                 );
                 break;
             case AttributeType::Underline:

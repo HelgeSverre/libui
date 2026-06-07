@@ -79,21 +79,21 @@ function rgbToHsl(float $r, float $g, float $b): array
 /** sRGB (0-1) -> OKLCH [L 0-1, C, H 0-360]. */
 function rgbToOklch(float $r, float $g, float $b): array
 {
-    $lin = static fn (float $c): float => $c <= 0.04045 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
+    $lin = static fn (float $c): float => $c <= 0.040_45 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
     $lr = $lin($r);
     $lg = $lin($g);
     $lb = $lin($b);
 
-    $l = (0.4122214708 * $lr) + (0.5363325363 * $lg) + (0.0514459929 * $lb);
-    $m = (0.2119034982 * $lr) + (0.6806995451 * $lg) + (0.1073969566 * $lb);
-    $s = (0.0883024619 * $lr) + (0.2817188376 * $lg) + (0.6299787005 * $lb);
+    $l = (0.412_221_470_8 * $lr) + (0.536_332_536_3 * $lg) + (0.051_445_992_9 * $lb);
+    $m = (0.211_903_498_2 * $lr) + (0.680_699_545_1 * $lg) + (0.107_396_956_6 * $lb);
+    $s = (0.088_302_461_9 * $lr) + (0.281_718_837_6 * $lg) + (0.629_978_700_5 * $lb);
     $l3 = $l ** (1 / 3);
     $m3 = $m ** (1 / 3);
     $s3 = $s ** (1 / 3);
 
-    $L = (0.2104542553 * $l3) + (0.7936177850 * $m3) - (0.0040720468 * $s3);
-    $a = (1.9779984951 * $l3) - (2.4285922050 * $m3) + (0.4505937099 * $s3);
-    $bb = (0.0259040371 * $l3) + (0.7827717662 * $m3) - (0.8086757660 * $s3);
+    $L = (0.210_454_255_3 * $l3) + (0.793_617_785_0 * $m3) - (0.004_072_046_8 * $s3);
+    $a = (1.977_998_495_1 * $l3) - (2.428_592_205_0 * $m3) + (0.450_593_709_9 * $s3);
+    $bb = (0.025_904_037_1 * $l3) + (0.782_771_766_2 * $m3) - (0.808_675_766_0 * $s3);
 
     $C = sqrt(($a * $a) + ($bb * $bb));
     $H = fmod(rad2deg(atan2($bb, $a)) + 360.0, 360.0);
@@ -147,7 +147,7 @@ $picker = new class extends AreaDelegate {
     {
         $w = $p->areaWidth;
         $h = $p->areaHeight;
-        $ctx->fillPath(Brush::rgb(0x10_12_1A), fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
+        $ctx->fillPath(Brush::rgb(0x10_12_1A), static fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
 
         // hue wheel: a fan of solid-hue wedges
         $segments = 72;
@@ -170,7 +170,7 @@ $picker = new class extends AreaDelegate {
         $ang = ($this->hue / 360.0) * 2 * \M_PI;
         $mx = $this->cx + (cos($ang) * $this->sat * $this->radius);
         $my = $this->cy + (sin($ang) * $this->sat * $this->radius);
-        $ctx->strokePath(Brush::rgb(0xFFFFFF), StrokeParams::solid(2.5), fn (Path $mk) => $mk->newFigureWithArc($mx, $my, 7, 0, 2 * \M_PI));
+        $ctx->strokePath(Brush::rgb(0xFF_FFFF), StrokeParams::solid(2.5), static fn (Path $mk) => $mk->newFigureWithArc($mx, $my, 7, 0, 2 * \M_PI));
 
         // value bar
         [$fr, $fg, $fb] = hsv($this->hue, $this->sat, 1.0);
@@ -182,7 +182,7 @@ $picker = new class extends AreaDelegate {
             fn (Path $bar) => $bar->addRectangle($this->barX, $this->barY, $this->barW, $this->barH),
         );
         $vy = $this->barY + ((1 - $this->val) * $this->barH);
-        $ctx->fillPath(Brush::rgb(0xFFFFFF), fn (Path $vm) => $vm->addRectangle($this->barX - 4, $vy - 1.5, $this->barW + 8, 3));
+        $ctx->fillPath(Brush::rgb(0xFF_FFFF), fn (Path $vm) => $vm->addRectangle($this->barX - 4, $vy - 1.5, $this->barW + 8, 3));
 
         // --- readout panel ---
         [$r, $g, $b] = hsv($this->hue, $this->sat, $this->val);

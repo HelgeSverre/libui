@@ -27,9 +27,6 @@ final class Loop
     /** @var int Next timer ID */
     private static int $nextId = 1;
 
-    /** @var array<int, callable> Queued callbacks to run on the next tick */
-    private static array $queued = [];
-
     /**
      * Schedule a callback to run on the next event loop tick.
      *
@@ -55,7 +52,7 @@ final class Loop
     {
         $id = self::$nextId++;
 
-        $wrapper = function () use ($id, $callback): bool {
+        $wrapper = static function () use ($id, $callback): bool {
             $callback();
             unset(self::$timers[$id]);
             return false; // Stop after one execution
@@ -80,7 +77,7 @@ final class Loop
     {
         $id = self::$nextId++;
 
-        $wrapper = function () use ($id, $callback): bool {
+        $wrapper = static function () use ($id, $callback): bool {
             $result = $callback();
             if ($result === false) {
                 unset(self::$timers[$id]);

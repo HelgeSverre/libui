@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Libui\Tests;
 
 use Libui\App;
-use Libui\Button;
 use Libui\Ffi;
 use Libui\Window;
 use PHPUnit\Framework\Attributes\Group;
@@ -56,9 +55,7 @@ final class AppTest extends LibuiTestCase
     {
         $app = App::new();
 
-        $result = $app->onShouldQuit(function (): bool {
-            return true;
-        });
+        $result = $app->onShouldQuit(static fn (): bool => true);
 
         $this->assertSame($app, $result);
     }
@@ -67,9 +64,7 @@ final class AppTest extends LibuiTestCase
     {
         $app = App::new();
 
-        $result = $app->onShouldQuit(function (): bool {
-            return false; // Veto quit
-        });
+        $result = $app->onShouldQuit(static fn (): bool => false);
 
         $this->assertSame($app, $result);
     }
@@ -79,7 +74,7 @@ final class AppTest extends LibuiTestCase
         $app = App::new();
         $canQuit = true;
 
-        $app->onShouldQuit(function () use (&$canQuit): bool {
+        $app->onShouldQuit(static function () use (&$canQuit): bool {
             return $canQuit;
         });
 
@@ -96,7 +91,7 @@ final class AppTest extends LibuiTestCase
         $app = App::new();
         $window = new Window('Test App', 100, 100, false);
 
-        $window->onClosing(function (): bool {
+        $window->onClosing(static function (): bool {
             Ffi::quit();
             return true;
         });
@@ -118,7 +113,7 @@ final class AppTest extends LibuiTestCase
         $autoloadPath = __DIR__ . '/../vendor/autoload.php';
         $script = <<<PHP
             <?php
-            require '$autoloadPath';
+            require '{$autoloadPath}';
 
             use Libui\App;
             use Libui\Button;
@@ -175,7 +170,7 @@ final class AppTest extends LibuiTestCase
                     $started = true;
                     break;
                 }
-                usleep(100000); // 100ms
+                usleep(100_000); // 100ms
             }
 
             $this->assertTrue($started, 'App should start and create the started flag');
@@ -197,7 +192,7 @@ final class AppTest extends LibuiTestCase
         $shouldQuit = true;
 
         $app->window($window);
-        $app->onShouldQuit(function () use (&$shouldQuit): bool {
+        $app->onShouldQuit(static function () use (&$shouldQuit): bool {
             return $shouldQuit;
         });
 
@@ -222,7 +217,7 @@ final class AppTest extends LibuiTestCase
         $documentSaved = false;
 
         $app->window($window);
-        $app->onShouldQuit(function () use (&$documentSaved): bool {
+        $app->onShouldQuit(static function () use (&$documentSaved): bool {
             return $documentSaved;
         });
 
@@ -244,9 +239,7 @@ final class AppTest extends LibuiTestCase
     {
         $app = App::new();
 
-        $result = $app->onShouldQuit(function (): bool {
-            return true;
-        });
+        $result = $app->onShouldQuit(static fn (): bool => true);
 
         $this->assertSame($app, $result);
     }
@@ -258,9 +251,7 @@ final class AppTest extends LibuiTestCase
 
         $result = $app
             ->window($window)
-            ->onShouldQuit(function (): bool {
-                return true;
-            });
+            ->onShouldQuit(static fn (): bool => true);
 
         $this->assertSame($app, $result);
     }

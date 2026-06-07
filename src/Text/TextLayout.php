@@ -25,7 +25,7 @@ final class TextLayout
 
     public function __construct(
         AttributedString $string,
-        FontDescriptor $font = null,
+        ?FontDescriptor $font = null,
         float $width = 0.0,
         DrawTextAlign $align = DrawTextAlign::Left,
     ) {
@@ -89,7 +89,7 @@ final class TextLayout
     }
 
     /**
-     * Get the extents as FFI CData (the underlying C array).
+     * Get the extents as FFI \FFI\CData (the underlying C array).
      */
     public function extentsCData(): \FFI\CData
     {

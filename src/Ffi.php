@@ -126,10 +126,10 @@ final class Ffi
                 throw new \RuntimeException('The FFI extension is required (it ships enabled on PHP 8.5 CLI).');
             }
             if (! is_file($header)) {
-                throw new \RuntimeException("Generated header missing at $header (run: composer regen).");
+                throw new \RuntimeException("Generated header missing at {$header} (run: composer regen).");
             }
             if (! is_file($lib)) {
-                throw new \RuntimeException("libui library missing at $lib (run: composer build-lib).");
+                throw new \RuntimeException("libui library missing at {$lib} (run: composer build-lib).");
             }
 
             self::$ffi = \FFI::cdef(file_get_contents($header), $lib);
@@ -162,7 +162,7 @@ final class Ffi
             $message = \FFI::string($err);
             // uiInit errors are freed with uiFreeInitError, NOT uiFreeText.
             $ffi->uiFreeInitError($err);
-            throw new \RuntimeException("uiInit failed: $message");
+            throw new \RuntimeException("uiInit failed: {$message}");
         }
 
         self::$initialized = true;
@@ -224,7 +224,7 @@ final class Ffi
      */
     public static function queueMain(callable $fn): void
     {
-        $cb = function ($data) use ($fn): void {
+        $cb = static function ($data) use ($fn): void {
             try {
                 $fn();
             } catch (\Throwable $e) {
@@ -243,7 +243,7 @@ final class Ffi
      */
     public static function timer(int $milliseconds, callable $fn): void
     {
-        $cb = function ($data) use ($fn): int {
+        $cb = static function ($data) use ($fn): int {
             try {
                 return $fn() === false ? 0 : 1;
             } catch (\Throwable $e) {
@@ -261,7 +261,7 @@ final class Ffi
      */
     public static function onShouldQuit(callable $fn): void
     {
-        $cb = function ($data) use ($fn): int {
+        $cb = static function ($data) use ($fn): int {
             try {
                 return $fn() === false ? 0 : 1;
             } catch (\Throwable $e) {

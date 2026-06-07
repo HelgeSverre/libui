@@ -31,7 +31,7 @@ abstract class Control
      * This is the `uiX *` pointer (e.g., `uiButton *`) that libui uses internally.
      * Most applications don't need to access this directly.
      *
-     * @return \FFI\CData The widget's native handle as FFI CData
+     * @return \FFI\CData The widget's native handle as FFI \FFI\CData
      */
     public function handle(): \FFI\CData
     {

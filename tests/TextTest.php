@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Libui\Tests;
 
-use Libui\Generated\Enum\At;
 use Libui\Generated\Enum\AttributeType;
 use Libui\Generated\Enum\TextItalic;
 use Libui\Generated\Enum\TextStretch;
@@ -27,6 +26,7 @@ final class TextTest extends TestCase
     {
         \Libui\Ffi::init();
     }
+
     // ========================================================================
     // ATTRIBUTED STRING TESTS
     // ========================================================================

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Libui;
 
+use Libui\Generated\Enum\TableSelectionMode;
+
 /**
  * A data-grid widget backed by a {@see TableModel}.
  *
@@ -183,7 +185,7 @@ final class Table extends Control
      *
      * @return \Libui\Generated\Enum\TableSelectionMode
      */
-    public function selectionMode(): \Libui\Generated\Enum\TableSelectionMode
+    public function selectionMode(): TableSelectionMode
     {
         return Ffi::get()->uiTableGetSelectionMode($this->handle);
     }
@@ -193,7 +195,7 @@ final class Table extends Control
      *
      * @param \Libui\Generated\Enum\TableSelectionMode $mode
      */
-    public function setSelectionMode(\Libui\Generated\Enum\TableSelectionMode $mode): static
+    public function setSelectionMode(TableSelectionMode $mode): static
     {
         Ffi::get()->uiTableSetSelectionMode($this->handle, $mode);
         return $this;
@@ -236,7 +238,7 @@ final class Table extends Control
         // properly construct the uiTableSelection struct
 
         // For now, just set the first selected row if any
-        if (! empty($rows)) {
+        if ($rows !== []) {
             // This is a placeholder - the actual implementation requires
             // creating a uiTableSelection struct and populating it
             // which is complex with FFI
@@ -250,7 +252,7 @@ final class Table extends Control
      */
     public function onSelectionChanged(callable $cb): static
     {
-        $fn = \Libui\Control::keep(function ($t) use ($cb) {
+        $fn = Control::keep(function ($t) use ($cb) {
             $cb($this);
         });
         Ffi::get()->uiTableOnSelectionChanged($this->handle, $fn, null);
@@ -264,7 +266,7 @@ final class Table extends Control
      */
     public function onRowClicked(callable $cb): static
     {
-        $fn = \Libui\Control::keep(function ($t) use ($cb) {
+        $fn = Control::keep(function ($t) use ($cb) {
             $cb($this);
         });
         Ffi::get()->uiTableOnRowClicked($this->handle, $fn, null);
@@ -278,7 +280,7 @@ final class Table extends Control
      */
     public function onRowDoubleClicked(callable $cb): static
     {
-        $fn = \Libui\Control::keep(function ($t) use ($cb) {
+        $fn = Control::keep(function ($t) use ($cb) {
             $cb($this);
         });
         Ffi::get()->uiTableOnRowDoubleClicked($this->handle, $fn, null);

@@ -82,7 +82,7 @@ final class Brush
 
         if ($this->stops !== []) {
             $n = \count($this->stops);
-            $array = $ffi->new("uiDrawBrushGradientStop[$n]");
+            $array = $ffi->new("uiDrawBrushGradientStop[{$n}]");
             foreach ($this->stops as $i => [$pos, $r, $g, $b, $a]) {
                 $array[$i]->Pos = $pos;
                 $array[$i]->R = $r;

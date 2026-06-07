@@ -19,7 +19,7 @@ final class LifecycleTest extends LibuiTestCase
     {
         $ran = false;
 
-        Ffi::queueMain(function () use (&$ran): void {
+        Ffi::queueMain(static function () use (&$ran): void {
             $ran = true;
             Ffi::quit();
         });
@@ -32,7 +32,7 @@ final class LifecycleTest extends LibuiTestCase
     {
         $ticks = 0;
 
-        Ffi::timer(10, function () use (&$ticks): bool {
+        Ffi::timer(10, static function () use (&$ticks): bool {
             if (++$ticks >= 3) {
                 Ffi::quit();
                 return false; // stop the timer

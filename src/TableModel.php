@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Libui;
 
 use Libui\Generated\Enum\TableValueType;
-
 /**
  * Bridges a {@see TableModelDelegate} to libui's uiTableModel.
  *
@@ -105,33 +104,25 @@ final class TableModel
         $handler = $ffi->new('uiTableModelHandler');
         $delegate = $this->delegate;
 
-        $this->callbacks['NumColumns'] = function ($mh, $m) use ($delegate): int {
-            return self::guard(fn () => $delegate->numColumns(), 0);
-        };
-        $this->callbacks['ColumnType'] = function ($mh, $m, $column) use ($delegate): int {
-            return self::guard(
-                fn () => $delegate->columnType($column)->value,
-                TableValueType::String->value,
-            );
-        };
-        $this->callbacks['NumRows'] = function ($mh, $m) use ($delegate): int {
-            return self::guard(fn () => $delegate->numRows(), 0);
-        };
+        $this->callbacks['NumColumns'] = static fn ($mh, $m) => self::guard($delegate->numColumns(...), 0);
+        $this->callbacks['ColumnType'] = static fn ($mh, $m, $column) => self::guard(
+            static fn () => $delegate->columnType($column)->value,
+            TableValueType::String->value,
+        );
+        $this->callbacks['NumRows'] = static fn ($mh, $m) => self::guard($delegate->numRows(...), 0);
         // libui takes ownership of the returned uiTableValue* and frees it, so
         // we mint a fresh one per call and hand off the pointer.
-        $this->callbacks['CellValue'] = function ($mh, $m, $row, $column) use ($delegate, $ffi) {
-            return self::guard(function () use ($delegate, $ffi, $row, $column) {
-                $type = $delegate->columnType($column);
-                $value = $delegate->cellValue($row, $column);
+        $this->callbacks['CellValue'] = static fn ($mh, $m, $row, $column) => self::guard(static function () use ($delegate, $ffi, $row, $column) {
+            $type = $delegate->columnType($column);
+            $value = $delegate->cellValue($row, $column);
 
-                return $type === TableValueType::Int
-                    ? $ffi->uiNewTableValueInt((int) $value)
-                    : $ffi->uiNewTableValueString((string) $value);
-            }, null);
-        };
-        $this->callbacks['SetCellValue'] = function ($mh, $m, $row, $column, $value) use ($delegate, $ffi): void {
+            return $type === TableValueType::Int
+                ? $ffi->uiNewTableValueInt((int) $value)
+                : $ffi->uiNewTableValueString((string) $value);
+        }, null);
+        $this->callbacks['SetCellValue'] = static function ($mh, $m, $row, $column, $value) use ($delegate, $ffi): void {
             self::guard(
-                function () use ($delegate, $ffi, $row, $column, $value): void {
+                static function () use ($delegate, $ffi, $row, $column, $value): void {
                     // $value is null when libui clears a cell (e.g. button columns).
                     $marshalled = null;
                     if ($value !== null) {

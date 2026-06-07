@@ -253,6 +253,12 @@ parameters:
 			path: src/Draw/DrawContext.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixInvert\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Draw/Matrix.php
+
+		-
 			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixMultiply\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -261,13 +267,13 @@ parameters:
 		-
 			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixRotate\(\)\.$#'
 			identifier: method.notFound
-			count: 1
+			count: 2
 			path: src/Draw/Matrix.php
 
 		-
 			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixScale\(\)\.$#'
 			identifier: method.notFound
-			count: 1
+			count: 2
 			path: src/Draw/Matrix.php
 
 		-
@@ -279,7 +285,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method FFI\:\:uiDrawMatrixSkew\(\)\.$#'
 			identifier: method.notFound
-			count: 1
+			count: 2
 			path: src/Draw/Matrix.php
 
 		-
@@ -465,7 +471,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method FFI\:\:uiDrawPathNewFigureWithArc\(\)\.$#'
 			identifier: method.notFound
-			count: 1
+			count: 2
 			path: src/Draw/Path.php
 
 		-
@@ -1495,6 +1501,24 @@ parameters:
 			path: src/Generated/Window.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiFreeImage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Image.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiImageAppend\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Image.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewImage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Image.php
+
+		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Model\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1507,7 +1531,49 @@ parameters:
 			path: src/Table.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiFreeTableSelection\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
 			message: '#^Call to an undefined method FFI\:\:uiNewTable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableAppendButtonColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableAppendCheckboxColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableAppendCheckboxTextColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableAppendImageColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableAppendImageTextColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableAppendProgressBarColumn\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Table.php
@@ -1525,6 +1591,18 @@ parameters:
 			path: src/Table.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiTableGetSelection\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableGetSelectionMode\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
 			message: '#^Call to an undefined method FFI\:\:uiTableHeaderSetVisible\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1532,6 +1610,30 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method FFI\:\:uiTableHeaderVisible\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableOnRowClicked\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableOnRowDoubleClicked\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableOnSelectionChanged\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableSetSelectionMode\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Table.php
@@ -1663,7 +1765,19 @@ parameters:
 			path: src/Text/Attribute.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiNewStretchAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/Attribute.php
+
+		-
 			message: '#^Call to an undefined method FFI\:\:uiNewUnderlineAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/Attribute.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiNewUnderlineColorAttribute\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Text/Attribute.php
@@ -1681,6 +1795,18 @@ parameters:
 			path: src/Text/AttributedString.php
 
 		-
+			message: '#^Call to an undefined method FFI\:\:uiAttributedStringDelete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/AttributedString.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiAttributedStringInsertAtUnattributed\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/AttributedString.php
+
+		-
 			message: '#^Call to an undefined method FFI\:\:uiAttributedStringLen\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1688,6 +1814,12 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method FFI\:\:uiAttributedStringSetAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Text/AttributedString.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiFreeAttributedString\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Text/AttributedString.php
@@ -1701,31 +1833,31 @@ parameters:
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Family\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: src/Text/FontDescriptor.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Italic\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: src/Text/FontDescriptor.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Size\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: src/Text/FontDescriptor.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Stretch\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: src/Text/FontDescriptor.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Weight\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: src/Text/FontDescriptor.php
 
 		-
@@ -1773,7 +1905,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method FFI\:\:uiDrawTextLayoutExtents\(\)\.$#'
 			identifier: method.notFound
-			count: 1
+			count: 2
 			path: src/Text/TextLayout.php
 
 		-
@@ -1781,6 +1913,432 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: src/Text/TextLayout.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$cdata\.$#'
+			identifier: property.notFound
+			count: 4
+			path: tests/AAAWidgetTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsBool\(\) with bool will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 3
+			path: tests/AAAWidgetTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsInt\(\) with int will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 2
+			path: tests/AAAWidgetTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsString\(\) with string will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AAAWidgetTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Grid with children…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AAAWidgetTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Multiple items…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AAAWidgetTest.php
+
+		-
+			message: '#^Class Libui\\Group is not an Attribute class\.$#'
+			identifier: attribute.notAttribute
+			count: 1
+			path: tests/AAAWidgetTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''App should be…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AppTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''App with shouldQuit…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AppTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''App with vetoing…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AppTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''App without…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AppTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Handler with…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AppTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Multiple windows…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AppTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Primary window…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/AppTest.php
+
+		-
+			message: '#^Anonymous function has an unused use \$button\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Anonymous function has an unused use \$expectedText\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Anonymous function has an unused use \$externalValue\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Anonymous function has an unused use \$object\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Libui\\\\Generated\\\\MenuItem'' and ''onClicked'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Callback with use…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Callback with…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Exception in…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Multiple callbacks…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''onClicked should…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function set_error_handler expects \(callable\(int, string, string, int\)\: bool\)\|null, Closure\(mixed, mixed\)\: void given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/CallbackTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsBool\(\) with bool will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 4
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsInt\(\) with int will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Box can contain Form'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Box can contain Grid'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Box can contain Tab'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Box can contain…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 2
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Complex nested…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''InsertAt with…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Multiple children…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Multiple controls…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ContainerTest.php
+
+		-
+			message: '#^Call to function is_subclass_of\(\) with ''Libui\\\\Button''\|''Libui\\\\Checkbox''\|''Libui\\\\Entry''\|''Libui\\\\Label'' and ''Libui\\\\Control'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: tests/ControlTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsBool\(\) with bool will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ControlTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Libui\\\\Button should…''\|''Libui\\\\Checkbox…''\|''Libui\\\\Entry should…''\|''Libui\\\\Label should…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ControlTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''destroy\(\) should…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ControlTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''onClicked should…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/ControlTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Complex path should…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Path with arc…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Path with bezier…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Path\:\:end\(\) should…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Path\:\:free\(\) should…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertNull\(\) with null will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/EnumCompleteTest.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiButtonText\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsCallable\(\) with array\{FFI, ''uiInit''\} will always evaluate to false\.$#'
+			identifier: method.impossibleType
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsCallable\(\) with array\{FFI, ''uiMain''\} will always evaluate to false\.$#'
+			identifier: method.impossibleType
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsCallable\(\) with array\{FFI, ''uiNewButton''\} will always evaluate to false\.$#'
+			identifier: method.impossibleType
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsCallable\(\) with array\{FFI, ''uiNewWindow''\} will always evaluate to false\.$#'
+			identifier: method.impossibleType
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsCallable\(\) with array\{FFI, ''uiQuit''\} will always evaluate to false\.$#'
+			identifier: method.impossibleType
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsInt\(\) with int\<0, max\> will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsString\(\) with ''Test String'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsString\(\) with ''hello'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsString\(\) with string will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Libui\\\\Table'' and ''fromDelegate'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: tests/TableFunctionalTest.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Libui\\\\Table'' and ''fromModel'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: tests/TableFunctionalTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''TableModel\:\:free\(\)…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 2
+			path: tests/TableFunctionalTest.php
+
+		-
+			message: '#^Method Libui\\TableModelDelegate@anonymous/tests/TableFunctionalTest\.php\:126\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/TableFunctionalTest.php
+
+		-
+			message: '#^Method Libui\\TableModelDelegate@anonymous/tests/TableFunctionalTest\.php\:436\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/TableFunctionalTest.php
+
+		-
+			message: '#^Method Libui\\TableModelDelegate@anonymous/tests/TableFunctionalTest\.php\:95\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/TableFunctionalTest.php
+
+		-
+			message: '#^Result of method Libui\\TableModelDelegate\:\:cellValueChanged\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: tests/TableFunctionalTest.php
+
+		-
+			message: '#^Result of method Libui\\TableModelDelegate\:\:setCellValue\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: tests/TableFunctionalTest.php
+
+		-
+			message: '#^Call to method Libui\\Text\\TextLayout\:\:setFont\(\) on a separate line has no effect\.$#'
+			identifier: method.resultUnused
+			count: 1
+			path: tests/TextTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsArray\(\) with array\{float, float\} will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/TextTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsFloat\(\) with float will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 4
+			path: tests/TextTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Attribute\:\:free\(\)…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/TextTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''AttributedString\:…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/TextTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''FontDescriptor\:…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/TextTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''TextLayout\:\:free\(\)…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/TextTest.php
 
 		-
 			message: '#^Call to function method_exists\(\) with ''Libui\\\\Generated\\\\Ui'' and ''msgBox'' will always evaluate to true\.$#'

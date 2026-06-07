@@ -12,7 +12,7 @@ namespace Libui;
  */
 final class Image
 {
-    private \FFI\CData $handle;
+    private ?\FFI\CData $handle;
 
     /**
      * Creates a new empty image with the specified dimensions.
@@ -28,7 +28,7 @@ final class Image
     /**
      * Returns the native uiImage handle.
      */
-    public function handle(): \FFI\CData
+    public function handle(): ?\FFI\CData
     {
         return $this->handle;
     }
@@ -56,6 +56,10 @@ final class Image
      */
     public function append(string $pixels, int $pixelWidth, int $pixelHeight, int $byteStride): void
     {
+        if ($this->handle === null) {
+            throw new \RuntimeException('Cannot append to a freed image');
+        }
+
         $ffi = Ffi::get();
         // Create a temporary C buffer from the PHP string
         $buf = $ffi->new('unsigned char[' . \strlen($pixels) . ']');
@@ -68,7 +72,7 @@ final class Image
      * Creates an Image from a PNG file.
      *
      * This method uses PHP's GD extension to decode the PNG and convert it to RGBA.
-     * If GD is not available, it throws a RuntimeException.
+     * If GD is not available, it throws a \RuntimeException.
      *
      * @param string $path Path to the PNG file
      * @return static A new Image instance with the decoded PNG data
@@ -84,14 +88,14 @@ final class Image
 
         $imageInfo = @getimagesize($path);
         if ($imageInfo === false) {
-            throw new \RuntimeException("Unable to read PNG file: $path");
+            throw new \RuntimeException("Unable to read PNG file: {$path}");
         }
 
         [$width, $height, $type] = $imageInfo;
 
         $gdImage = @imagecreatefrompng($path);
         if ($gdImage === false) {
-            throw new \RuntimeException("Unable to decode PNG file: $path");
+            throw new \RuntimeException("Unable to decode PNG file: {$path}");
         }
 
         // Convert to truecolor if needed

@@ -52,7 +52,7 @@
     "format": "mago fmt",
     "format:check": "mago fmt --check",
     "lint": "mago lint",
-    "lint:check": "mago lint --check",
+    "lint:check": "mago lint",
     "check": [
       "@lint",
       "@stan",

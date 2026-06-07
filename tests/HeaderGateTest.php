@@ -36,7 +36,7 @@ final class HeaderGateTest extends LibuiTestCase
         $this->assertStringContainsString(
             $symbol . '(',
             $header,
-            "$symbol should be declared in the generated header",
+            "{$symbol} should be declared in the generated header",
         );
     }
 

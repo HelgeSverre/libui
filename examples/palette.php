@@ -43,9 +43,11 @@ function fuzzy(string $q, string $s): bool
     $i = 0;
     $n = strlen($q);
     foreach (str_split($s) as $ch) {
-        if ($i < $n && $ch === $q[$i]) {
-            $i++;
+        if (! ($i < $n && $ch === $q[$i])) {
+            continue;
         }
+
+        $i++;
     }
     return $i === $n;
 }
@@ -81,7 +83,7 @@ $palette = new class extends AreaDelegate {
         $w = $p->areaWidth;
         $h = $p->areaHeight;
 
-        $ctx->fillPath(Brush::rgb(0x14_16_1D), fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
+        $ctx->fillPath(Brush::rgb(0x14_16_1D), static fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
 
         // search input row
         $ctx->drawString('⌕', new FontDescriptor(FONT, 26.0), [0.40, 0.55, 1.0], 22, 16);
@@ -90,7 +92,7 @@ $palette = new class extends AreaDelegate {
         } else {
             $ctx->drawString($this->query, new FontDescriptor(FONT, 19.0), [0.92, 0.94, 0.98], 58, 22);
         }
-        $ctx->fillPath(Brush::rgb(0x25_29_33), fn (Path $rule) => $rule->addRectangle(0, 62, $w, 1));
+        $ctx->fillPath(Brush::rgb(0x25_29_33), static fn (Path $rule) => $rule->addRectangle(0, 62, $w, 1));
 
         // result rows
         $rowH = 46.0;
@@ -98,7 +100,7 @@ $palette = new class extends AreaDelegate {
         foreach ($this->filtered() as $i => $cmd) {
             $isSel = $i === $this->selected;
             if ($isSel) {
-                $ctx->fillPath(Brush::solid(0.36, 0.42, 0.95, 0.18), fn (Path $hl) => $hl->addRectangle(8, $y - 4, $w - 16, $rowH - 4));
+                $ctx->fillPath(Brush::solid(0.36, 0.42, 0.95, 0.18), static fn (Path $hl) => $hl->addRectangle(8, $y - 4, $w - 16, $rowH - 4));
             }
             $ctx->drawString($cmd[0], new FontDescriptor(FONT, 20.0), [1, 1, 1], 22, $y + 6);
             $ctx->drawString(

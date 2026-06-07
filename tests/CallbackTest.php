@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Libui\Tests;
 
 use Libui\Button;
-use Libui\Checkbox;
 use Libui\Control;
-use Libui\Entry;
 use Libui\Ffi;
 use Libui\Window;
 use PHPUnit\Framework\Attributes\Group;
@@ -25,7 +23,7 @@ final class CallbackTest extends LibuiTestCase
         $called = false;
         $button = new Button('Click me');
 
-        $button->onClicked(function () use (&$called): void {
+        $button->onClicked(static function () use (&$called): void {
             $called = true;
         });
 
@@ -36,7 +34,7 @@ final class CallbackTest extends LibuiTestCase
     public function testButtonOnClickedReturnsThisForChaining(): void
     {
         $button = new Button('Click me');
-        $result = $button->onClicked(function (): void {});
+        $result = $button->onClicked(static function (): void {});
 
         $this->assertSame($button, $result);
     }
@@ -45,9 +43,7 @@ final class CallbackTest extends LibuiTestCase
     {
         $window = new Window('Test', 100, 100, false);
 
-        $result = $window->onClosing(function () {
-            return true; // Allow closing
-        });
+        $result = $window->onClosing(static fn () => true);
 
         $this->assertSame($window, $result);
     }
@@ -56,9 +52,7 @@ final class CallbackTest extends LibuiTestCase
     {
         $window = new Window('Test', 100, 100, false);
 
-        $result = $window->onClosing(function () {
-            return false; // Veto closing
-        });
+        $result = $window->onClosing(static fn () => false);
 
         $this->assertSame($window, $result);
     }
@@ -78,12 +72,11 @@ final class CallbackTest extends LibuiTestCase
 
     public function testControlKeepRetainsClosure(): void
     {
-        $callback = function (): void {};
+        $callback = static function (): void {};
 
         // Use reflection to access the protected keep method
         $reflection = new \ReflectionClass(Control::class);
         $method = $reflection->getMethod('keep');
-        $method->setAccessible(true);
 
         $result = $method->invoke(null, $callback);
 
@@ -92,16 +85,14 @@ final class CallbackTest extends LibuiTestCase
 
     public function testControlKeepStoresClosureStatically(): void
     {
-        $callback1 = function (): void {};
-        $callback2 = function (): void {};
+        $callback1 = static function (): void {};
+        $callback2 = static function (): void {};
 
         $reflection = new \ReflectionClass(Control::class);
         $method = $reflection->getMethod('keep');
-        $method->setAccessible(true);
 
         // Access the callbacks storage
         $property = $reflection->getProperty('callbacks');
-        $property->setAccessible(true);
 
         $countBefore = count($property->getValue());
 
@@ -118,7 +109,7 @@ final class CallbackTest extends LibuiTestCase
         $externalValue = 'test';
         $button = new Button('Click');
 
-        $button->onClicked(function () use ($externalValue): void {
+        $button->onClicked(static function () use ($externalValue): void {
             // The closure captures $externalValue
             // This should be retained properly
         });
@@ -133,7 +124,7 @@ final class CallbackTest extends LibuiTestCase
 
         $button = new Button('Click');
 
-        $button->onClicked(function () use ($object): void {
+        $button->onClicked(static function () use ($object): void {
             // The closure captures the object
         });
 
@@ -145,11 +136,11 @@ final class CallbackTest extends LibuiTestCase
         $button = new Button('Click');
         $count = 0;
 
-        $button->onClicked(function () use (&$count): void {
+        $button->onClicked(static function () use (&$count): void {
             $count++;
         });
 
-        $button->onClicked(function () use (&$count): void {
+        $button->onClicked(static function () use (&$count): void {
             $count++;
         });
 
@@ -162,14 +153,13 @@ final class CallbackTest extends LibuiTestCase
     {
         $ran = false;
 
-        Ffi::queueMain(function () use (&$ran): void {
+        Ffi::queueMain(static function () use (&$ran): void {
             $ran = true;
         });
 
         // The callback should be retained in Ffi::$retained
         $reflection = new \ReflectionClass(Ffi::class);
         $property = $reflection->getProperty('retained');
-        $property->setAccessible(true);
 
         $retained = $property->getValue();
 
@@ -181,7 +171,7 @@ final class CallbackTest extends LibuiTestCase
     {
         $ticks = 0;
 
-        Ffi::timer(100, function () use (&$ticks): bool {
+        Ffi::timer(100, static function () use (&$ticks): bool {
             $ticks++;
             return $ticks < 3; // Stop after 3 ticks
         });
@@ -189,7 +179,6 @@ final class CallbackTest extends LibuiTestCase
         // The callback should be retained
         $reflection = new \ReflectionClass(Ffi::class);
         $property = $reflection->getProperty('retained');
-        $property->setAccessible(true);
 
         $retained = $property->getValue();
         $this->assertGreaterThan(0, count($retained));
@@ -197,14 +186,11 @@ final class CallbackTest extends LibuiTestCase
 
     public function testFfiOnShouldQuitRetainsCallback(): void
     {
-        Ffi::onShouldQuit(function (): bool {
-            return true;
-        });
+        Ffi::onShouldQuit(static fn (): bool => true);
 
         // The callback should be retained
         $reflection = new \ReflectionClass(Ffi::class);
         $property = $reflection->getProperty('retained');
-        $property->setAccessible(true);
 
         $retained = $property->getValue();
         $this->assertGreaterThan(0, count($retained));
@@ -215,7 +201,7 @@ final class CallbackTest extends LibuiTestCase
         // This tests that callbacks are retained statically on Control,
         // not on the widget instance, so they survive widget destruction
 
-        $callback = function (): void {};
+        $callback = static function (): void {};
 
         $button = new Button('Test');
         $button->onClicked($callback);
@@ -223,7 +209,6 @@ final class CallbackTest extends LibuiTestCase
         // Get the callbacks storage
         $reflection = new \ReflectionClass(Control::class);
         $property = $reflection->getProperty('callbacks');
-        $property->setAccessible(true);
 
         $countBefore = count($property->getValue());
 
@@ -240,12 +225,12 @@ final class CallbackTest extends LibuiTestCase
         $errorMessage = '';
 
         // Set up a custom error handler to capture the message
-        set_error_handler(function ($severity, $message) use (&$errorMessage): void {
+        set_error_handler(static function ($severity, $message) use (&$errorMessage): void {
             $errorMessage = $message;
         });
 
         try {
-            Ffi::queueMain(function (): void {
+            Ffi::queueMain(static function (): void {
                 throw new \RuntimeException('Test exception in callback');
             });
 
@@ -267,7 +252,7 @@ final class CallbackTest extends LibuiTestCase
         // that the callback binding itself doesn't throw
 
         try {
-            Ffi::queueMain(function () use (&$exceptionThrown): void {
+            Ffi::queueMain(static function () use (&$exceptionThrown): void {
                 $exceptionThrown = true;
                 throw new \RuntimeException('Test');
             });
@@ -283,7 +268,7 @@ final class CallbackTest extends LibuiTestCase
         $button = new Button('Initial');
         $expectedText = 'Updated';
 
-        $button->onClicked(function () use ($button, $expectedText): void {
+        $button->onClicked(static function () use ($button, $expectedText): void {
             // The callback can access the widget via closure
             // This tests that the widget is still accessible
             // Note: We can't actually trigger the click, but we can verify binding
@@ -300,10 +285,10 @@ final class CallbackTest extends LibuiTestCase
         $order = [];
 
         $result = $button
-            ->onClicked(function () use (&$order): void {
+            ->onClicked(static function () use (&$order): void {
                 $order[] = 'first';
             })
-            ->onClicked(function () use (&$order): void {
+            ->onClicked(static function () use (&$order): void {
                 $order[] = 'second';
             });
 

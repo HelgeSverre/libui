@@ -25,6 +25,7 @@ empty-line-after-opening-tag = false
 
 [linter]
 integrations = ["php-unit"]
+baseline = "mago-baseline.json"
 
 [linter.rules]
 # This library's entire premise is PHP FFI — the FFI rules would fire everywhere.

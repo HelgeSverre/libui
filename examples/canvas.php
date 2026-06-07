@@ -36,10 +36,10 @@ $delegate = new class extends AreaDelegate {
         $h = $p->areaHeight;
 
         // dark background
-        $ctx->fillPath(Brush::rgb(0x0F172A), fn (Path $p) => $p->addRectangle(0, 0, $w, $h));
+        $ctx->fillPath(Brush::rgb(0x0F_172A), static fn (Path $p) => $p->addRectangle(0, 0, $w, $h));
 
         // a gradient-filled mountain silhouette
-        $mountain = fn (Path $p) => $p
+        $mountain = static fn (Path $p) => $p
             ->newFigure(0, $h * 0.80)
             ->lineTo($w * 0.20, $h * 0.45)
             ->lineTo($w * 0.40, $h * 0.62)
@@ -53,11 +53,11 @@ $delegate = new class extends AreaDelegate {
             [0.0, 0.31, 0.27, 0.90, 1.0], // indigo
             [1.0, 0.02, 0.71, 0.83, 1.0], // cyan
         ]), $mountain);
-        $ctx->strokePath(Brush::rgb(0xFFFFFF), StrokeParams::solid(2.0), $mountain);
+        $ctx->strokePath(Brush::rgb(0xFF_FFFF), StrokeParams::solid(2.0), $mountain);
 
         // mouse-trail dots
         foreach ($this->dots as [$x, $y]) {
-            $ctx->fillPath(Brush::rgb(0xFACC15), fn (Path $p) => $p->addRectangle($x - 3, $y - 3, 6, 6));
+            $ctx->fillPath(Brush::rgb(0xFA_CC15), static fn (Path $p) => $p->addRectangle($x - 3, $y - 3, 6, 6));
         }
     }
 

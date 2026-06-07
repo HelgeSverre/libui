@@ -149,7 +149,6 @@ final class FfiMarshallingTest extends LibuiTestCase
         // Use reflection to test the private method
         $reflection = new \ReflectionClass(Ffi::class);
         $method = $reflection->getMethod('libPath');
-        $method->setAccessible(true);
 
         $path = $method->invoke(null);
 
@@ -157,7 +156,7 @@ final class FfiMarshallingTest extends LibuiTestCase
         // Check that the path ends with a library extension
         $this->assertTrue(
             str_ends_with($path, '.dylib') || str_ends_with($path, '.so') || str_ends_with($path, '.dll'),
-            "Expected library path to end with .dylib, .so, or .dll, got: $path"
+            "Expected library path to end with .dylib, .so, or .dll, got: {$path}",
         );
 
         // The file should exist (at least on macOS where it's prebuilt)
@@ -177,11 +176,10 @@ final class FfiMarshallingTest extends LibuiTestCase
             touch($tmpFile);
 
             // Set the override to point to our temp file
-            putenv("LIBUI_LIB=$tmpFile");
+            putenv("LIBUI_LIB={$tmpFile}");
 
             $reflection = new \ReflectionClass(Ffi::class);
             $method = $reflection->getMethod('libPath');
-            $method->setAccessible(true);
 
             $path = $method->invoke(null);
 
@@ -194,7 +192,7 @@ final class FfiMarshallingTest extends LibuiTestCase
             if ($original === false) {
                 putenv('LIBUI_LIB');
             } else {
-                putenv("LIBUI_LIB=$original");
+                putenv("LIBUI_LIB={$original}");
             }
         }
     }
@@ -216,7 +214,6 @@ final class FfiMarshallingTest extends LibuiTestCase
         // Access the private property via reflection
         $reflection = new \ReflectionClass(Ffi::class);
         $property = $reflection->getProperty('retained');
-        $property->setAccessible(true);
 
         $retained = $property->getValue();
 
@@ -227,19 +224,18 @@ final class FfiMarshallingTest extends LibuiTestCase
     {
         $ran = false;
 
-        Ffi::queueMain(function () use (&$ran): void {
+        Ffi::queueMain(static function () use (&$ran): void {
             $ran = true;
         });
 
         // The callback should be retained
         $reflection = new \ReflectionClass(Ffi::class);
         $property = $reflection->getProperty('retained');
-        $property->setAccessible(true);
 
         $retainedBefore = count($property->getValue());
 
         // Queue another callback
-        Ffi::queueMain(function (): void {});
+        Ffi::queueMain(static function (): void {});
 
         $retainedAfter = count($property->getValue());
 
@@ -250,14 +246,11 @@ final class FfiMarshallingTest extends LibuiTestCase
     {
         $reflection = new \ReflectionClass(Ffi::class);
         $property = $reflection->getProperty('retained');
-        $property->setAccessible(true);
 
         $retainedBefore = count($property->getValue());
 
         // Create a timer
-        Ffi::timer(100, function (): bool {
-            return false;
-        });
+        Ffi::timer(100, static fn (): bool => false);
 
         $retainedAfter = count($property->getValue());
 
@@ -268,14 +261,11 @@ final class FfiMarshallingTest extends LibuiTestCase
     {
         $reflection = new \ReflectionClass(Ffi::class);
         $property = $reflection->getProperty('retained');
-        $property->setAccessible(true);
 
         $retainedBefore = count($property->getValue());
 
         // Install should-quit handler
-        Ffi::onShouldQuit(function (): bool {
-            return true;
-        });
+        Ffi::onShouldQuit(static fn (): bool => true);
 
         $retainedAfter = count($property->getValue());
 

@@ -61,7 +61,7 @@ function cleanHeader(string $src): string
     }
     $src = preg_replace("/\n{3,}/", "\n\n", trim(implode("\n", $out)));
 
-    return "// GENERATED from libui-ng ui.h by tools/generate.php — DO NOT EDIT.\n" . "// Re-run `composer regen` to regenerate.\n\n" . $src . "\n";
+    return "// GENERATED from libui-ng ui.h by tools/generate.php — DO NOT EDIT.\n// Re-run `composer regen` to regenerate.\n\n" . $src . "\n";
 }
 
 // =============================================================================
@@ -427,17 +427,17 @@ function phpReturnType(array $c, array $generatedTypes): string
 function returnStmt(array $c, string $call, array $generatedTypes, bool $asBool): string
 {
     if ($c['kind'] === 'void')
-        return "        $call;";
+        return "        {$call};";
     if ($asBool && $c['kind'] === 'int')
-        return "        return $call !== 0;";
+        return "        return {$call} !== 0;";
     return match ($c['kind']) {
-        'string_owned' => "        return \\Libui\\Ffi::ownedString($call);",
-        'string_borrow' => "        return \\Libui\\Ffi::borrowedString($call);",
-        'enum' => "        return \\Libui\\Generated\\Enum\\" . enumClass($c['name']) . "::from($call);",
+        'string_owned' => "        return \\Libui\\Ffi::ownedString({$call});",
+        'string_borrow' => "        return \\Libui\\Ffi::borrowedString({$call});",
+        'enum' => "        return \\Libui\\Generated\\Enum\\" . enumClass($c['name']) . "::from({$call});",
         'widget' => in_array($c['name'], $generatedTypes, true)
-            ? "        return \\Libui\\Generated\\" . shortName($c['name']) . "::wrap($call);"
-            : "        return $call;",
-        default => "        return $call;",
+            ? "        return \\Libui\\Generated\\" . shortName($c['name']) . "::wrap({$call});"
+            : "        return {$call};",
+        default => "        return {$call};",
     };
 }
 
@@ -452,7 +452,7 @@ function rrmdir(string $dir): void
     foreach (scandir($dir) as $f) {
         if ($f === '.' || $f === '..')
             continue;
-        $p = "$dir/$f";
+        $p = "{$dir}/{$f}";
         is_dir($p) ? rrmdir($p) : unlink($p);
     }
     rmdir($dir);
@@ -460,7 +460,7 @@ function rrmdir(string $dir): void
 
 function writeFile(string $path, string $content): void
 {
-    @mkdir(dirname($path), 0777, true);
+    @mkdir(dirname($path), 0o777, true);
     file_put_contents($path, $content);
 }
 
@@ -496,7 +496,7 @@ function emitMethod(array $fn, string $type, array $ctx): ?string
         return (
             docBlock($name, $docs, '    ')
             . "    public function {$method}(callable \$cb): static\n    {\n"
-            . "$body\n"
+            . "{$body}\n"
             . "        \\Libui\\Ffi::get()->{$name}(\$this->handle, \$fn, null);\n"
             . "        return \$this;\n    }\n"
         );
@@ -511,9 +511,9 @@ function emitMethod(array $fn, string $type, array $ctx): ?string
             $isBool && $c['kind'] === 'int' && str_starts_with($rest, 'Set') && $i === (count($params) - 1)
                 ? 'bool'
                 : phpParamType($c);
-        $var = '$' . ($p['name'] ?: "a$i");
-        $sig[] = "$pt $var";
-        $args[] = $pt === 'bool' ? "(int) $var" : marshalArg($c, $var);
+        $var = '$' . ($p['name'] ?: "a{$i}");
+        $sig[] = "{$pt} {$var}";
+        $args[] = $pt === 'bool' ? "(int) {$var}" : marshalArg($c, $var);
     }
     $call = "\\Libui\\Ffi::get()->{$name}(" . implode(', ', $args) . ')';
     $ret = classify($fn['ret'], $enums, $types);
@@ -521,7 +521,7 @@ function emitMethod(array $fn, string $type, array $ctx): ?string
     $isSetter = str_starts_with($rest, 'Set');
     if ($isSetter || $ret['kind'] === 'void') {
         // fluent
-        return docBlock($name, $docs, '    ') . "    public function {$method}(" . implode(', ', $sig) . "): static\n    {\n" . "        $call;\n        return \$this;\n    }\n";
+        return docBlock($name, $docs, '    ') . "    public function {$method}(" . implode(', ', $sig) . "): static\n    {\n" . "        {$call};\n        return \$this;\n    }\n";
     }
 
     $rt = $isBool && $ret['kind'] === 'int' ? 'bool' : phpReturnType($ret, $gen);
@@ -529,7 +529,7 @@ function emitMethod(array $fn, string $type, array $ctx): ?string
         docBlock($name, $docs, '    ')
         . "    public function {$method}("
         . implode(', ', $sig)
-        . "): $rt\n    {\n"
+        . "): {$rt}\n    {\n"
         . returnStmt($ret, $call, $gen, $isBool && $ret['kind'] === 'int')
         . "\n    }\n"
     );
@@ -552,9 +552,9 @@ function emitWidget(string $type, array $members, array $ctor, array $ctx): stri
             $c = classify($p['type'], $enums, $types);
             $isHas = str_starts_with($p['name'], 'has') && $c['kind'] === 'int';
             $pt = $isHas ? 'bool' : phpParamType($c);
-            $var = '$' . ($p['name'] ?: "a$i");
-            $sig[] = "$pt $var";
-            $args[] = $isHas ? "(int) $var" : marshalArg($c, $var);
+            $var = '$' . ($p['name'] ?: "a{$i}");
+            $sig[] = "{$pt} {$var}";
+            $args[] = $isHas ? "(int) {$var}" : marshalArg($c, $var);
         }
         $methods[] =
             docBlock($primaryFn, $docs, '    ')
@@ -573,8 +573,8 @@ function emitWidget(string $type, array $members, array $ctor, array $ctx): stri
         $args = [];
         foreach ($params as $i => $p) {
             $c = classify($p['type'], $enums, $types);
-            $var = '$' . ($p['name'] ?: "a$i");
-            $sig[] = phpParamType($c) . " $var";
+            $var = '$' . ($p['name'] ?: "a{$i}");
+            $sig[] = phpParamType($c) . " {$var}";
             $args[] = marshalArg($c, $var);
         }
         $methods[] =
@@ -672,15 +672,15 @@ function emitFacade(array $fns, array $ctx): string
         $args = [];
         foreach ($fn['params'] as $i => $p) {
             $c = classify($p['type'], $enums, $types);
-            $var = '$' . ($p['name'] ?: "a$i");
-            $sig[] = phpParamType($c) . " $var";
+            $var = '$' . ($p['name'] ?: "a{$i}");
+            $sig[] = phpParamType($c) . " {$var}";
             $args[] = marshalArg($c, $var);
         }
         $call = "\\Libui\\Ffi::get()->{$fn['name']}(" . implode(', ', $args) . ')';
         $ret = classify($fn['ret'], $enums, $types);
         $rt = phpReturnType($ret, $gen);
         $body = returnStmt($ret, $call, $gen, false);
-        $methods[] = docBlock($fn['name'], $docs, '    ') . "    public static function {$method}(" . implode(', ', $sig) . "): $rt\n    {\n" . "$body\n    }\n";
+        $methods[] = docBlock($fn['name'], $docs, '    ') . "    public static function {$method}(" . implode(', ', $sig) . "): {$rt}\n    {\n" . "{$body}\n    }\n";
     }
     return (
         "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated;\n\n"
@@ -806,10 +806,12 @@ function main(): void
             continue; // handled as constructor
         $owner = null;
         foreach ($types as $T) { // types sorted longest-first
-            if (str_starts_with($name, $T) && strlen($name) > strlen($T) && ctype_upper($name[strlen($T)])) {
-                $owner = $T;
-                break;
+            if (! (str_starts_with($name, $T) && strlen($name) > strlen($T) && ctype_upper($name[strlen($T)]))) {
+                continue;
             }
+
+            $owner = $T;
+            break;
         }
         if ($owner === null) {
             $free[$name] = $fn;

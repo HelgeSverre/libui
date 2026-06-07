@@ -58,7 +58,7 @@ final class StrokeParams
 
         if ($this->dashes !== []) {
             $n = \count($this->dashes);
-            $array = $ffi->new("double[$n]");
+            $array = $ffi->new("double[{$n}]");
             foreach ($this->dashes as $i => $d) {
                 $array[$i] = $d;
             }

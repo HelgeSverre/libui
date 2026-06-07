@@ -25,7 +25,7 @@ final class DrawContext
     public function fill(Path $path, Brush $brush): void
     {
         // libui takes the brush/stroke structs by pointer.
-        Ffi::get()->uiDrawFill($this->ctx, $path->handle(), \FFI::addr($brush->toCData()));
+        Ffi::get()->uiDrawFill($this->ctx, $path->handle(), $brush->toCData());
     }
 
     public function stroke(Path $path, Brush $brush, StrokeParams $stroke): void
@@ -33,8 +33,8 @@ final class DrawContext
         Ffi::get()->uiDrawStroke(
             $this->ctx,
             $path->handle(),
-            \FFI::addr($brush->toCData()),
-            \FFI::addr($stroke->toCData()),
+            $brush->toCData(),
+            $stroke->toCData(),
         );
     }
 

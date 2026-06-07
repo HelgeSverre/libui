@@ -39,7 +39,7 @@ $delegate = new class extends AreaDelegate {
         $h = $p->areaHeight;
 
         // Light background rectangle behind the text.
-        $ctx->fillPath(Brush::rgb(0xF8FAFC), fn (Path $p) => $p->addRectangle(0, 0, $w, $h));
+        $ctx->fillPath(Brush::rgb(0xF8_FAFC), static fn (Path $p) => $p->addRectangle(0, 0, $w, $h));
 
         // Build a multi-styled paragraph. Each append() applies its attributes
         // to exactly the span just added.

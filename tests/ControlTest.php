@@ -112,7 +112,7 @@ final class ControlTest extends LibuiTestCase
     {
         $button = new Button('Test');
 
-        $button->onClicked(function (): void {});
+        $button->onClicked(static function (): void {});
 
         $this->assertTrue(true, 'onClicked should bind without error');
     }
@@ -137,7 +137,7 @@ final class ControlTest extends LibuiTestCase
         foreach ($widgets as $widgetClass) {
             $this->assertTrue(
                 is_subclass_of($widgetClass, Control::class),
-                "$widgetClass should extend Control",
+                "{$widgetClass} should extend Control",
             );
         }
     }

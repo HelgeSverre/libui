@@ -129,7 +129,7 @@ $dash = new class($ncpu) extends AreaDelegate {
         $h = $p->areaHeight;
 
         // Background.
-        $ctx->fillPath(Brush::rgb(BG), fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
+        $ctx->fillPath(Brush::rgb(BG), static fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
 
         $pad = 18.0;
         $headerH = 56.0;
@@ -212,10 +212,10 @@ $dash = new class($ncpu) extends AreaDelegate {
     /** Flat panel background with a subtle border. */
     private function panel(DrawContext $ctx, float $x, float $y, float $w, float $h): void
     {
-        $ctx->fillPath(Brush::rgb(PANEL), fn (Path $p) => $p->addRectangle($x, $y, $w, $h));
+        $ctx->fillPath(Brush::rgb(PANEL), static fn (Path $p) => $p->addRectangle($x, $y, $w, $h));
         $stroke = StrokeParams::solid(1.0);
         $stroke->join = DrawLineJoin::Round;
-        $ctx->strokePath(Brush::rgb(PANEL_EDGE), $stroke, fn (Path $p) => $p
+        $ctx->strokePath(Brush::rgb(PANEL_EDGE), $stroke, static fn (Path $p) => $p
             ->newFigure($x + 0.5, $y + 0.5)
             ->lineTo($x + $w - 0.5, $y + 0.5)
             ->lineTo($x + $w - 0.5, $y + $h - 0.5)
@@ -252,7 +252,7 @@ $dash = new class($ncpu) extends AreaDelegate {
             $stroke = StrokeParams::solid(1.0);
             for ($g = 0; $g <= 3; $g++) {
                 $gy = $y + $h - (($g / 3) * $h);
-                $ctx->strokePath(Brush::rgb(GRID), $stroke, fn (Path $p) => $p
+                $ctx->strokePath(Brush::rgb(GRID), $stroke, static fn (Path $p) => $p
                     ->newFigure($x, $gy)->lineTo($x + $w, $gy));
                 $this->label($ctx, sprintf('%.1f', ($g / 3) * $max), $x + $w - 34, $gy - 13, 9.0, MUTED, TextWeight::Normal, 34, DrawTextAlign::Right);
             }
@@ -263,11 +263,11 @@ $dash = new class($ncpu) extends AreaDelegate {
         }
 
         $step = $w / ($n - 1);
-        $px = fn (int $i): float => $x + ($i * $step);
-        $py = fn (float $v): float => $y + $h - (($v / $max) * $h);
+        $px = static fn (int $i): float => $x + ($i * $step);
+        $py = static fn (float $v): float => $y + $h - (($v / $max) * $h);
 
         // Filled area under the curve (semi-transparent series colour).
-        $ctx->fillPath(Brush::rgb($color, 0.16), function (Path $p) use ($data, $n, $px, $py, $x, $y, $h): void {
+        $ctx->fillPath(Brush::rgb($color, 0.16), static function (Path $p) use ($data, $n, $px, $py, $x, $y, $h): void {
             $p->newFigure($x, $y + $h);
             for ($i = 0; $i < $n; $i++) {
                 $p->lineTo($px($i), $py($data[$i]));
@@ -280,7 +280,7 @@ $dash = new class($ncpu) extends AreaDelegate {
         $line = StrokeParams::solid(2.0);
         $line->cap = DrawLineCap::Round;
         $line->join = DrawLineJoin::Round;
-        $ctx->strokePath(Brush::rgb($color), $line, function (Path $p) use ($data, $n, $px, $py): void {
+        $ctx->strokePath(Brush::rgb($color), $line, static function (Path $p) use ($data, $n, $px, $py): void {
             $p->newFigure($px(0), $py($data[0]));
             for ($i = 1; $i < $n; $i++) {
                 $p->lineTo($px($i), $py($data[$i]));
@@ -290,7 +290,7 @@ $dash = new class($ncpu) extends AreaDelegate {
         // Marker dot on the most recent sample.
         $lx = $px($n - 1);
         $ly = $py($data[$n - 1]);
-        $ctx->fillPath(Brush::rgb($color), fn (Path $p) => $p->addRectangle($lx - 2.5, $ly - 2.5, 5, 5));
+        $ctx->fillPath(Brush::rgb($color), static fn (Path $p) => $p->addRectangle($lx - 2.5, $ly - 2.5, 5, 5));
     }
 
     /**
@@ -326,7 +326,7 @@ $dash = new class($ncpu) extends AreaDelegate {
             $a = $start + (($end - $start) * $f);
             $r0 = $radius + ($thickness / 2) + 2;
             $r1 = $radius + ($thickness / 2) + 8;
-            $ctx->strokePath(Brush::rgb(MUTED), $tick, fn (Path $p) => $p
+            $ctx->strokePath(Brush::rgb(MUTED), $tick, static fn (Path $p) => $p
                 ->newFigure($cx + (cos($a) * $r0), $cy + (sin($a) * $r0))
                 ->lineTo($cx + (cos($a) * $r1), $cy + (sin($a) * $r1)));
         }
@@ -354,7 +354,7 @@ $dash = new class($ncpu) extends AreaDelegate {
         $stroke = StrokeParams::solid($thickness);
         $stroke->cap = DrawLineCap::Round;
         $stroke->join = DrawLineJoin::Round;
-        $ctx->strokePath($brush, $stroke, function (Path $p) use ($cx, $cy, $radius, $start, $end, $segments): void {
+        $ctx->strokePath($brush, $stroke, static function (Path $p) use ($cx, $cy, $radius, $start, $end, $segments): void {
             for ($i = 0; $i <= $segments; $i++) {
                 $a = $start + (($end - $start) * ($i / $segments));
                 $px = $cx + (cos($a) * $radius);

@@ -154,13 +154,13 @@ final class DrawTest extends TestCase
 
     public function testBrushRgb(): void
     {
-        $brush = Brush::rgb(0xFF0000); // Red
+        $brush = Brush::rgb(0xFF_0000); // Red
         $this->assertInstanceOf(Brush::class, $brush);
     }
 
     public function testBrushRgbWithAlpha(): void
     {
-        $brush = Brush::rgb(0x00FF00, 0.5); // Green with 50% opacity
+        $brush = Brush::rgb(0x00_FF00, 0.5); // Green with 50% opacity
         $this->assertInstanceOf(Brush::class, $brush);
     }
 

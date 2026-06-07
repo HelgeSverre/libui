@@ -8,7 +8,6 @@ use Libui\Draw\DrawContext;
 use Libui\Draw\Params\AreaDrawParams;
 use Libui\Draw\Params\AreaKeyEvent;
 use Libui\Draw\Params\AreaMouseEvent;
-
 /**
  * A custom-drawn surface, driven by an AreaDelegate.
  *
@@ -54,21 +53,19 @@ final class Area extends Control
         // libui's event loop calls these C function pointers; a PHP exception
         // escaping one is a hard fatal ("throwing from FFI callbacks is not
         // allowed"), so each is guarded and reports to STDERR instead.
-        $handler->Draw = static::keep(function ($ah, $area, $params) use ($delegate): void {
-            self::guard(fn () => $delegate->draw(new DrawContext($params->Context), AreaDrawParams::fromCData($params)));
+        $handler->Draw = static::keep(static function ($ah, $area, $params) use ($delegate): void {
+            self::guard(static fn () => $delegate->draw(new DrawContext($params->Context), AreaDrawParams::fromCData($params)));
         });
-        $handler->MouseEvent = static::keep(function ($ah, $area, $event) use ($delegate): void {
-            self::guard(fn () => $delegate->mouse(AreaMouseEvent::fromCData($event)));
+        $handler->MouseEvent = static::keep(static function ($ah, $area, $event) use ($delegate): void {
+            self::guard(static fn () => $delegate->mouse(AreaMouseEvent::fromCData($event)));
         });
-        $handler->MouseCrossed = static::keep(function ($ah, $area, $left) use ($delegate): void {
-            self::guard(fn () => $delegate->mouseCrossed($left !== 0));
+        $handler->MouseCrossed = static::keep(static function ($ah, $area, $left) use ($delegate): void {
+            self::guard(static fn () => $delegate->mouseCrossed($left !== 0));
         });
-        $handler->DragBroken = static::keep(function ($ah, $area) use ($delegate): void {
-            self::guard(fn () => $delegate->dragBroken());
+        $handler->DragBroken = static::keep(static function ($ah, $area) use ($delegate): void {
+            self::guard($delegate->dragBroken(...));
         });
-        $handler->KeyEvent = static::keep(function ($ah, $area, $event) use ($delegate): int {
-            return self::guard(fn () => $delegate->key(AreaKeyEvent::fromCData($event)) ? 1 : 0) ?? 0;
-        });
+        $handler->KeyEvent = static::keep(static fn ($ah, $area, $event) => self::guard(static fn () => $delegate->key(AreaKeyEvent::fromCData($event)) ? 1 : 0) ?? 0);
 
         return $handler;
     }

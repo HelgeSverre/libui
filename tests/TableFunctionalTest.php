@@ -287,7 +287,7 @@ final class TableFunctionalTest extends TestCase
 
             public function cellValue(int $row, int $column): string
             {
-                return "Row $row, Col $column";
+                return "Row {$row}, Col {$column}";
             }
 
             public function setCellValue(int $row, int $column, mixed $value): void
@@ -360,7 +360,7 @@ final class TableFunctionalTest extends TestCase
 
             public function cellValue(int $row, int $column): string
             {
-                return "R$row,C$column";
+                return "R{$row},C{$column}";
             }
         };
 
@@ -535,7 +535,7 @@ final class TableFunctionalTest extends TestCase
 
             public function cellValue(int $row, int $column): string
             {
-                return "($row,$column)";
+                return "({$row},{$column})";
             }
         };
 

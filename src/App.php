@@ -57,7 +57,7 @@ final class App
         foreach ($this->windows as $index => $window) {
             // Closing the primary (first) window quits the app; others just close.
             if ($index === 0) {
-                $window->onClosing(function () {
+                $window->onClosing(static function () {
                     Ffi::quit();
                     return true;
                 });

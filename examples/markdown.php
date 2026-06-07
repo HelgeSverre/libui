@@ -153,7 +153,7 @@ $preview = new class extends AreaDelegate {
     {
         $w = $p->areaWidth;
         $h = $p->areaHeight;
-        $ctx->fillPath(Brush::rgb(0x0F_11_17), fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
+        $ctx->fillPath(Brush::rgb(0x0F_11_17), static fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
 
         $pad = 24.0;
         $x = $pad;
@@ -190,17 +190,17 @@ $preview = new class extends AreaDelegate {
             case 'ul':
                 $f = new FontDescriptor(BODY_FONT, 14.5);
                 foreach ($b['items'] as $item) {
-                    $ctx->fillPath(Brush::solid(...C_ACCENT), fn (Path $d) => $d->addRectangle($x + 2, $y + 8, 5, 5));
+                    $ctx->fillPath(Brush::solid(...C_ACCENT), static fn (Path $d) => $d->addRectangle($x + 2, $y + 8, 5, 5));
                     $h = $this->text($ctx, inline($item, 14.5, C_BODY), $f, $x + 18, $y, $width - 18);
                     $y += $h + 6;
                 }
                 return $y + 6;
 
             case 'quote':
-                $ctx->fillPath(Brush::solid(...C_ACCENT), fn (Path $bar) => $bar->addRectangle($x, $y, 3, 0));
+                $ctx->fillPath(Brush::solid(...C_ACCENT), static fn (Path $bar) => $bar->addRectangle($x, $y, 3, 0));
                 $f = new FontDescriptor(BODY_FONT, 14.5, TextWeight::Normal, TextItalic::Italic);
                 $h = $this->text($ctx, inline($b['text'], 14.5, C_QUOTE), $f, $x + 14, $y, $width - 14);
-                $ctx->fillPath(Brush::solid(...C_ACCENT), fn (Path $bar) => $bar->addRectangle($x, $y, 3, $h));
+                $ctx->fillPath(Brush::solid(...C_ACCENT), static fn (Path $bar) => $bar->addRectangle($x, $y, 3, $h));
                 return $y + $h + 12;
 
             case 'code':
@@ -209,12 +209,12 @@ $preview = new class extends AreaDelegate {
                 $s->append($b['text'], Attribute::size(13.0), Attribute::family(CODE_FONT), Attribute::color(...C_CODE));
                 $layout = new TextLayout($s, $f, $width - 24);
                 [, $h] = $layout->extents();
-                $ctx->fillPath(Brush::rgb(0x16_19_22), fn (Path $bgp) => $bgp->addRectangle($x, $y, $width, $h + 20));
+                $ctx->fillPath(Brush::rgb(0x16_19_22), static fn (Path $bgp) => $bgp->addRectangle($x, $y, $width, $h + 20));
                 $ctx->text($layout, $x + 12, $y + 10);
                 return $y + $h + 32;
 
             case 'hr':
-                $ctx->fillPath(Brush::rgb(0x2A_2F_3A), fn (Path $rule) => $rule->addRectangle($x, $y + 6, $width, 1));
+                $ctx->fillPath(Brush::rgb(0x2A_2F_3A), static fn (Path $rule) => $rule->addRectangle($x, $y + 6, $width, 1));
                 return $y + 18;
         }
         return $y;

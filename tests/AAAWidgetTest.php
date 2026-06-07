@@ -7,7 +7,6 @@ namespace Libui\Tests;
 use Libui\Button;
 use Libui\Checkbox;
 use Libui\ColorButton;
-use Libui\Combobox;
 use Libui\DateTimePicker;
 use Libui\EditableCombobox;
 use Libui\Entry;
@@ -18,17 +17,10 @@ use Libui\Generated\Enum\Align;
 use Libui\Generated\Enum\At;
 use Libui\Grid;
 use Libui\Group;
-use Libui\Label;
 use Libui\Menu;
-use Libui\MenuItem;
-use Libui\MultilineEntry;
-use Libui\ProgressBar;
 use Libui\RadioButtons;
 use Libui\Separator;
-use Libui\Slider;
-use Libui\Spinbox;
 use Libui\Tab;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Comprehensive widget tests for all untested widgets.
@@ -172,7 +164,7 @@ final class AAAWidgetTest extends LibuiTestCase
     public function testRadioButtonsOnSelected(): void
     {
         $radio = new RadioButtons();
-        $result = $radio->onSelected(function (): void {});
+        $result = $radio->onSelected(static function (): void {});
 
         $this->assertSame($radio, $result);
     }
@@ -272,7 +264,7 @@ final class AAAWidgetTest extends LibuiTestCase
     public function testTabOnSelected(): void
     {
         $tab = new Tab();
-        $result = $tab->onSelected(function (): void {});
+        $result = $tab->onSelected(static function (): void {});
 
         $this->assertSame($tab, $result);
     }
@@ -404,7 +396,7 @@ final class AAAWidgetTest extends LibuiTestCase
     public function testColorButtonOnChanged(): void
     {
         $button = new ColorButton();
-        $result = $button->onChanged(function (): void {});
+        $result = $button->onChanged(static function (): void {});
 
         $this->assertSame($button, $result);
     }
@@ -416,7 +408,7 @@ final class AAAWidgetTest extends LibuiTestCase
     public function testFontButtonOnChanged(): void
     {
         $button = new FontButton();
-        $result = $button->onChanged(function (): void {});
+        $result = $button->onChanged(static function (): void {});
 
         $this->assertSame($button, $result);
     }
@@ -578,7 +570,7 @@ final class AAAWidgetTest extends LibuiTestCase
     {
         $menu = new Menu('Test Menu');
         $item = $menu->appendItem('Test');
-        $result = $item->onClicked(function (): void {});
+        $result = $item->onClicked(static function (): void {});
 
         $this->assertSame($item, $result);
     }
@@ -751,7 +743,7 @@ final class AAAWidgetTest extends LibuiTestCase
     public function testColorButtonChaining(): void
     {
         $button = new ColorButton();
-        $result = $button->setColor(1.0, 0.5, 0.25, 1.0)->onChanged(function (): void {});
+        $result = $button->setColor(1.0, 0.5, 0.25, 1.0)->onChanged(static function (): void {});
 
         $this->assertSame($button, $result);
     }

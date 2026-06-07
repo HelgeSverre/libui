@@ -43,7 +43,7 @@ $field = new class extends AreaDelegate {
         $h = $p->areaHeight;
 
         // near-black background
-        $ctx->fillPath(Brush::rgb(0x05_07_0F), fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
+        $ctx->fillPath(Brush::rgb(0x05_07_0F), static fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
 
         $cols = 20;
         $rows = 14;

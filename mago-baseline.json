@@ -1,0 +1,469 @@
+variant = "loose"
+
+[[issues]]
+file = "examples/async_http.php"
+code = "function-name"
+message = "Function name `simulateHttpRequest` should be in snake case."
+count = 1
+
+[[issues]]
+file = "examples/colorpicker.php"
+code = "function-name"
+message = "Function name `rgbToHsl` should be in snake case."
+count = 1
+
+[[issues]]
+file = "examples/colorpicker.php"
+code = "function-name"
+message = "Function name `rgbToOklch` should be in snake case."
+count = 1
+
+[[issues]]
+file = "examples/colorpicker.php"
+code = "identity-comparison"
+message = "Use identity comparison `===` instead of equality comparison `==`."
+count = 1
+
+[[issues]]
+file = "examples/colorpicker.php"
+code = "literal-named-argument"
+message = "Literal argument `1.0` should be passed as a named argument for clarity."
+count = 3
+
+[[issues]]
+file = "examples/colorpicker.php"
+code = "literal-named-argument"
+message = "Literal argument `100` should be passed as a named argument for clarity."
+count = 2
+
+[[issues]]
+file = "examples/colorpicker.php"
+code = "literal-named-argument"
+message = "Literal argument `2.0` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "examples/colorpicker.php"
+code = "literal-named-argument"
+message = "Literal argument `3599` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "examples/colorpicker.php"
+code = "literal-named-argument"
+message = "Literal argument `360.0` should be passed as a named argument for clarity."
+count = 4
+
+[[issues]]
+file = "examples/colorpicker.php"
+code = "literal-named-argument"
+message = "Literal argument `6.0` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "examples/markdown.php"
+code = "function-name"
+message = "Function name `parseMarkdown` should be in snake case."
+count = 1
+
+[[issues]]
+file = "examples/markdown.php"
+code = "literal-named-argument"
+message = "Literal argument `14.5` should be passed as a named argument for clarity."
+count = 3
+
+[[issues]]
+file = "examples/markdown.php"
+code = "literal-named-argument"
+message = "Literal argument `1` should be passed as a named argument for clarity."
+count = 2
+
+[[issues]]
+file = "examples/markdown.php"
+code = "literal-named-argument"
+message = "Literal argument `2` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "examples/markdown.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 1
+
+[[issues]]
+file = "examples/monitor.php"
+code = "no-nested-ternary"
+message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
+count = 1
+
+[[issues]]
+file = "examples/monitor.php"
+code = "no-sprintf-concat"
+message = "String concatenation with `sprintf` can be simplified."
+count = 1
+
+[[issues]]
+file = "examples/palette.php"
+code = "literal-named-argument"
+message = "Literal argument `0` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "src/Ffi.php"
+code = "no-nested-ternary"
+message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
+count = 1
+
+[[issues]]
+file = "src/Image.php"
+code = "literal-named-argument"
+message = "Literal argument `0` should be passed as a named argument for clarity."
+count = 4
+
+[[issues]]
+file = "src/Image.php"
+code = "literal-named-argument"
+message = "Literal argument `false` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "src/Image.php"
+code = "literal-named-argument"
+message = "Literal argument `true` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "src/Image.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Loop.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 1
+
+[[issues]]
+file = "src/Utils/Clipboard.php"
+code = "literal-named-argument"
+message = "Literal argument `'r'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "src/Utils/Clipboard.php"
+code = "literal-named-argument"
+message = "Literal argument `'w'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tests/FfiMarshallingTest.php"
+code = "literal-named-argument"
+message = "Literal argument `'libui_test_'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tests/table_lifecycle.php"
+code = "function-name"
+message = "Function name `silenceLeakTrap` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "block-statement"
+message = "`else if` statement should use a block body."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "block-statement"
+message = "`foreach` statement should use a block body."
+count = 2
+
+[[issues]]
+file = "tools/generate.php"
+code = "block-statement"
+message = "`if` statement should use a block body."
+count = 42
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `cleanHeader` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `docBlock` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitEnum` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitFacade` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitFlags` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitMethod` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitWidget` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `enumClass` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `enumDocBlock` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `evalEnumExpr` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `extractSummary` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `harvestDocs` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `isReservedWord` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `longestCommonPrefix` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `marshalArg` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `parseEnums` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `parseFunctions` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `parseParams` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `phpParamType` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `phpReturnType` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `returnStmt` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `sanitizeSummary` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `shortName` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `summaryFromBlock` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `summaryFromLineComments` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `typeList` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `writeFile` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = 'Literal argument `"\n\n"` should be passed as a named argument for clarity.'
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `'    '` should be passed as a named argument for clarity."
+count = 6
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `'    public function '` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `'    public static function '` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `' '` should be passed as a named argument for clarity."
+count = 2
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `''` should be passed as a named argument for clarity."
+count = 8
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `'*'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `'/'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `'struct tm { int tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, tm_wday, tm_yday, tm_isdst; };'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `'typedef unsigned int $1; enum'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `'{}'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `0` should be passed as a named argument for clarity."
+count = 2
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `0o777` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `117` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `2` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `false` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = "Literal argument `true` should be passed as a named argument for clarity."
+count = 9
+
+[[issues]]
+file = "tools/generate.php"
+code = "no-isset"
+message = "Use of the `isset` construct."
+count = 8
+
+[[issues]]
+file = "tools/generate.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 2
+
+[[issues]]
+file = "tools/generate.php"
+code = "no-shorthand-ternary"
+message = "Use of the shorthand ternary operator."
+count = 5
