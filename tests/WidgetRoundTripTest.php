@@ -120,4 +120,40 @@ final class WidgetRoundTripTest extends LibuiTestCase
         $window->setMargined(false);
         $this->assertFalse($window->margined());
     }
+
+    public function testWindowCenteredWithExplicitScreenSize(): void
+    {
+        $window = new Window('center', 100, 100, false);
+
+        $this->assertSame($window, $window->centered(1920, 1080));
+
+        // (1920 - 100) / 2 = 910, (1080 - 100) / 2 = 490
+        [$x, $y] = $this->windowPosition($window);
+        $this->assertSame(910, $x);
+        $this->assertSame(490, $y);
+    }
+
+    public function testWindowCenteredClampsToZeroWhenLargerThanScreen(): void
+    {
+        $window = new Window('huge', 800, 600, false);
+        $window->centered(640, 480);
+
+        [$x, $y] = $this->windowPosition($window);
+        $this->assertSame(0, $x);
+        $this->assertSame(0, $y);
+    }
+
+    /**
+     * Read a window's screen position straight from libui.
+     *
+     * @return array{int, int} [x, y]
+     */
+    private function windowPosition(Window $window): array
+    {
+        $out = \Libui\Ffi::get()->new('int[2]');
+        // @phpstan-ignore-next-line dynamic libui FFI call on the \FFI handle
+        \Libui\Ffi::get()->uiWindowPosition($window->handle(), \FFI::addr($out[0]), \FFI::addr($out[1]));
+
+        return [$out[0], $out[1]];
+    }
 }
