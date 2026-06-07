@@ -115,32 +115,39 @@ final class AppTest extends LibuiTestCase
     public function testAppFullLifecycleInSubprocess(): void
     {
         // Create a temporary script that runs the app
-        $script = <<<'PHP'
+        $autoloadPath = __DIR__ . '/../vendor/autoload.php';
+        $script = <<<PHP
             <?php
-            require __DIR__ . '/../vendor/autoload.php';
+            require '$autoloadPath';
 
             use Libui\App;
             use Libui\Button;
             use Libui\Ffi;
+            use Libui\Loop;
             use Libui\Window;
 
             Ffi::init();
 
-            $app = App::new();
-            $window = new Window('Test', 100, 100, false);
-            $button = new Button('Quit');
+            \$app = App::new();
+            \$window = new Window('Test', 100, 100, false);
+            \$button = new Button('Quit');
 
-            $button->onClicked(function () use ($window): void {
+            \$button->onClicked(function () use (\$window): void {
                 Ffi::quit();
             });
 
-            $window->setChild($button);
-            $app->window($window);
+            \$window->setChild(\$button);
+            \$app->window(\$window);
 
             // Set a flag that we've started
             file_put_contents('/tmp/libui_app_test_started', '1');
 
-            $app->run();
+            // Auto-quit after a short delay so the test doesn't hang
+            Loop::delay(500, function() use (\$app): void {
+                Ffi::quit();
+            });
+
+            \$app->run();
 
             // Set a flag that we've completed
             file_put_contents('/tmp/libui_app_test_completed', '1');

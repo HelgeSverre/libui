@@ -33,14 +33,39 @@ final class AttributedString
         return Ffi::get()->uiAttributedStringLen($this->string);
     }
 
+    /** Alias for len(). */
+    public function length(): int
+    {
+        return $this->len();
+    }
+
+    public function insert(string $text, int $at): self
+    {
+        Ffi::get()->uiAttributedStringInsertAtUnattributed($this->string, $text, $at);
+        return $this;
+    }
+
+    public function delete_(int $start, int $end): self
+    {
+        Ffi::get()->uiAttributedStringDelete($this->string, $start, $end);
+        return $this;
+    }
+
     public function appendUnattributed(string $text): self
     {
         Ffi::get()->uiAttributedStringAppendUnattributed($this->string, $text);
         return $this;
     }
 
-    public function setAttribute(Attribute $attribute, int $start, int $end): self
+    public function setAttribute(Attribute $attribute, ?int $start = null, ?int $end = null): self
     {
+        // Use the attribute's stored range if not provided
+        if ($start === null) {
+            $start = $attribute->getStart();
+        }
+        if ($end === null) {
+            $end = $attribute->getEnd();
+        }
         Ffi::get()->uiAttributedStringSetAttribute($this->string, $attribute->handle(), $start, $end);
         return $this;
     }
@@ -62,5 +87,10 @@ final class AttributedString
         }
 
         return $this;
+    }
+
+    public function free(): void
+    {
+        Ffi::get()->uiFreeAttributedString($this->string);
     }
 }

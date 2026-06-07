@@ -22,11 +22,28 @@ final class StrokeParams
     private ?\FFI\CData $cdata = null;
     private ?\FFI\CData $dashArray = null;
 
+    /**
+     * @param float[] $dashes Dash on/off lengths; empty = solid line
+     */
+    public function __construct(
+        float $thickness = 1.0,
+        DrawLineCap $cap = DrawLineCap::Flat,
+        DrawLineJoin $join = DrawLineJoin::Miter,
+        float $miterLimit = 10.0,
+        array $dashes = [],
+        float $dashPhase = 0.0,
+    ) {
+        $this->thickness = $thickness;
+        $this->cap = $cap;
+        $this->join = $join;
+        $this->miterLimit = $miterLimit;
+        $this->dashes = $dashes;
+        $this->dashPhase = $dashPhase;
+    }
+
     public static function solid(float $thickness): self
     {
-        $s = new self();
-        $s->thickness = $thickness;
-        return $s;
+        return new self(thickness: $thickness);
     }
 
     public function toCData(): \FFI\CData
@@ -51,6 +68,6 @@ final class StrokeParams
         }
 
         $this->cdata = $sp;
-        return $sp;
+        return \FFI::addr($sp);
     }
 }

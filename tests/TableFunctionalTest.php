@@ -256,8 +256,9 @@ final class TableFunctionalTest extends TestCase
     public function testTableSelectionModes(): void
     {
         $this->assertSame(0, TableSelectionMode::None->value);
-        $this->assertSame(1, TableSelectionMode::Single->value);
-        $this->assertSame(2, TableSelectionMode::Multiple->value);
+        $this->assertSame(1, TableSelectionMode::ZeroOrOne->value);
+        $this->assertSame(2, TableSelectionMode::One->value);
+        $this->assertSame(3, TableSelectionMode::ZeroOrMany->value);
     }
 
     public function testSortIndicators(): void

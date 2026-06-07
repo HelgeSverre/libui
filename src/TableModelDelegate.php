@@ -44,4 +44,18 @@ abstract class TableModelDelegate
      * a text column is made editable, override this to store $value.
      */
     public function setCellValue(int $row, int $column, mixed $value): void {}
+
+    /**
+     * Whether a cell is editable. Defaults to null (not editable).
+     * Return true for editable cells, false for read-only.
+     */
+    public function cellEditable(int $row, int $column): ?bool
+    {
+        return null;
+    }
+
+    /**
+     * Called after a cell value has been changed. No-op by default.
+     */
+    public function cellValueChanged(int $row, int $column): void {}
 }

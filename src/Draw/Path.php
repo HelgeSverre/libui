@@ -77,6 +77,16 @@ final class Path
         return $this;
     }
 
+    /**
+     * Add an arc to the current figure (angles in radians, clockwise; $negative
+     * sweeps the other way). This starts a new figure if one isn't active.
+     */
+    public function arc(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): self
+    {
+        Ffi::get()->uiDrawPathNewFigureWithArc($this->path, $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
+        return $this;
+    }
+
     /** Finalise the path; required before it can be drawn. */
     public function end(): self
     {

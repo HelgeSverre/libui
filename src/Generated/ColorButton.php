@@ -29,7 +29,7 @@ class ColorButton extends Control
      */
     public function color(\FFI\CData $r, \FFI\CData $g, \FFI\CData $bl, \FFI\CData $a): static
     {
-        \Libui\Ffi::get()->uiColorButtonColor($this->handle, $r, $g, $bl, $a);
+        \Libui\Ffi::get()->uiColorButtonColor($this->handle, \FFI::addr($r), \FFI::addr($g), \FFI::addr($bl), \FFI::addr($a));
         return $this;
     }
 

@@ -36,20 +36,43 @@ final class Matrix
         return $this;
     }
 
-    public function scale(float $xCenter, float $yCenter, float $x, float $y): self
+    /** Scale by $x and $y around the origin (0,0). */
+    public function scale(float $x, float $y): self
+    {
+        Ffi::get()->uiDrawMatrixScale($this->addr(), 0.0, 0.0, $x, $y);
+        return $this;
+    }
+
+    /** Scale by $x and $y around point ($xCenter, $yCenter). */
+    public function scaleAround(float $xCenter, float $yCenter, float $x, float $y): self
     {
         Ffi::get()->uiDrawMatrixScale($this->addr(), $xCenter, $yCenter, $x, $y);
         return $this;
     }
 
+    /** Rotate by $amount radians around the origin (0,0). */
+    public function rotate(float $amount): self
+    {
+        Ffi::get()->uiDrawMatrixRotate($this->addr(), 0.0, 0.0, $amount);
+        return $this;
+    }
+
     /** Rotate by $amount radians around the point ($x, $y). */
-    public function rotate(float $x, float $y, float $amount): self
+    public function rotateAround(float $x, float $y, float $amount): self
     {
         Ffi::get()->uiDrawMatrixRotate($this->addr(), $x, $y, $amount);
         return $this;
     }
 
-    public function skew(float $x, float $y, float $xamount, float $yamount): self
+    /** Skew by $xamount and $yamount around the origin (0,0). */
+    public function skew(float $xamount, float $yamount): self
+    {
+        Ffi::get()->uiDrawMatrixSkew($this->addr(), 0.0, 0.0, $xamount, $yamount);
+        return $this;
+    }
+
+    /** Skew by $xamount and $yamount around point ($x, $y). */
+    public function skewAround(float $x, float $y, float $xamount, float $yamount): self
     {
         Ffi::get()->uiDrawMatrixSkew($this->addr(), $x, $y, $xamount, $yamount);
         return $this;
@@ -62,9 +85,25 @@ final class Matrix
         return $this;
     }
 
+    /** Invert this matrix in place. Returns $this for chaining, or throws if not invertible. */
+    public function invert(): self
+    {
+        $result = Ffi::get()->uiDrawMatrixInvert($this->addr());
+        if ($result === 0) {
+            throw new \RuntimeException('Matrix is not invertible');
+        }
+        return $this;
+    }
+
+    /** Reset this matrix to identity. */
+    public function reset(): self
+    {
+        return $this->setIdentity();
+    }
+
     public function toCData(): \FFI\CData
     {
-        return $this->matrix;
+        return $this->addr();
     }
 
     public function addr(): \FFI\CData

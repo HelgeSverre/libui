@@ -33,6 +33,11 @@ final class TableModel
     /** Trampolines for the five vtable fields, retained against GC. */
     private array $callbacks = [];
 
+    public static function fromDelegate(TableModelDelegate $delegate): self
+    {
+        return new self($delegate);
+    }
+
     public function __construct(
         private readonly TableModelDelegate $delegate,
     ) {

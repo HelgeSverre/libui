@@ -24,8 +24,8 @@ final class FontDescriptor
     private \FFI\CData $familyBuffer;
 
     public function __construct(
-        string $family,
-        float $size,
+        string $family = 'Arial',
+        float $size = 14.0,
         TextWeight $weight = TextWeight::Normal,
         TextItalic $italic = TextItalic::Normal,
         TextStretch $stretch = TextStretch::Normal,
@@ -50,6 +50,44 @@ final class FontDescriptor
         $this->familyBuffer = $buffer;
     }
 
+    public function setFamily(string $family): self
+    {
+        $ffi = Ffi::get();
+        $bytes = \strlen($family);
+        $buffer = $ffi->new('char[' . ($bytes + 1) . ']');
+        \FFI::memcpy($buffer, $family, $bytes);
+        $buffer[$bytes] = "\0";
+
+        $this->descriptor->Family = \FFI::addr($buffer[0]);
+        $this->familyBuffer = $buffer;
+
+        return $this;
+    }
+
+    public function setSize(float $size): self
+    {
+        $this->descriptor->Size = $size;
+        return $this;
+    }
+
+    public function setWeight(TextWeight $weight): self
+    {
+        $this->descriptor->Weight = $weight->value;
+        return $this;
+    }
+
+    public function setItalic(TextItalic $italic): self
+    {
+        $this->descriptor->Italic = $italic->value;
+        return $this;
+    }
+
+    public function setStretch(TextStretch $stretch): self
+    {
+        $this->descriptor->Stretch = $stretch->value;
+        return $this;
+    }
+
     public function toCData(): \FFI\CData
     {
         return $this->descriptor;
@@ -58,5 +96,16 @@ final class FontDescriptor
     public function addr(): \FFI\CData
     {
         return \FFI::addr($this->descriptor);
+    }
+
+    public function handle(): \FFI\CData
+    {
+        return $this->addr();
+    }
+
+    public function free(): void
+    {
+        // The struct is on the stack/FFI, nothing to free
+        // But we keep the method for API consistency
     }
 }

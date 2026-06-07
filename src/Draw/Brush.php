@@ -96,6 +96,6 @@ final class Brush
         }
 
         $this->cdata = $brush; // keep the struct alive for the draw call
-        return $brush;
+        return \FFI::addr($brush);
     }
 }

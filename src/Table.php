@@ -43,6 +43,12 @@ final class Table extends Control
         return new self(new TableModel($delegate));
     }
 
+    /** Convenience: wrap an existing TableModel in a table. */
+    public static function fromModel(TableModel $model): self
+    {
+        return new self($model);
+    }
+
     /** The TableModel backing this table. */
     public function model(): TableModel
     {

@@ -23,6 +23,10 @@ use PHPUnit\Framework\TestCase;
  */
 final class TextTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        \Libui\Ffi::init();
+    }
     // ========================================================================
     // ATTRIBUTED STRING TESTS
     // ========================================================================
@@ -73,13 +77,13 @@ final class TextTest extends TestCase
         $str = new AttributedString('Hello World');
         $str->insert(' Beautiful ', 6);
 
-        $this->assertSame(19, $str->length());
+        $this->assertSame(22, $str->length());
     }
 
     public function testAttributedStringDelete(): void
     {
         $str = new AttributedString('Hello World');
-        $str->delete_(5, 6); // Delete " World"
+        $str->delete_(5, 11); // Delete " World" (positions 5-11)
 
         $this->assertSame(5, $str->length());
     }
@@ -130,7 +134,7 @@ final class TextTest extends TestCase
 
     public function testAttributeWithBackgroundColor(): void
     {
-        $attr = new Attribute(AttributeType::BackgroundColor, 0, 10, 0.0, 1.0, 0.0, 1.0);
+        $attr = new Attribute(AttributeType::Background, 0, 10, 0.0, 1.0, 0.0, 1.0);
         $this->assertInstanceOf(Attribute::class, $attr);
     }
 
@@ -142,7 +146,7 @@ final class TextTest extends TestCase
 
     public function testAttributeWithUnderlineColor(): void
     {
-        $attr = new Attribute(AttributeType::UnderlineColor, 0, 10, UnderlineColor::Color);
+        $attr = new Attribute(AttributeType::UnderlineColor, 0, 10, UnderlineColor::Custom);
         $this->assertInstanceOf(Attribute::class, $attr);
     }
 
@@ -166,13 +170,13 @@ final class TextTest extends TestCase
 
     public function testAttributeWithFontFamily(): void
     {
-        $attr = new Attribute(AttributeType::FontFamily, 0, 10, 'Arial');
+        $attr = new Attribute(AttributeType::Family, 0, 10, 'Arial');
         $this->assertInstanceOf(Attribute::class, $attr);
     }
 
     public function testAttributeWithFontSize(): void
     {
-        $attr = new Attribute(AttributeType::FontSize, 0, 10, 14.0);
+        $attr = new Attribute(AttributeType::Size, 0, 10, 14.0);
         $this->assertInstanceOf(Attribute::class, $attr);
     }
 
@@ -320,7 +324,8 @@ final class TextTest extends TestCase
         $layout = new TextLayout($str);
 
         $extents = $layout->extents();
-        $this->assertInstanceOf(\FFI\CData::class, $extents);
+        $this->assertIsArray($extents);
+        $this->assertCount(2, $extents);
     }
 
     public function testTextLayoutFree(): void
@@ -357,10 +362,10 @@ final class TextTest extends TestCase
         $str = new AttributedString('Styled Text');
 
         // Set font family
-        $str->setAttribute(new Attribute(AttributeType::FontFamily, 0, 11, 'Arial'));
+        $str->setAttribute(new Attribute(AttributeType::Family, 0, 11, 'Arial'));
 
         // Set font size
-        $str->setAttribute(new Attribute(AttributeType::FontSize, 0, 11, 16.0));
+        $str->setAttribute(new Attribute(AttributeType::Size, 0, 11, 16.0));
 
         // Set font weight
         $str->setAttribute(new Attribute(AttributeType::Weight, 0, 11, TextWeight::Bold));
@@ -373,7 +378,7 @@ final class TextTest extends TestCase
         $str = new AttributedString('Underlined Text');
 
         $str->setAttribute(new Attribute(AttributeType::Underline, 0, 15, Underline::Single));
-        $str->setAttribute(new Attribute(AttributeType::UnderlineColor, 0, 15, UnderlineColor::Color));
+        $str->setAttribute(new Attribute(AttributeType::UnderlineColor, 0, 15, UnderlineColor::Custom));
 
         $this->assertSame(15, $str->length());
     }
@@ -430,8 +435,8 @@ final class TextTest extends TestCase
     public function testTextItalicValues(): void
     {
         $this->assertSame(0, TextItalic::Normal->value);
-        $this->assertSame(1, TextItalic::Italic->value);
-        $this->assertSame(2, TextItalic::Oblique->value);
+        $this->assertSame(1, TextItalic::Oblique->value);
+        $this->assertSame(2, TextItalic::Italic->value);
     }
 
     public function testTextStretchValues(): void
@@ -451,8 +456,10 @@ final class TextTest extends TestCase
 
     public function testUnderlineColorValues(): void
     {
-        $this->assertSame(0, UnderlineColor::Spacing->value);
-        $this->assertSame(1, UnderlineColor::Color->value);
+        $this->assertSame(0, UnderlineColor::Custom->value);
+        $this->assertSame(1, UnderlineColor::Spelling->value);
+        $this->assertSame(2, UnderlineColor::Grammar->value);
+        $this->assertSame(3, UnderlineColor::Auxiliary->value);
     }
 
     // ========================================================================
@@ -463,19 +470,19 @@ final class TextTest extends TestCase
     {
         $str = new AttributedString('Hello Beautiful World');
 
-        // "Hello" in red bold
+        // "Hello" in red bold (positions 0-4, length 5)
         $str->setAttribute(new Attribute(AttributeType::Color, 0, 5, 1.0, 0.0, 0.0, 1.0));
         $str->setAttribute(new Attribute(AttributeType::Weight, 0, 5, TextWeight::Bold));
 
-        // " Beautiful" in green italic
-        $str->setAttribute(new Attribute(AttributeType::Color, 5, 14, 0.0, 1.0, 0.0, 1.0));
-        $str->setAttribute(new Attribute(AttributeType::Italic, 5, 14, TextItalic::Italic));
+        // " Beautiful" in green italic (positions 5-14, length 10 including spaces)
+        $str->setAttribute(new Attribute(AttributeType::Color, 5, 15, 0.0, 1.0, 0.0, 1.0));
+        $str->setAttribute(new Attribute(AttributeType::Italic, 5, 15, TextItalic::Italic));
 
-        // "World" in blue underlined
-        $str->setAttribute(new Attribute(AttributeType::Color, 14, 19, 0.0, 0.0, 1.0, 1.0));
-        $str->setAttribute(new Attribute(AttributeType::Underline, 14, 19, Underline::Single));
+        // "World" in blue underlined (positions 15-20, length 5)
+        $str->setAttribute(new Attribute(AttributeType::Color, 15, 20, 0.0, 0.0, 1.0, 1.0));
+        $str->setAttribute(new Attribute(AttributeType::Underline, 15, 20, Underline::Single));
 
-        $this->assertSame(19, $str->length());
+        $this->assertSame(21, $str->length());
     }
 
     public function testAttributedStringManipulation(): void
@@ -486,12 +493,14 @@ final class TextTest extends TestCase
         $str->append(' World');
         $this->assertSame(11, $str->length());
 
-        // Insert
+        // Insert " Beautiful " (11 bytes) at position 6 in "Hello World" (11 bytes)
+        // Result: "Hello  Beautiful World" (22 bytes)
         $str->insert(' Beautiful ', 6);
-        $this->assertSame(21, $str->length());
+        $this->assertSame(22, $str->length());
 
-        // Delete
-        $str->delete_(6, 10); // Remove " Beautiful"
+        // Delete from position 6 to 17 (the " Beautiful " text)
+        // Note: after insert, " Beautiful " is at positions 6-16 (11 bytes)
+        $str->delete_(6, 17); // Remove " Beautiful "
         $this->assertSame(11, $str->length());
     }
 
