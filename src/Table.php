@@ -187,7 +187,7 @@ final class Table extends Control
      */
     public function selectionMode(): TableSelectionMode
     {
-        return Ffi::get()->uiTableGetSelectionMode($this->handle);
+        return TableSelectionMode::from(Ffi::get()->uiTableGetSelectionMode($this->handle));
     }
 
     /**
@@ -197,7 +197,7 @@ final class Table extends Control
      */
     public function setSelectionMode(TableSelectionMode $mode): static
     {
-        Ffi::get()->uiTableSetSelectionMode($this->handle, $mode);
+        Ffi::get()->uiTableSetSelectionMode($this->handle, $mode->value);
         return $this;
     }
 
@@ -228,21 +228,35 @@ final class Table extends Control
     /**
      * Set the selected rows programmatically.
      *
+     * Honours the current selection mode (e.g. a One/ZeroOrOne table keeps only
+     * one row). Pass an empty array to clear the selection.
+     *
      * @param int[] $rows Array of row indices to select
      */
     public function setSelectedRows(array $rows): static
     {
-        // uiTableSetSelection requires a uiTableSelection struct
-        // For simplicity, we'll clear and re-add selections
-        // This is a simplified approach - a full implementation would
-        // properly construct the uiTableSelection struct
+        $ffi = Ffi::get();
+        $sel = $ffi->new('uiTableSelection');
 
-        // For now, just set the first selected row if any
-        if ($rows !== []) {
-            // This is a placeholder - the actual implementation requires
-            // creating a uiTableSelection struct and populating it
-            // which is complex with FFI
+        if ($rows === []) {
+            $sel->NumRows = 0;
+            $sel->Rows = null;
+            $ffi->uiTableSetSelection($this->handle, \FFI::addr($sel));
+            return $this;
         }
+
+        $rows = array_values($rows);
+        $count = \count($rows);
+
+        // Allocate a C int[] for the row indices and keep it alive for the call.
+        $buffer = $ffi->new("int[{$count}]");
+        foreach ($rows as $i => $row) {
+            $buffer[$i] = $row;
+        }
+
+        $sel->NumRows = $count;
+        $sel->Rows = $ffi->cast('int *', \FFI::addr($buffer[0]));
+        $ffi->uiTableSetSelection($this->handle, \FFI::addr($sel));
 
         return $this;
     }

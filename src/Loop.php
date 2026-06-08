@@ -7,30 +7,44 @@ namespace Libui;
 /**
  * Async event loop integration with libui's native event loop.
  *
- * This class provides a bridge between PHP's async ecosystem and libui-ng's
- * event loop. It allows you to schedule callbacks to run on the main thread
- * and set up repeating timers, enabling non-blocking I/O patterns.
+ * A thin, ergonomic layer over {@see Ffi}'s loop primitives for scheduling work
+ * on the GUI thread without freezing it:
  *
- * Usage:
- *   Loop::defer(fn() => echo "This runs on the next event loop tick");
- *   Loop::delay(1000, fn() => echo "This runs after 1 second");
- *   Loop::repeat(100, fn() => echo "This runs every 100ms");
+ *   Loop::defer(fn () => print "next tick\n");
+ *   Loop::delay(1000, fn () => print "after one second\n");
+ *   $id = Loop::repeat(100, fn () => print "every 100ms\n");
+ *   Loop::cancel($id);
  *
- * For full async integration with Revolt/ReactPHP/amphp, see the async
- * event-loop bridge implementation.
+ * Cancellation is *lazy*: libui's uiTimer has no cancel call (a timer stops only
+ * by returning 0 from its own callback). So after cancel() the user callback is
+ * never invoked again, and the native timer stops on its next wake-up. For a
+ * one-shot delay cancelled before it fires, the callback simply never runs.
+ *
+ * For full async integration, drive your event loop (Revolt/ReactPHP/Amp) from a
+ * short Loop::repeat() tick and marshal completions back with Loop::defer().
  */
 final class Loop
 {
-    /** @var array<int, callable> Active timers indexed by their internal ID */
+    /**
+     * Live timer IDs. A timer's wrapper checks this set on every wake-up; once an
+     * ID is gone the wrapper returns false and the native timer stops.
+     *
+     * @var array<int, true>
+     */
     private static array $timers = [];
 
-    /** @var int Next timer ID */
+    /** Next timer ID handed out by delay()/repeat(). */
     private static int $nextId = 1;
 
+    /** Whether the native event loop is currently running (between run() and stop()). */
+    private static bool $running = false;
+
     /**
-     * Schedule a callback to run on the next event loop tick.
+     * Schedule a callback to run once on the next event-loop tick.
      *
-     * This is equivalent to Ffi::queueMain() but with a more descriptive API.
+     * Equivalent to {@see Ffi::queueMain()} with a more descriptive name. Use it
+     * to hand work back to the GUI thread (e.g. applying the result of background
+     * I/O to a widget).
      *
      * @param callable $callback The callback to invoke
      */
@@ -40,54 +54,71 @@ final class Loop
     }
 
     /**
-     * Schedule a callback to run after a delay.
+     * Schedule a callback to run once after a delay.
      *
-     * The callback runs once, after the specified number of milliseconds.
-     *
-     * @param int $milliseconds Delay in milliseconds
+     * @param int $milliseconds Delay in milliseconds (must be >= 0)
      * @param callable $callback The callback to invoke
-     * @return int A timer ID that can be used with cancel()
+     * @return int A timer ID usable with {@see Loop::cancel()}
+     * @throws \InvalidArgumentException If $milliseconds is negative
      */
     public static function delay(int $milliseconds, callable $callback): int
     {
+        if ($milliseconds < 0) {
+            throw new \InvalidArgumentException('delay() milliseconds must be >= 0');
+        }
+
         $id = self::$nextId++;
+        self::$timers[$id] = true;
 
-        $wrapper = static function () use ($id, $callback): bool {
-            $callback();
+        Ffi::timer($milliseconds, static function () use ($id, $callback): bool {
+            // Cancelled before it fired — do nothing and stop the native timer.
+            if (! isset(self::$timers[$id])) {
+                return false;
+            }
+            // One-shot: consume the ID before running, so re-entrant cancel() is a no-op.
             unset(self::$timers[$id]);
-            return false; // Stop after one execution
-        };
-
-        self::$timers[$id] = $wrapper;
-        Ffi::timer($milliseconds, $wrapper);
+            $callback();
+            return false;
+        });
 
         return $id;
     }
 
     /**
-     * Schedule a callback to run repeatedly at an interval.
+     * Schedule a callback to run repeatedly at a fixed interval.
      *
-     * The callback runs every $milliseconds until cancelled or it returns false.
+     * The callback fires every $milliseconds until it returns false, it is
+     * cancelled, or it throws (a throw is reported to STDERR and stops the timer).
      *
-     * @param int $milliseconds Interval in milliseconds
+     * @param int $milliseconds Interval in milliseconds (must be > 0)
      * @param callable $callback The callback to invoke; return false to stop
-     * @return int A timer ID that can be used with cancel()
+     * @return int A timer ID usable with {@see Loop::cancel()}
+     * @throws \InvalidArgumentException If $milliseconds is not positive
      */
     public static function repeat(int $milliseconds, callable $callback): int
     {
-        $id = self::$nextId++;
+        if ($milliseconds <= 0) {
+            throw new \InvalidArgumentException('repeat() milliseconds must be > 0');
+        }
 
-        $wrapper = static function () use ($id, $callback): bool {
-            $result = $callback();
-            if ($result === false) {
+        $id = self::$nextId++;
+        self::$timers[$id] = true;
+
+        Ffi::timer($milliseconds, static function () use ($id, $callback): bool {
+            // Cancelled (externally or by a previous self-cancel) — stop the native timer.
+            if (! isset(self::$timers[$id])) {
+                return false;
+            }
+
+            // Explicit stop request from the callback. A callback that cancels
+            // itself but returns true is caught by the isset check on the next wake.
+            if ($callback() === false) {
                 unset(self::$timers[$id]);
                 return false;
             }
-            return true;
-        };
 
-        self::$timers[$id] = $wrapper;
-        Ffi::timer($milliseconds, $wrapper);
+            return true;
+        });
 
         return $id;
     }
@@ -95,43 +126,47 @@ final class Loop
     /**
      * Cancel a scheduled timer.
      *
+     * After this returns the callback for $id will not be invoked again. The
+     * underlying native timer stops lazily on its next wake-up. Cancelling an
+     * unknown or already-finished ID is a harmless no-op.
+     *
      * @param int $id The timer ID returned by delay() or repeat()
      */
     public static function cancel(int $id): void
     {
-        if (isset(self::$timers[$id])) {
-            unset(self::$timers[$id]);
-
-            // Note: We can't actually stop the C timer, but we remove our reference
-            // so the callback won't be called again. The timer will just stop naturally
-            // or we'd need to track it differently.
-        }
+        unset(self::$timers[$id]);
     }
 
     /**
-     * Check if the event loop is currently running.
+     * Whether the native event loop is currently running.
      *
-     * @return bool True if the loop is running, false otherwise
+     * True between {@see Loop::run()} and {@see Loop::stop()} (i.e. inside any
+     * callback dispatched by the loop).
      */
     public static function isRunning(): bool
     {
-        return Ffi::isInitialized();
+        return self::$running;
     }
 
     /**
-     * Run the event loop until quit is called.
+     * Run the event loop until {@see Loop::stop()} is called or all windows close.
      *
-     * This is equivalent to Ffi::main() but provides a more semantic API.
+     * Equivalent to {@see Ffi::main()} with running-state tracking.
      */
     public static function run(): void
     {
-        Ffi::main();
+        self::$running = true;
+        try {
+            Ffi::main();
+        } finally {
+            self::$running = false;
+        }
     }
 
     /**
      * Signal the event loop to quit.
      *
-     * This is equivalent to Ffi::quit() but provides a more semantic API.
+     * Equivalent to {@see Ffi::quit()}.
      */
     public static function stop(): void
     {

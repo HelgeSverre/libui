@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Libui\Draw;
 
 use Libui\Ffi;
+
 /**
  * An affine transform, wrapping the uiDrawMatrix struct (M11..M32).
  *

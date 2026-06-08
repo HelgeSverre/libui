@@ -161,12 +161,17 @@ class Window extends Generated\Window
         });
 
         $this->show();
-        Ffi::main();
 
-        if ($afterClose !== null) {
-            $afterClose();
+        try {
+            Ffi::main();
+
+            if ($afterClose !== null) {
+                $afterClose();
+            }
+        } finally {
+            // Always tear libui down, even if $afterClose throws — otherwise the
+            // next init() in the same process would be left in a bad state.
+            Ffi::uninit();
         }
-
-        Ffi::uninit();
     }
 }

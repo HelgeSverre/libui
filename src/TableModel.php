@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Libui;
 
 use Libui\Generated\Enum\TableValueType;
+
 /**
  * Bridges a {@see TableModelDelegate} to libui's uiTableModel.
  *

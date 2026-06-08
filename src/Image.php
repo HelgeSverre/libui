@@ -59,6 +59,16 @@ final class Image
         if ($this->handle === null) {
             throw new \RuntimeException('Cannot append to a freed image');
         }
+        if ($pixelWidth <= 0 || $pixelHeight <= 0) {
+            throw new \InvalidArgumentException("Pixel dimensions must be positive, got {$pixelWidth}x{$pixelHeight}");
+        }
+        if ($byteStride < (4 * $pixelWidth)) {
+            throw new \InvalidArgumentException("byteStride ({$byteStride}) must be at least 4 * pixelWidth (" . (4 * $pixelWidth) . ')');
+        }
+        $expected = $byteStride * $pixelHeight;
+        if (\strlen($pixels) < $expected) {
+            throw new \InvalidArgumentException("Pixel buffer too small: need {$expected} bytes, got " . \strlen($pixels));
+        }
 
         $ffi = Ffi::get();
         // Create a temporary C buffer from the PHP string
@@ -104,7 +114,6 @@ final class Image
             imagealphablending($trueColor, false);
             imagesavealpha($trueColor, true);
             imagecopy($trueColor, $gdImage, 0, 0, 0, 0, $width, $height);
-            imagedestroy($gdImage);
             $gdImage = $trueColor;
         }
 
@@ -115,13 +124,14 @@ final class Image
                 $r = ($rgba >> 16) & 0xFF;
                 $g = ($rgba >> 8) & 0xFF;
                 $b = $rgba & 0xFF;
-                $a = 0xFF - (($rgba >> 24) & 0xFF); // GD uses 0-127 for alpha (0=opaque, 127=transparent)
+                // GD stores alpha as 0-127 (0 = opaque, 127 = transparent); scale
+                // to libui's straight 0-255 RGBA (255 = opaque).
+                $gdAlpha = ($rgba >> 24) & 0x7F;
+                $a = 255 - (int) round(($gdAlpha * 255) / 127);
 
                 $pixelData .= \chr($r) . \chr($g) . \chr($b) . \chr($a);
             }
         }
-
-        imagedestroy($gdImage);
 
         $image = new static((float) $width, (float) $height);
         $byteStride = 4 * $width; // 4 bytes per pixel (RGBA)
@@ -142,6 +152,14 @@ final class Image
      */
     public static function fromRgba(string $rgbaData, int $width, int $height): static
     {
+        if ($width <= 0 || $height <= 0) {
+            throw new \InvalidArgumentException("Image dimensions must be positive, got {$width}x{$height}");
+        }
+        $expected = $width * $height * 4;
+        if (\strlen($rgbaData) !== $expected) {
+            throw new \InvalidArgumentException("RGBA data must be exactly {$expected} bytes ({$width}x{$height}x4), got " . \strlen($rgbaData));
+        }
+
         $image = new static((float) $width, (float) $height);
         $byteStride = 4 * $width;
         $image->append($rgbaData, $width, $height, $byteStride);
