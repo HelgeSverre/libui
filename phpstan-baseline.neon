@@ -1525,9 +1525,21 @@ parameters:
 			path: src/Table.php
 
 		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$NumRows\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Table.php
+
+		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$RowBackgroundColorModelColumn\.$#'
 			identifier: property.notFound
 			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Rows\.$#'
+			identifier: property.notFound
+			count: 2
 			path: src/Table.php
 
 		-
@@ -1630,6 +1642,12 @@ parameters:
 			message: '#^Call to an undefined method FFI\:\:uiTableOnSelectionChanged\(\)\.$#'
 			identifier: method.notFound
 			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Call to an undefined method FFI\:\:uiTableSetSelection\(\)\.$#'
+			identifier: method.notFound
+			count: 2
 			path: src/Table.php
 
 		-
@@ -2249,6 +2267,12 @@ parameters:
 			identifier: method.alreadyNarrowedType
 			count: 1
 			path: tests/FfiMarshallingTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$cdata\.$#'
+			identifier: property.notFound
+			count: 4
+			path: tests/GeneratorRegressionTest.php
 
 		-
 			message: '#^Call to function method_exists\(\) with ''Libui\\\\Table'' and ''fromDelegate'' will always evaluate to true\.$#'

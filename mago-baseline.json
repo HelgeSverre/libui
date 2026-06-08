@@ -142,7 +142,7 @@ count = 1
 file = "src/Loop.php"
 code = "no-isset"
 message = "Use of the `isset` construct."
-count = 1
+count = 2
 
 [[issues]]
 file = "src/Utils/Clipboard.php"
@@ -163,9 +163,147 @@ message = "Literal argument `'libui_test_'` should be passed as a named argument
 count = 1
 
 [[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `'libui_img_'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `0` should be passed as a named argument for clarity."
+count = 10
+
+[[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `10` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `128` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `16` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `1` should be passed as a named argument for clarity."
+count = 4
+
+[[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `255` should be passed as a named argument for clarity."
+count = 6
+
+[[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `2` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `64` should be passed as a named argument for clarity."
+count = 2
+
+[[issues]]
+file = "tests/ImageTest.php"
+code = "literal-named-argument"
+message = "Literal argument `true` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tests/LoopTest.php"
+code = "no-redundant-use"
+message = "Unused import: `Ffi`."
+count = 1
+
+[[issues]]
+file = "tests/LoopTest.php"
+code = "prefer-first-class-callable"
+message = "Use first-class callable syntax `...` instead of a arrow function."
+count = 6
+
+[[issues]]
 file = "tests/table_lifecycle.php"
 code = "function-name"
 message = "Function name `silenceLeakTrap` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "function-name"
+message = "Function name `fqcnFromPath` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "function-name"
+message = "Function name `renderDefault` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "function-name"
+message = "Function name `renderParams` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "function-name"
+message = "Function name `shortType` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "function-name"
+message = "Function name `typeToString` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "literal-named-argument"
+message = "Literal argument `''` should be passed as a named argument for clarity."
+count = 2
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "literal-named-argument"
+message = "Literal argument `'* '` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "literal-named-argument"
+message = "Literal argument `'-'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "literal-named-argument"
+message = '''Literal argument `'\\'` should be passed as a named argument for clarity.'''
+count = 2
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "literal-named-argument"
+message = "Literal argument `true` should be passed as a named argument for clarity."
+count = 3
+
+[[issues]]
+file = "tools/gen-api-docs.php"
+code = "no-nested-ternary"
+message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
 count = 1
 
 [[issues]]
@@ -184,7 +322,7 @@ count = 2
 file = "tools/generate.php"
 code = "block-statement"
 message = "`if` statement should use a block body."
-count = 42
+count = 44
 
 [[issues]]
 file = "tools/generate.php"
@@ -448,7 +586,7 @@ count = 1
 file = "tools/generate.php"
 code = "literal-named-argument"
 message = "Literal argument `true` should be passed as a named argument for clarity."
-count = 9
+count = 10
 
 [[issues]]
 file = "tools/generate.php"

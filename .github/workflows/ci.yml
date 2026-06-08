@@ -85,12 +85,12 @@ jobs:
           ini-values: ffi.enable=1
           coverage: none
 
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: ffi
-          ini-values: ffi.enable=1
-          coverage: none
+      # macOS runners are arm64 (macos-latest = Apple Silicon). We deliberately do
+      # NOT test the Intel (macos-13) runner — it is slow and the committed dylib is
+      # already a universal arm64+x86_64 binary covered by the arm64 job.
+      - name: Show runner architecture
+        shell: bash
+        run: uname -m
 
       - name: Build toolchain + GTK 3 (Linux)
         if: runner.os == 'Linux'
