@@ -50,7 +50,13 @@ class Button extends Control
      */
     public function onClicked(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $data) use ($cb) { $cb($this); });
+        $fn = static::keep(function ($sender, $data) use ($cb) {
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onClicked] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiButtonOnClicked($this->handle, $fn, null);
         return $this;
     }

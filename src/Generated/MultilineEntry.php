@@ -71,7 +71,13 @@ class MultilineEntry extends Control
      */
     public function onChanged(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $data) use ($cb) { $cb($this); });
+        $fn = static::keep(function ($sender, $data) use ($cb) {
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onChanged] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiMultilineEntryOnChanged($this->handle, $fn, null);
         return $this;
     }

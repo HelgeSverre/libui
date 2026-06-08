@@ -50,7 +50,7 @@ class Window extends Control
      */
     public function position(\FFI\CData $x, \FFI\CData $y): static
     {
-        \Libui\Ffi::get()->uiWindowPosition($this->handle, $x, $y);
+        \Libui\Ffi::get()->uiWindowPosition($this->handle, \FFI::addr($x), \FFI::addr($y));
         return $this;
     }
 
@@ -72,7 +72,13 @@ class Window extends Control
      */
     public function onPositionChanged(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $data) use ($cb) { $cb($this); });
+        $fn = static::keep(function ($sender, $data) use ($cb) {
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onPositionChanged] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiWindowOnPositionChanged($this->handle, $fn, null);
         return $this;
     }
@@ -84,7 +90,7 @@ class Window extends Control
      */
     public function contentSize(\FFI\CData $width, \FFI\CData $height): static
     {
-        \Libui\Ffi::get()->uiWindowContentSize($this->handle, $width, $height);
+        \Libui\Ffi::get()->uiWindowContentSize($this->handle, \FFI::addr($width), \FFI::addr($height));
         return $this;
     }
 
@@ -127,7 +133,13 @@ class Window extends Control
      */
     public function onContentSizeChanged(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $data) use ($cb) { $cb($this); });
+        $fn = static::keep(function ($sender, $data) use ($cb) {
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onContentSizeChanged] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiWindowOnContentSizeChanged($this->handle, $fn, null);
         return $this;
     }
@@ -140,8 +152,13 @@ class Window extends Control
     public function onClosing(callable $cb): static
     {
         $fn = static::keep(function ($sender, $data) use ($cb) {
-            $r = $cb($this);
-            return $r === false ? 0 : (\is_int($r) ? $r : 1);
+            try {
+                $r = $cb($this);
+                return $r === false ? 0 : (\is_int($r) ? $r : 1);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onClosing] {$e->getMessage()}\n");
+                return 0;
+            }
         });
         \Libui\Ffi::get()->uiWindowOnClosing($this->handle, $fn, null);
         return $this;
@@ -154,7 +171,13 @@ class Window extends Control
      */
     public function onFocusChanged(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $data) use ($cb) { $cb($this); });
+        $fn = static::keep(function ($sender, $data) use ($cb) {
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onFocusChanged] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiWindowOnFocusChanged($this->handle, $fn, null);
         return $this;
     }

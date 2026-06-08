@@ -41,7 +41,13 @@ class MenuItem extends Control
      */
     public function onClicked(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $window, $data) use ($cb) { $cb($this, $window); });
+        $fn = static::keep(function ($sender, $window, $data) use ($cb) {
+            try {
+                $cb($this, $window);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onClicked] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiMenuItemOnClicked($this->handle, $fn, null);
         return $this;
     }

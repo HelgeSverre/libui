@@ -376,6 +376,11 @@ function classify(string $type, array $enums, array $types): array
         return ['kind' => 'control'];
     if (in_array($base, $types, true))
         return ['kind' => 'widget', 'name' => $base];
+    // A pointer to a scalar primitive (double *, int *, …) is an out-parameter:
+    // libui writes the result through it. The caller passes a CData scalar and
+    // we must hand C its address — passing the scalar directly is a type error.
+    if ($base === 'double' || $base === 'int' || str_contains($base, 'int') || in_array($base, ['size_t', 'uintptr_t'], true))
+        return ['kind' => 'cdata', 'scalarOut' => true];
     return ['kind' => 'cdata'];
 }
 
@@ -394,6 +399,8 @@ function phpParamType(array $c): string
 function marshalArg(array $c, string $var): string
 {
     // NB: braces required — "$var->handle()" would interpolate $var->handle.
+    if (($c['scalarOut'] ?? false) === true)
+        return "\\FFI::addr({$var})";
     return match ($c['kind']) {
         'enum' => "{$var}->value",
         'control' => "\\Libui\\Ffi::control({$var}->handle())",
@@ -482,16 +489,38 @@ function emitMethod(array $fn, string $type, array $ctx): ?string
     $hasCallback = (bool) array_filter($params, fn ($p) => $p['isCallback']);
     if (str_starts_with($rest, 'On') && $hasCallback) {
         $dev = $ANN['deviating_callbacks'][$name] ?? null;
+        // A PHP exception unwinding into libui's C trampoline is a hard fatal, so
+        // every user callback runs inside try/catch: errors are reported to STDERR
+        // and a safe value is returned to C (0 = veto/stop for the int handlers).
         if ($dev === 'int') {
             $body =
                 "        \$fn = static::keep(function (\$sender, \$data) use (\$cb) {\n"
-                . "            \$r = \$cb(\$this);\n"
-                . "            return \$r === false ? 0 : (\\is_int(\$r) ? \$r : 1);\n"
+                . "            try {\n"
+                . "                \$r = \$cb(\$this);\n"
+                . "                return \$r === false ? 0 : (\\is_int(\$r) ? \$r : 1);\n"
+                . "            } catch (\\Throwable \$e) {\n"
+                . "                \\fwrite(\\STDERR, \"[{$method}] {\$e->getMessage()}\\n\");\n"
+                . "                return 0;\n"
+                . "            }\n"
                 . '        });';
         } elseif ($dev === 'menuitem') {
-            $body = "        \$fn = static::keep(function (\$sender, \$window, \$data) use (\$cb) { \$cb(\$this, \$window); });";
+            $body =
+                "        \$fn = static::keep(function (\$sender, \$window, \$data) use (\$cb) {\n"
+                . "            try {\n"
+                . "                \$cb(\$this, \$window);\n"
+                . "            } catch (\\Throwable \$e) {\n"
+                . "                \\fwrite(\\STDERR, \"[{$method}] {\$e->getMessage()}\\n\");\n"
+                . "            }\n"
+                . '        });';
         } else {
-            $body = "        \$fn = static::keep(function (\$sender, \$data) use (\$cb) { \$cb(\$this); });";
+            $body =
+                "        \$fn = static::keep(function (\$sender, \$data) use (\$cb) {\n"
+                . "            try {\n"
+                . "                \$cb(\$this);\n"
+                . "            } catch (\\Throwable \$e) {\n"
+                . "                \\fwrite(\\STDERR, \"[{$method}] {\$e->getMessage()}\\n\");\n"
+                . "            }\n"
+                . '        });';
         }
         return (
             docBlock($name, $docs, '    ')

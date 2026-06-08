@@ -50,7 +50,13 @@ class Checkbox extends Control
      */
     public function onToggled(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $data) use ($cb) { $cb($this); });
+        $fn = static::keep(function ($sender, $data) use ($cb) {
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onToggled] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiCheckboxOnToggled($this->handle, $fn, null);
         return $this;
     }

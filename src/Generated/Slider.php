@@ -71,7 +71,13 @@ class Slider extends Control
      */
     public function onChanged(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $data) use ($cb) { $cb($this); });
+        $fn = static::keep(function ($sender, $data) use ($cb) {
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onChanged] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiSliderOnChanged($this->handle, $fn, null);
         return $this;
     }
@@ -83,7 +89,13 @@ class Slider extends Control
      */
     public function onReleased(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $data) use ($cb) { $cb($this); });
+        $fn = static::keep(function ($sender, $data) use ($cb) {
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onReleased] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiSliderOnReleased($this->handle, $fn, null);
         return $this;
     }

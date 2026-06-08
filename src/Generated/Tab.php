@@ -50,7 +50,13 @@ class Tab extends Control
      */
     public function onSelected(callable $cb): static
     {
-        $fn = static::keep(function ($sender, $data) use ($cb) { $cb($this); });
+        $fn = static::keep(function ($sender, $data) use ($cb) {
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                \fwrite(\STDERR, "[onSelected] {$e->getMessage()}\n");
+            }
+        });
         \Libui\Ffi::get()->uiTabOnSelected($this->handle, $fn, null);
         return $this;
     }

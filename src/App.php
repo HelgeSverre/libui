@@ -65,7 +65,10 @@ final class App
             $window->show();
         }
 
-        Ffi::main();
-        Ffi::uninit();
+        try {
+            Ffi::main();
+        } finally {
+            Ffi::uninit();
+        }
     }
 }
