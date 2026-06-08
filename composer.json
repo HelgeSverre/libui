@@ -21,7 +21,7 @@
     }
   ],
   "require": {
-    "php": ">=8.3",
+    "php": ">=8.5",
     "ext-ffi": "*"
   },
   "require-dev": {
@@ -42,6 +42,7 @@
   "scripts": {
     "build-lib": "bash build-libui.sh",
     "regen": "php tools/generate.php",
+    "docs:api": "php tools/gen-api-docs.php",
     "test": "phpunit",
     "gate": "phpunit --group gate",
     "smoke": "phpunit --group smoke",
@@ -72,6 +73,7 @@
   "scripts-descriptions": {
     "build-lib": "Build/refresh lib/libui.dylib from libui-ng source",
     "regen": "Regenerate src/Native/libui.gen.h and src/Generated/* from ui.h",
+    "docs:api": "Regenerate docs/API.md from the public API surface (reflection-based)",
     "test": "Run the full PHPUnit test suite",
     "test:unit": "Run unit tests (excludes integration tests)",
     "test:all": "Run all tests including integration",

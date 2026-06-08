@@ -103,7 +103,14 @@ see [Development](#development) to run them.
 - **Attributed text** — `AttributedString` with per-range colour/weight/italic/
   underline attributes, a `FontDescriptor`, and a drawable `TextLayout`.
 - **Data-grid table** — `Table` backed by a `TableModelDelegate` you implement.
-- **Event loop helpers** — `queueMain()`, `timer()`, `onShouldQuit()`.
+- **Images** — `Image::fromPng()` (via GD) or `Image::fromRgba()` for table image
+  columns and area drawing.
+- **App lifecycle** — `App` facade for multi-window apps + an `onShouldQuit()`
+  handler, or `Window::run()` for one-call single-window apps.
+- **Async helpers** — the `Loop` class (`defer`/`delay`/`repeat`/`cancel`) over
+  libui's native event loop, plus raw `queueMain()`, `timer()`, `onShouldQuit()`.
+- **Clipboard** — `Utils\Clipboard` cross-platform copy/paste (best-effort,
+  shells out to the platform tool).
 - **All 299 libui functions callable** — anything without a sugar wrapper is
   still reachable raw via `Ffi::get()->ui…()`.
 
@@ -114,17 +121,22 @@ callbacks on the event loop without freezing the GUI:
 
 ```php
 use Libui\Loop;
-use Libui\Window;
-use Libui\Button;
 
-Loop::delay(1000, fn() => echo "This runs after 1 second\n");
-Loop::repeat(100, fn() => echo "This runs every 100ms\n");
-Loop::defer(fn() => echo "This runs on the next tick\n");
+Loop::defer(fn () => print "This runs on the next tick\n");
+Loop::delay(1000, fn () => print "This runs after 1 second\n");
+$id = Loop::repeat(100, fn () => print "This runs every 100ms\n");
+Loop::cancel($id); // stop a repeating/pending timer
 ```
 
-For HTTP requests, use an async HTTP client (ReactPHP, Amp, Guzzle) and marshal
-callbacks onto the main loop with `Loop::defer()`. See `examples/async_http.php`
-for a complete example.
+(`fn () => echo …` is a syntax error — `echo` is a statement; use `print`, which
+is an expression, or a normal `function () { … }` body.)
+
+Cancellation is lazy: after `Loop::cancel()` the callback never fires again, and
+the native timer stops on its next wake-up. For HTTP requests, drive an async
+HTTP client (ReactPHP, Amp, Guzzle) from a short `Loop::repeat()` tick and
+marshal results back with `Loop::defer()`. See `examples/async_http.php` for a
+complete example, and the [user guide](docs/GUIDE.md#async--the-event-loop) for
+the full async story.
 
 ## Platform support
 
@@ -154,9 +166,14 @@ runtime and calls it through FFI, so there's no extension to compile.
   is the data grid.
 - Custom drawing covers paths, gradients, stroking, clipping and transforms;
   attributed text has a full sugar layer.
-- Still raw-only (no sugar yet): editable / checkbox / image / progress / button
-  **table columns**, table selection and row callbacks, image/OpenGL areas, and
+- `Image` has a sugar class (`fromPng`/`fromRgba`); tables, the `App`/`Loop`
+  lifecycle, and `Clipboard` all have typed helpers too.
+- Still raw-only (no sugar yet): editable / checkbox / progress / button
+  **table columns**, some table selection and row callbacks, OpenGL areas, and
   the less-common drawing primitives (arcs/béziers).
+
+See the **[user guide](docs/GUIDE.md)** for a task-by-task walkthrough and the
+gotchas (FFI lifetime, callback retention, string ownership, table teardown).
 
 ---
 
@@ -207,7 +224,15 @@ composer format      # Mago formatter
 composer lint        # Mago linter
 composer regen       # regenerate src/Native/libui.gen.h + src/Generated/** from ui.h
 composer build-lib   # (re)build the native library
+composer docs:api    # regenerate docs/API.md from the public API surface
 ```
+
+### Documentation
+
+- **[docs/GUIDE.md](docs/GUIDE.md)** — task-by-task user guide and gotchas.
+- **[docs/API.md](docs/API.md)** — generated API reference (`composer docs:api`).
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — how the binding and generator
+  work.
 
 ### How it's built
 
