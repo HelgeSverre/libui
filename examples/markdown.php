@@ -148,6 +148,8 @@ function inline(string $text, float $size, array $color, TextWeight $weight = Te
 $preview = new class extends AreaDelegate {
     public ?Area $area = null;
     public array $blocks = [];
+    public float $contentHeight = 0;
+    private array $blockPositions = [];
 
     public function draw(DrawContext $ctx, AreaDrawParams $p): void
     {
@@ -160,15 +162,36 @@ $preview = new class extends AreaDelegate {
         $y = $pad;
         $width = $w - (2 * $pad);
 
-        foreach ($this->blocks as $b) {
-            $y = $this->block($ctx, $b, $x, $y, $width);
+        $clipY = $p->clipY ?? 0;
+        $clipH = $p->clipHeight ?? $h;
+        $clipBottom = $clipY + $clipH;
+
+        foreach ($this->blocks as $i => $b) {
+            $blockStartY = $this->blockPositions[$i]['y'] ?? $y;
+            $blockHeight = $this->blockPositions[$i]['height'] ?? 0;
+            $blockEndY = $blockStartY + $blockHeight;
+
+            if ($blockStartY > $clipBottom || $blockEndY < $clipY) {
+                continue;
+            }
+
+            $y = $this->block($ctx, $b, $x, $blockStartY, $width);
         }
+
+        $this->contentHeight = $y;
     }
 
     private function text(DrawContext $ctx, AttributedString $s, FontDescriptor $f, float $x, float $y, float $width): float
     {
         $layout = new TextLayout($s, $f, $width);
         $ctx->text($layout, $x, $y);
+        [, $height] = $layout->extents();
+        return $height;
+    }
+
+    private function measureText(AttributedString $s, FontDescriptor $f, float $width): float
+    {
+        $layout = new TextLayout($s, $f, $width);
         [, $height] = $layout->extents();
         return $height;
     }
@@ -219,6 +242,65 @@ $preview = new class extends AreaDelegate {
         }
         return $y;
     }
+
+    public function measureContentHeight(float $width): float
+    {
+        $pad = 24.0;
+        $x = $pad;
+        $y = $pad;
+        $contentWidth = $width - (2 * $pad);
+
+        $this->blockPositions = [];
+
+        foreach ($this->blocks as $i => $b) {
+            $startY = $y;
+            $y = $this->measureBlock($b, $x, $y, $contentWidth);
+            $this->blockPositions[$i] = ['y' => $startY, 'height' => $y - $startY];
+        }
+
+        return $y;
+    }
+
+    private function measureBlock(array $b, float $x, float $y, float $width): float
+    {
+        switch ($b['type']) {
+            case 'h':
+                $size = [1 => 27.0, 2 => 21.0, 3 => 17.0][$b['level']];
+                $f = new FontDescriptor(BODY_FONT, $size, TextWeight::Bold);
+                $h = $this->measureText(inline($b['text'], $size, C_HEADING, TextWeight::Bold), $f, $width);
+                return $y + $h + 14;
+
+            case 'p':
+                $f = new FontDescriptor(BODY_FONT, 14.5);
+                $h = $this->measureText(inline($b['text'], 14.5, C_BODY), $f, $width);
+                return $y + $h + 12;
+
+            case 'ul':
+                $f = new FontDescriptor(BODY_FONT, 14.5);
+                foreach ($b['items'] as $item) {
+                    $h = $this->measureText(inline($item, 14.5, C_BODY), $f, $width - 18);
+                    $y += $h + 6;
+                }
+                return $y + 6;
+
+            case 'quote':
+                $f = new FontDescriptor(BODY_FONT, 14.5, TextWeight::Normal, TextItalic::Italic);
+                $h = $this->measureText(inline($b['text'], 14.5, C_QUOTE), $f, $width - 14);
+                return $y + $h + 12;
+
+            case 'code':
+                $f = new FontDescriptor(CODE_FONT, 13.0);
+                $s = new AttributedString();
+                $s->append($b['text'], Attribute::size(13.0), Attribute::family(CODE_FONT), Attribute::color(...C_CODE));
+                $layout = new TextLayout($s, $f, $width - 24);
+                [, $h] = $layout->extents();
+                return $y + $h + 32;
+
+            case 'hr':
+                return $y + 18;
+        }
+        return $y;
+    }
 };
 
 $sample = <<<'MD'
@@ -254,13 +336,18 @@ Ffi::init();
 $editor = new MultilineEntry();
 $editor->setText($sample);
 
-$area = new Area($preview);
-$preview->area = $area;
 $preview->blocks = parseMarkdown($sample);
+$previewWidth = 460;
+$contentHeight = max(600, $preview->measureContentHeight($previewWidth));
 
-$editor->onChanged(function () use ($editor, $preview): void {
+$area = Area::scrolling($preview, $previewWidth, (int) ceil($contentHeight));
+$preview->area = $area;
+
+$editor->onChanged(function () use ($editor, $preview, $area): void {
     $preview->blocks = parseMarkdown($editor->text());
-    $preview->area?->queueRedrawAll();
+    $contentHeight = max(600, $preview->measureContentHeight(460));
+    $area->setSize(460, (int) ceil($contentHeight));
+    $area->queueRedrawAll();
 });
 
 new Window('Markdown editor', 920, 600)
