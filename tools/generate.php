@@ -431,6 +431,45 @@ function phpReturnType(array $c, array $generatedTypes): string
     };
 }
 
+/**
+ * PHP parameter type for the raw \FFI boundary (not the high-level wrapper).
+ *
+ * @param array{raw: string, isCallback: bool, type: string, name: string} $p
+ * @param array<string, array<string, int>> $enums
+ */
+function ffiParamType(array $p, array $enums): string
+{
+    if ($p['isCallback']) {
+        return 'callable';
+    }
+
+    $c = classify($p['type'], $enums, []);
+
+    return match ($c['kind']) {
+        'void' => 'void',
+        'double' => 'float',
+        'enum', 'int' => 'int',
+        'string_borrow', 'string_owned' => 'string|\\FFI\\CData',
+        default => '?\\FFI\\CData',
+    };
+}
+
+/**
+ * PHP return type for the raw \FFI boundary (not the high-level wrapper).
+ *
+ * @param array{kind: string, name?: string, scalarOut?: bool} $c
+ */
+function ffiReturnType(array $c): string
+{
+    return match ($c['kind']) {
+        'void' => 'void',
+        'double' => 'float',
+        'enum', 'int' => 'int',
+        'string_borrow', 'string_owned' => '?\\FFI\\CData',
+        default => '?\\FFI\\CData',
+    };
+}
+
 function returnStmt(array $c, string $call, array $generatedTypes, bool $asBool): string
 {
     if ($c['kind'] === 'void')
@@ -634,7 +673,9 @@ function emitWidget(string $type, array $members, array $ctor, array $ctx): stri
         "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated;\n\n"
         . "use Libui\\Control;\n\n"
         . "/**\n * GENERATED wrapper for libui `{$type}`. DO NOT EDIT — run `composer regen`.\n"
-        . " * Add convenience methods in a hand-written Libui\\\\{$class} subclass instead.\n */\n"
+        . " * Add convenience methods in a hand-written Libui\\\\{$class} subclass instead.\n *\n"
+        . " * @generated from libui-ng ui.h by tools/generate.php\n"
+        . " */\n"
         . "class {$class} extends Control\n{\n"
         . implode("\n", $methods)
         . "}\n"
@@ -664,9 +705,9 @@ function enumDocBlock(string $name, array $docs): string
 {
     $summary = $docs[$name] ?? '';
     if ($summary === '') {
-        return "/** GENERATED from libui `{$name}`. DO NOT EDIT. */\n";
+        return "/**\n * GENERATED from libui `{$name}`. DO NOT EDIT.\n *\n * @generated from libui-ng ui.h by tools/generate.php\n */\n";
     }
-    return "/**\n * {$summary}\n *\n * GENERATED from libui `{$name}`. DO NOT EDIT.\n */\n";
+    return "/**\n * {$summary}\n *\n * GENERATED from libui `{$name}`. DO NOT EDIT.\n *\n * @generated from libui-ng ui.h by tools/generate.php\n */\n";
 }
 
 /** Emit a bit-flags enum as a const class. */
@@ -681,7 +722,9 @@ function emitFlags(string $name, array $members): string
     }
     return (
         "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated\\Flags;\n\n"
-        . "/** GENERATED bit-flags from libui `{$name}`. DO NOT EDIT. */\n"
+        . "/**\n * GENERATED bit-flags from libui `{$name}`. DO NOT EDIT.\n *\n"
+        . " * @generated from libui-ng ui.h by tools/generate.php\n"
+        . " */\n"
         . "final class {$class}\n{\n"
         . implode("\n", $consts)
         . "\n\n"
@@ -713,10 +756,83 @@ function emitFacade(array $fns, array $ctx): string
     }
     return (
         "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated;\n\n"
-        . "/**\n * GENERATED facade for libui free functions (dialogs, etc.). DO NOT EDIT.\n */\n"
+        . "/**\n * GENERATED facade for libui free functions (dialogs, etc.). DO NOT EDIT.\n *\n"
+        . " * @generated from libui-ng ui.h by tools/generate.php\n"
+        . " */\n"
         . "final class Ui\n{\n"
         . implode("\n", $methods)
         . "}\n"
+    );
+}
+
+/**
+ * Build the @method lines shared by the FfiFunctions interface and the PHPStan stub.
+ *
+ * @param array<string, array{name: string, ret: string, params: list<array{raw: string, isCallback: bool, type: string, name: string}>}> $funcs
+ * @param array<string, array<string, int>> $enums
+ * @return list<string>
+ */
+function ffiMethodLines(array $funcs, array $enums): array
+{
+    $methods = [];
+    ksort($funcs);
+
+    foreach ($funcs as $fn) {
+        $sig = [];
+        foreach ($fn['params'] as $i => $p) {
+            $var = '$' . ($p['name'] !== '' ? $p['name'] : "a{$i}");
+            $sig[] = ffiParamType($p, $enums) . ' ' . $var;
+        }
+
+        $ret = classify($fn['ret'], $enums, []);
+        $rt = ffiReturnType($ret);
+        $params = '(' . implode(', ', $sig) . ')';
+        $methods[] = " * @method {$rt} {$fn['name']}{$params}";
+    }
+
+    return $methods;
+}
+
+/**
+ * Emit a docblock-only interface describing every libui function bound by \FFI::cdef().
+ *
+ * @param array<string, array{name: string, ret: string, params: list<array{raw: string, isCallback: bool, type: string, name: string}>}> $funcs
+ * @param array<string, array<string, int>> $enums
+ */
+function emitFfiFunctionsInterface(array $funcs, array $enums): string
+{
+    $methods = ffiMethodLines($funcs, $enums);
+
+    return (
+        "<?php\n\ndeclare(strict_types=1);\n\nnamespace Libui\\Generated;\n\n"
+        . "/**\n * GENERATED docblock contract for libui functions bound via FFI::cdef(). DO NOT EDIT.\n *\n"
+        . " * @generated from libui-ng ui.h by tools/generate.php\n"
+        . ($methods === [] ? '' : " *\n" . implode("\n", $methods) . "\n")
+        . " */\n"
+        . "interface FfiFunctions\n{\n}\n"
+    );
+}
+
+/**
+ * Emit a PHPStan stub that teaches static analysis about the dynamic libui methods on \FFI.
+ *
+ * @param array<string, array{name: string, ret: string, params: list<array{raw: string, isCallback: bool, type: string, name: string}>}> $funcs
+ * @param array<string, array<string, int>> $enums
+ */
+function emitFfiStub(array $funcs, array $enums): string
+{
+    $methods = ffiMethodLines($funcs, $enums);
+
+    return (
+        "<?php\n\ndeclare(strict_types=1);\n\n"
+        . "/**\n * GENERATED PHPStan stub for the built-in \\FFI class. DO NOT EDIT.\n *\n"
+        . " * libui-ng functions are bound dynamically on the singleton FFI handle; this stub\n"
+        . " * gives PHPStan a static view of those methods so calls like \\FFI::uiMain() are\n"
+        . " * understood without baselining every site.\n *\n"
+        . " * @generated from libui-ng ui.h by tools/generate.php\n"
+        . ($methods === [] ? '' : " *\n" . implode("\n", $methods) . "\n")
+        . " */\n"
+        . "class FFI\n{\n}\n"
     );
 }
 
@@ -854,6 +970,9 @@ function main(): void
     // --- emit ---
     rrmdir(GEN_DIR);
     $ctx = ['enums' => $enums, 'types' => $types, 'gen' => $genTypes, 'funcs' => $funcs, 'ann' => $ANN, 'docs' => $docs];
+
+    writeFile(GEN_DIR . '/FfiFunctions.php', emitFfiFunctionsInterface($funcs, $enums));
+    writeFile(ROOT . '/stubs/FFI.php', emitFfiStub($funcs, $enums));
 
     $widgetCount = $methodCount = $stubCount = 0;
     foreach ($genTypes as $T) {

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Libui\Generated\Enum;
 
-/** GENERATED from libui `uiDrawBrushType`. DO NOT EDIT. */
+/**
+ * GENERATED from libui `uiDrawBrushType`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
+ */
 enum DrawBrushType: int
 {
     case Solid = 0;

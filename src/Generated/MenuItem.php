@@ -9,6 +9,8 @@ use Libui\Control;
 /**
  * GENERATED wrapper for libui `uiMenuItem`. DO NOT EDIT — run `composer regen`.
  * Add convenience methods in a hand-written Libui\\MenuItem subclass instead.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 class MenuItem extends Control
 {

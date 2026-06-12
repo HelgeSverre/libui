@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * uiTextStretch represents possible stretches (also called "widths") of a font.
  *
  * GENERATED from libui `uiTextStretch`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum TextStretch: int
 {

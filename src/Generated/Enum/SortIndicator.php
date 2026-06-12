@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * Sort indicators.
  *
  * GENERATED from libui `uiSortIndicator`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum SortIndicator: int
 {

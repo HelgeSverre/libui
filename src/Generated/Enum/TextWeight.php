@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * uiTextWeight represents possible text weights.
  *
  * GENERATED from libui `uiTextWeight`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum TextWeight: int
 {

@@ -9,6 +9,10 @@ namespace Libui;
  * low-level marshalling helpers the generated classes and the drawing adapter
  * rely on.
  *
+ * Dynamic libui functions are documented on {@see \Libui\Generated\FfiFunctions}
+ * and intersected with the raw \FFI return type so static analysis understands
+ * calls like `Ffi::get()->uiMsgBox(...)`.
+ *
  * One process holds one libui instance, so the handle is a lazily-created
  * singleton.
  */
@@ -109,9 +113,10 @@ final class Ffi
      * Returns the singleton FFI instance bound to libui-ng.
      *
      * Lazily loads the cleaned FFI header and shared library on first call.
-     * The returned \FFI instance has all 299 libui functions bound and callable.
+     * The returned \FFI instance has all libui functions bound and callable.
      *
-     * @return \FFI The singleton FFI handle
+     * @return \FFI The singleton FFI handle with libui methods
+     * @see \Libui\Generated\FfiFunctions for the generated method contract
      * @throws \RuntimeException If FFI extension is not loaded
      * @throws \RuntimeException If generated header is missing (run: composer regen)
      * @throws \RuntimeException If libui library is missing (run: composer build-lib)

@@ -9,6 +9,8 @@ use Libui\Control;
 /**
  * GENERATED wrapper for libui `uiGroup`. DO NOT EDIT — run `composer regen`.
  * Add convenience methods in a hand-written Libui\\Group subclass instead.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 class Group extends Control
 {

@@ -9,6 +9,8 @@ use Libui\Control;
 /**
  * GENERATED wrapper for libui `uiCombobox`. DO NOT EDIT — run `composer regen`.
  * Add convenience methods in a hand-written Libui\\Combobox subclass instead.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 class Combobox extends Control
 {

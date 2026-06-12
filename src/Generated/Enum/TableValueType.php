@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * uiTableValue types.
  *
  * GENERATED from libui `uiTableValueType`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum TableValueType: int
 {

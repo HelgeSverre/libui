@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * Placement specifier to define placement in relation to another control.
  *
  * GENERATED from libui `uiAt`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum At: int
 {

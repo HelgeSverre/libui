@@ -9,6 +9,8 @@ use Libui\Control;
 /**
  * GENERATED wrapper for libui `uiGrid`. DO NOT EDIT — run `composer regen`.
  * Add convenience methods in a hand-written Libui\\Grid subclass instead.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 class Grid extends Control
 {

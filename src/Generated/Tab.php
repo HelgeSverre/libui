@@ -9,6 +9,8 @@ use Libui\Control;
 /**
  * GENERATED wrapper for libui `uiTab`. DO NOT EDIT — run `composer regen`.
  * Add convenience methods in a hand-written Libui\\Tab subclass instead.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 class Tab extends Control
 {

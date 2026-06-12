@@ -9,6 +9,8 @@ use Libui\Control;
 /**
  * GENERATED wrapper for libui `uiMultilineEntry`. DO NOT EDIT — run `composer regen`.
  * Add convenience methods in a hand-written Libui\\MultilineEntry subclass instead.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 class MultilineEntry extends Control
 {

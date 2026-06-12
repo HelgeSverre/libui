@@ -6,6 +6,8 @@ namespace Libui\Generated;
 
 /**
  * GENERATED facade for libui free functions (dialogs, etc.). DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 final class Ui
 {

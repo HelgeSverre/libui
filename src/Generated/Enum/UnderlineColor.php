@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * uiUnderlineColor specifies the color of any underline on the text it is applied to, regardless of the type of underline.
  *
  * GENERATED from libui `uiUnderlineColor`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum UnderlineColor: int
 {

@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * uiUnderline specifies a type of underline to use on text.
  *
  * GENERATED from libui `uiUnderline`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum Underline: int
 {

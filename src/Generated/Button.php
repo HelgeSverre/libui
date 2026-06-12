@@ -9,6 +9,8 @@ use Libui\Control;
 /**
  * GENERATED wrapper for libui `uiButton`. DO NOT EDIT — run `composer regen`.
  * Add convenience methods in a hand-written Libui\\Button subclass instead.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 class Button extends Control
 {

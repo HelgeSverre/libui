@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Libui\Generated\Flags;
 
-/** GENERATED bit-flags from libui `uiModifiers`. DO NOT EDIT. */
+/**
+ * GENERATED bit-flags from libui `uiModifiers`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
+ */
 final class Modifiers
 {
     public const int Ctrl = 1;

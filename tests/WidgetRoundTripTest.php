@@ -151,7 +151,6 @@ final class WidgetRoundTripTest extends LibuiTestCase
     private function windowPosition(Window $window): array
     {
         $out = \Libui\Ffi::get()->new('int[2]');
-        // @phpstan-ignore-next-line dynamic libui FFI call on the \FFI handle
         \Libui\Ffi::get()->uiWindowPosition($window->handle(), \FFI::addr($out[0]), \FFI::addr($out[1]));
 
         return [$out[0], $out[1]];

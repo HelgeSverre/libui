@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * uiAttributeType holds the possible uiAttribute types that may be returned by uiAttributeGetType().
  *
  * GENERATED from libui `uiAttributeType`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum AttributeType: int
 {

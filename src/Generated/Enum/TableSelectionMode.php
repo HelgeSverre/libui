@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * Table selection modes.
  *
  * GENERATED from libui `uiTableSelectionMode`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum TableSelectionMode: int
 {

@@ -8,6 +8,9 @@ parameters:
         - tools
         - tests
 
+    stubFiles:
+        - stubs/FFI.php
+
     # The FFI-dynamic noise (uiXxx() calls on the \FFI handle, struct field access
     # on \FFI\CData) and a few intentional retention-property / test-assertion
     # findings are captured in phpstan-baseline.neon, matched by file + message +

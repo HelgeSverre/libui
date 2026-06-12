@@ -8,6 +8,8 @@ namespace Libui\Generated\Enum;
  * Alignment specifiers to define placement within the reserved area.
  *
  * GENERATED from libui `uiAlign`. DO NOT EDIT.
+ *
+ * @generated from libui-ng ui.h by tools/generate.php
  */
 enum Align: int
 {

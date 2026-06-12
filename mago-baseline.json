@@ -605,3 +605,33 @@ file = "tools/generate.php"
 code = "no-shorthand-ternary"
 message = "Use of the shorthand ternary operator."
 count = 5
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitFfiFunctionsInterface` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitFfiStub` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `ffiMethodLines` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `ffiParamType` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `ffiReturnType` should be in snake case."
+count = 1
