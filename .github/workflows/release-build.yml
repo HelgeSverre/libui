@@ -136,9 +136,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG=${{ github.ref_name }}
+          # On a tag push github.ref_name is the tag; on workflow_dispatch it is the
+          # branch ("main"), so prefer the explicit tag input when present.
+          TAG="${{ inputs.tag }}"
           if [ -z "$TAG" ]; then
-            TAG=${{ inputs.tag }}
+            TAG="${{ github.ref_name }}"
           fi
 
           echo "Attaching artifacts to release: $TAG"
