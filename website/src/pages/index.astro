@@ -1,0 +1,227 @@
+---
+import { Code } from 'astro:components';
+import Layout from '../layouts/Layout.astro';
+
+const codeTheme = 'vesper';
+
+const greeter = `<?php
+
+require 'vendor/autoload.php';
+
+use Libui\\Ffi;
+use Libui\\Window;
+use Libui\\Box;
+use Libui\\Entry;
+use Libui\\Button;
+
+Ffi::init();
+
+$entry  = new Entry();
+$button = (new Button('Greet'))
+    ->onClicked(fn () => print("Hi, {$entry->text()}!\\n"));
+
+(new Window('Greeter'))
+    ->setChild(
+        (new Box(padded: true))
+            ->append($entry)
+            ->append($button),
+    )
+    ->run();`;
+
+const tableCode = `// A data grid in a few lines — no model class, no manual cleanup.
+$table = Table::fromRows([
+    ['Rasmus Lerdorf',     'PHP',        '1995'],
+    ['Yukihiro Matsumoto', 'Ruby',       '1995'],
+    ['Guido van Rossum',   'Python',     '1991'],
+], headers: ['Author', 'Language', 'Year']);
+
+(new Window('Data grid', 480, 240))
+    ->setChild((new Box())->appendStretchy($table))
+    ->run();`;
+
+const drawCode = `// Custom 2D drawing: a gradient-filled path, stroked white.
+public function draw(DrawContext $ctx, AreaDrawParams $p): void
+{
+    $ctx->fillPath(
+        Brush::linearGradient(0, 0, 0, $p->areaHeight, [
+            Stop::at(0.0, Color::rgb(0x312B90)),
+            Stop::at(1.0, Color::rgb(0x0296C3)),
+        ]),
+        fn (Path $path) => $path->roundedRect(24, 24, 300, 160, 16),
+    );
+    $ctx->drawString('Drawn in PHP', new FontDescriptor('Helvetica', 22),
+        Color::white(), 44, 44);
+}`;
+
+const shots = [
+  { f: 'flowfield.png', name: 'flowfield.php', cap: 'Generative art', sub: 'thousands of streamlines', cls: 'wide' },
+  { f: 'monitor.png',   name: 'monitor.php',   cap: 'System monitor', sub: 'live charts + gauge',     cls: '' },
+  { f: 'colorpicker.png', name: 'colorpicker.php', cap: 'Colour picker', sub: 'HSV wheel, custom-drawn', cls: '' },
+  { f: 'markdown.png',  name: 'markdown.php',  cap: 'Markdown editor',  sub: 'live rendered preview',  cls: 'wide' },
+  { f: 'palette.png',   name: 'palette.php',   cap: 'Command palette',  sub: 'borderless, fuzzy search', cls: '' },
+  { f: 'gallery.png',   name: 'gallery.php',   cap: 'Widget gallery',   sub: 'tabs, forms, sliders',    cls: '' },
+];
+
+const Sym = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="3.5" width="19" height="17" rx="3" fill="#1e1a13" stroke="#e0823c" stroke-width="2"/><path d="M3 9 H21" stroke="#e0823c" stroke-width="2"/><circle cx="6" cy="6.25" r="0.95" fill="#e0823c"/></svg>`;
+---
+
+<Layout>
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="wrap inner">
+      <a class="brand" href="/" set:html={Sym + '<b>libui</b><span>/php</span>'}></a>
+      <span class="badge"><span class="dot"></span>v0.5.0</span>
+      <div class="links">
+        <a href="#build" class="hide-sm">What you build</a>
+        <a href="#features" class="hide-sm">Features</a>
+        <a href="https://github.com/HelgeSverre/libui/blob/main/docs/GUIDE.md">Docs</a>
+        <a href="https://github.com/HelgeSverre/libui">GitHub →</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="section" style="padding-top:64px; padding-bottom:56px;">
+    <div class="wrap">
+      <p class="kicker">PHP 8.5 · FFI · libui-ng</p>
+      <h1 style="font-size:clamp(38px,6.4vw,76px); margin:18px 0 0; max-width:14ch;">
+        Native desktop GUIs.<br /><span class="accent">Written in PHP.</span>
+      </h1>
+      <p class="prose" style="font-size:19px; max-width:60ch; margin:24px 0 30px;">
+        A typed, object-oriented binding to <code>libui-ng</code> driven by PHP's built-in
+        <b style="color:var(--ink)">FFI</b>. Real native windows, widgets, 2D drawing and text —
+        no compiled extension, no web view, no Electron. Prebuilt for macOS, Linux and Windows.
+      </p>
+
+      <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom:48px;">
+        <div class="window" style="display:inline-flex;">
+          <div class="titlebar" style="padding:10px 16px;">
+            <span class="muted">$</span>
+            <span class="name" style="color:var(--ink);">composer require helgesverre/libui</span>
+          </div>
+        </div>
+        <a class="btn btn-primary" href="#build">See what you can build</a>
+      </div>
+
+      <!-- code -> window showcase -->
+      <div class="window">
+        <div class="titlebar">
+          <span class="lights"><i></i><i></i><i></i></span>
+          <span class="name">greeter.php</span>
+          <span class="spacer"></span>
+          <span class="muted">one file · one window</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1.15fr 0.85fr;">
+          <div style="border-right:1px solid var(--line);">
+            <Code code={greeter} lang="php" theme={codeTheme} />
+          </div>
+          <div style="background:#0f0d09; display:flex; align-items:center; justify-content:center; padding:28px;">
+            <img src="/shots/form.png" alt="The resulting native window" style="max-width:100%; border-radius:8px; border:1px solid var(--line); box-shadow:0 20px 50px -24px #000;" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- WHAT YOU CAN BUILD -->
+  <section class="section" id="build">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Real apps, real pixels</p>
+        <h2>Not toy demos. Native windows you ship.</h2>
+        <p class="prose">Generative art, live dashboards, editors, custom-drawn controls — every one of
+          these is a PHP script in <a href="https://github.com/HelgeSverre/libui/tree/main/examples">examples/</a>.</p>
+      </div>
+      <div class="gallery">
+        {shots.map((s) => (
+          <div class={`window shot ${s.cls}`}>
+            <div class="titlebar"><span class="lights"><i></i><i></i><i></i></span><span class="name">{s.name}</span></div>
+            <img src={`/shots/${s.f}`} alt={s.cap} loading="lazy" />
+            <div class="cap"><b>{s.cap}</b> — {s.sub}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- A SECOND TASTE: TABLE + DRAW -->
+  <section class="section" style="padding-top:0;">
+    <div class="wrap" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+      <div class="window">
+        <div class="titlebar"><span class="lights"><i></i><i></i><i></i></span><span class="name">table.php</span></div>
+        <Code code={tableCode} lang="php" theme={codeTheme} />
+      </div>
+      <div class="window">
+        <div class="titlebar"><span class="lights"><i></i><i></i><i></i></span><span class="name">draw.php</span></div>
+        <Code code={drawCode} lang="php" theme={codeTheme} />
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features" style="padding-top:30px;">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">The surface</p>
+        <h2>Typed all the way down.</h2>
+        <p class="prose">Every widget is a class with fluent setters and IDE autocompletion. Anything
+          without a sugar wrapper is still reachable raw through the FFI handle.</p>
+      </div>
+      <dl class="features">
+        <div class="feature"><h3>23 typed widgets</h3><p>Windows, boxes, grids, tabs, forms, entries, sliders, spinboxes, combos, date &amp; colour pickers, menus — all generated 1:1 from libui's C header.</p></div>
+        <div class="feature"><h3>Custom 2D drawing</h3><p>Vector <code>Path</code>s with circle/arc/rounded-rect sugar, gradient brushes with typed <code>Stop</code>s, a fluent <code>StrokeParams</code> builder, clipping and transforms.</p></div>
+        <div class="feature"><h3>One <code>Color</code> type</h3><p><code>Color::rgb(0x312B90)</code>, <code>::hex()</code>, <code>::rgba()</code>, named — accepted across brushes, text and colour buttons.</p></div>
+        <div class="feature"><h3>Attributed text</h3><p>Per-range colour/weight/italic spans, a measurable <code>TextLayout</code>, plus a <code>RichText</code> builder for one-call styled text.</p></div>
+        <div class="feature"><h3>Data grids</h3><p><code>Table::fromRows()</code> for static data — no delegate class, automatic model lifetime, typed columns and row-index callbacks.</p></div>
+        <div class="feature"><h3>Form binding</h3><p>Input widgets implement <code>HasValue</code>; <code>Form::values()</code> / <code>setValues()</code> read and write a whole form at once, keyed by label.</p></div>
+        <div class="feature"><h3>Async over the loop</h3><p>The <code>Loop</code> class (<code>defer</code>/<code>delay</code>/<code>repeat</code>) drives background work — HTTP, timers, animation — without freezing the UI.</p></div>
+        <div class="feature"><h3>Safe menus &amp; dialogs</h3><p>A <code>Menu</code> builder that enforces libui's ordering rules, clean <code>onClick</code> handlers, and a parent-bound <code>Dialogs</code> facade.</p></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section class="section" style="padding-top:0;">
+    <div class="wrap">
+      <div class="window">
+        <div class="titlebar"><span class="lights"><i></i><i></i><i></i></span><span class="name">platform support</span><span class="spacer"></span><span class="muted">prebuilt · no compiler</span></div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);">
+          <div style="background:var(--bg-window); padding:26px;">
+            <div class="badge" style="margin-bottom:14px;"><span class="dot"></span>macOS</div>
+            <p class="muted" style="margin:0; font-size:13.5px;">Universal <code>arm64 + x86_64</code> dylib ships in the package. Works out of the box.</p>
+          </div>
+          <div style="background:var(--bg-window); padding:26px;">
+            <div class="badge" style="margin-bottom:14px;"><span class="dot"></span>Linux</div>
+            <p class="muted" style="margin:0; font-size:13.5px;">Prebuilt <code>.so</code> for <code>x86_64 + aarch64</code> (GTK 3 baseline). Just needs GTK 3 installed.</p>
+          </div>
+          <div style="background:var(--bg-window); padding:26px;">
+            <div class="badge" style="margin-bottom:14px;"><span class="dot"></span>Windows</div>
+            <p class="muted" style="margin:0; font-size:13.5px;">Prebuilt <code>libui.dll</code> (built with MSVC). No toolchain required.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY NOT ext-ui -->
+  <section class="section" style="padding-top:0; padding-bottom:80px;">
+    <div class="wrap" style="max-width:760px;">
+      <p class="kicker">Why FFI, not a PECL extension</p>
+      <h2 style="font-size:clamp(22px,2.8vw,30px); margin:14px 0 14px;">No C toolchain on your machine.</h2>
+      <p class="prose">PHP's old <code>ext-ui</code> is abandoned and PHP&nbsp;7-only — it won't compile on modern PHP.
+        libui&nbsp;for&nbsp;PHP reaches the same goal a different way: it loads the maintained
+        <code>libui-ng</code> shared library at runtime and calls it through FFI. Nothing to compile,
+        nothing to install but the package — and you stay on the PHP you already run.</p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap inner">
+      <span set:html={Sym} style="opacity:.7;"></span>
+      <span>libui for PHP — MIT</span>
+      <span class="muted">·</span>
+      <a href="https://github.com/HelgeSverre/libui">github.com/HelgeSverre/libui</a>
+      <span style="margin-left:auto;" class="muted">Bundles libui-ng (MIT).</span>
+    </div>
+  </footer>
+</Layout>
