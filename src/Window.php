@@ -10,6 +10,9 @@ namespace Libui;
  */
 class Window extends Generated\Window
 {
+    /** True once any Window has been constructed this process — menus are then locked. */
+    private static bool $menusLocked = false;
+
     /** @var (callable():void)|null */
     private $onClose = null;
 
@@ -23,6 +26,30 @@ class Window extends Generated\Window
         parent::__construct($title, $width, $height, $hasMenubar);
         $this->width = $width;
         $this->height = $height;
+        self::$menusLocked = true; // libui freezes the menu list at first window creation
+    }
+
+    /** Whether any Window has been created (after which new Menus are illegal). */
+    public static function menusLocked(): bool
+    {
+        return self::$menusLocked;
+    }
+
+    /**
+     * Reset the menu-ordering lock. For tests and rare multi-session apps that
+     * call Ffi::uninit() and start a fresh libui session.
+     *
+     * @internal
+     */
+    public static function resetMenuLockForTesting(): void
+    {
+        self::$menusLocked = false;
+    }
+
+    /** A Dialogs facade bound to this window as the parent. */
+    public function dialogs(): Dialogs
+    {
+        return new Dialogs($this);
     }
 
     /**

@@ -19,7 +19,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use Libui\App;
 use Libui\Box;
 use Libui\Ffi;
-use Libui\Generated\Ui;
 use Libui\Label;
 use Libui\Menu;
 use Libui\Window;
@@ -57,20 +56,20 @@ $window->setChild($box);
 
 // --- 3. Wire the menu items ----------------------------------------------
 //
-// NOTE: uiMenuItemOnClicked hands the callback TWO args: ($item, $rawWindow).
-// The 2nd arg is a raw uiWindow* CData, NOT a \Libui\Window — do not pass it
-// to the Ui facade. Capture our own $window via `use` instead.
+// onClick() hides libui's raw uiWindow* 2nd arg, handing your handler only the
+// typed MenuItem. Window::dialogs() binds a Dialogs facade to this window, so
+// you never repeat $parent and file choosers return ?string (null on cancel).
 
-$open->onClicked(function ($item, $win) use ($window) {
-    $path = Ui::openFile($window);
-    if ($path !== '') {
-        Ui::msgBox($window, 'You picked', $path);
+$dialogs = $window->dialogs();
+
+$open->onClick(function (\Libui\MenuItem $item) use ($dialogs) {
+    $path = $dialogs->openFile();
+    if ($path !== null) {
+        $dialogs->msgBox('You picked', $path);
     }
 });
 
-$about->onClicked(function ($item, $win) use ($window) {
-    Ui::msgBox($window, 'About', 'PHP libui menu demo');
-});
+$about->onClick(fn (\Libui\MenuItem $item) => $dialogs->msgBox('About', 'PHP libui menu demo'));
 
 foreach (['Cut' => $cut, 'Copy' => $copy, 'Paste' => $paste] as $name => $entry) {
     $entry->onClicked(function ($item, $win) use ($name) {
