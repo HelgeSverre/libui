@@ -391,13 +391,13 @@ final class ContainerTest extends LibuiTestCase
         $tab->append('Tab', $button);
 
         $margined = $tab->margined(0);
-        $this->assertIsInt($margined);
+        $this->assertIsBool($margined);
 
-        $result = $tab->setMargined(0, 1);
+        $result = $tab->setMargined(0, true);
         $this->assertSame($tab, $result);
 
         $marginedAfter = $tab->margined(0);
-        $this->assertSame(1, $marginedAfter);
+        $this->assertTrue($marginedAfter);
     }
 
     // ========================================================================

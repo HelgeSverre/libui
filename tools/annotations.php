@@ -69,6 +69,9 @@ return [
         'uiSliderSetHasToolTip',
         'uiMenuItemChecked',
         'uiMenuItemSetChecked',
+        'uiWindowFocused',
+        'uiTabMargined',
+        'uiTabSetMargined',
     ],
 
     // Enums that are bit-flags: emitted as a const class (PHP backed enums

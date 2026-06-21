@@ -124,7 +124,7 @@ $tab->append('Choosers', $choosers);
 
 // Give every page an inner margin.
 for ($i = 0, $n = $tab->numPages(); $i < $n; $i++) {
-    $tab->setMargined($i, 1);
+    $tab->setMargined($i, true);
 }
 
 $window->setChild($tab);

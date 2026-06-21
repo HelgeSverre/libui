@@ -233,13 +233,13 @@ class Window extends Control
     /**
      * Returns whether or not the window is focused.
      *
-     * @return int `TRUE` if window is focused, `FALSE` otherwise.
+     * @return bool `TRUE` if window is focused, `FALSE` otherwise.
      *
      * @see uiWindowFocused
      */
-    public function focused(): int
+    public function focused(): bool
     {
-        return \Libui\Ffi::get()->uiWindowFocused($this->handle);
+        return \Libui\Ffi::get()->uiWindowFocused($this->handle) !== 0;
     }
 
     /**

@@ -62,6 +62,22 @@ final class TableColumnsTest extends LibuiTestCase
         $this->assertInstanceOf(Table::class, $table);
     }
 
+    public function testAppendImageTextColumnDoesNotThrow(): void
+    {
+        // Regression: this passed 3 FFI args where uiTableAppendImageTextColumn
+        // needs 6, so it threw the moment it was called.
+        $table = Table::fromDelegate($this->delegate())->appendImageTextColumn('IT', 0, 1);
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
+    public function testAppendCheckboxTextColumnDoesNotThrow(): void
+    {
+        // Regression: this passed 3 FFI args where uiTableAppendCheckboxTextColumn
+        // needs 7, so it threw the moment it was called.
+        $table = Table::fromDelegate($this->delegate())->appendCheckboxTextColumn('CT', 0, 1);
+        $this->assertInstanceOf(Table::class, $table);
+    }
+
     public function testConstructorRowBackgroundColumnAccepted(): void
     {
         // Smoke: the param is consumed by uiNewTable() and can't be read back,

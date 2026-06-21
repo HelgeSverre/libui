@@ -237,7 +237,7 @@ final class AAAWidgetTest extends LibuiTestCase
         $tab->append('First', $button);
 
         $margined = $tab->margined(0);
-        $this->assertIsInt($margined);
+        $this->assertIsBool($margined);
     }
 
     public function testTabSetMargined(): void
@@ -246,7 +246,7 @@ final class AAAWidgetTest extends LibuiTestCase
         $button = new Button('Tab 1');
         $tab->append('First', $button);
 
-        $result = $tab->setMargined(0, 1);
+        $result = $tab->setMargined(0, true);
         $this->assertSame($tab, $result);
     }
 

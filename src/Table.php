@@ -181,15 +181,23 @@ final class Table extends Control
     }
 
     /**
-     * Append a read-only image+text column titled $name that reads from model column
-     * $imageModelColumn. The model should return Image instances for the image part.
+     * Append an image+text column titled $name. The image is read from
+     * $imageModelColumn (model returns Image) and the text from $textModelColumn
+     * (model returns string). Pass $textEditableModelColumn to make the text editable.
      */
-    public function appendImageTextColumn(string $name, int $imageModelColumn): static
-    {
+    public function appendImageTextColumn(
+        string $name,
+        int $imageModelColumn,
+        int $textModelColumn,
+        ?int $textEditableModelColumn = null,
+    ): static {
         Ffi::get()->uiTableAppendImageTextColumn(
             $this->handle,
             $name,
             $imageModelColumn,
+            $textModelColumn,
+            $textEditableModelColumn ?? self::NEVER_EDITABLE,
+            null, // textParams (optional column styling)
         );
         return $this;
     }
@@ -210,15 +218,25 @@ final class Table extends Control
     }
 
     /**
-     * Append a checkbox+text column titled $name that reads from model column
-     * $modelColumn. The model should return bool values for the checkbox part.
+     * Append a checkbox+text column titled $name. The checkbox is read from
+     * $checkboxModelColumn (model returns bool) and the text from $textModelColumn
+     * (model returns string). Pass the editable-column args to allow toggling/editing.
      */
-    public function appendCheckboxTextColumn(string $name, int $modelColumn): static
-    {
+    public function appendCheckboxTextColumn(
+        string $name,
+        int $checkboxModelColumn,
+        int $textModelColumn,
+        ?int $checkboxEditableModelColumn = null,
+        ?int $textEditableModelColumn = null,
+    ): static {
         Ffi::get()->uiTableAppendCheckboxTextColumn(
             $this->handle,
             $name,
-            $modelColumn,
+            $checkboxModelColumn,
+            $checkboxEditableModelColumn ?? self::NEVER_EDITABLE,
+            $textModelColumn,
+            $textEditableModelColumn ?? self::NEVER_EDITABLE,
+            null, // textParams (optional column styling)
         );
         return $this;
     }
@@ -368,7 +386,13 @@ final class Table extends Control
     public function onSelectionChanged(callable $cb): static
     {
         $fn = Control::keep(function ($t) use ($cb) {
-            $cb($this);
+            // A throw escaping into libui's C trampoline is a hard fatal — guard it
+            // like onRowClicked()/onRowDoubleClicked() do.
+            try {
+                $cb($this);
+            } catch (\Throwable $e) {
+                fwrite(STDERR, "[Table::onSelectionChanged] {$e->getMessage()}\n");
+            }
         });
         Ffi::get()->uiTableOnSelectionChanged($this->handle, $fn, null);
         return $this;

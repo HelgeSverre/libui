@@ -131,26 +131,26 @@ class Tab extends Control
      * Returns whether or not the page/tab at $index has a margin.
      *
      * @param int $index Index to check if it has a margin.
-     * @return int `TRUE` if the tab has a margin, `FALSE` otherwise.
+     * @return bool `TRUE` if the tab has a margin, `FALSE` otherwise.
      *
      * @see uiTabMargined
      */
-    public function margined(int $index): int
+    public function margined(int $index): bool
     {
-        return \Libui\Ffi::get()->uiTabMargined($this->handle, $index);
+        return \Libui\Ffi::get()->uiTabMargined($this->handle, $index) !== 0;
     }
 
     /**
      * Sets whether or not the page/tab at $index has a margin.
      *
      * @param int $index Index of the tab/page to un/set margin for.
-     * @param int $margined `TRUE` to set a margin for tab at $index, `FALSE` otherwise.
+     * @param bool $margined `TRUE` to set a margin for tab at $index, `FALSE` otherwise.
      *
      * @see uiTabSetMargined
      */
-    public function setMargined(int $index, int $margined): static
+    public function setMargined(int $index, bool $margined): static
     {
-        \Libui\Ffi::get()->uiTabSetMargined($this->handle, $index, $margined);
+        \Libui\Ffi::get()->uiTabSetMargined($this->handle, $index, (int) $margined);
         return $this;
     }
 }

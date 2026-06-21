@@ -367,18 +367,6 @@ parameters:
 			path: src/Table.php
 
 		-
-			message: '#^Method FFI\:\:uiTableAppendCheckboxTextColumn\(\) invoked with 3 parameters, 7 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: src/Table.php
-
-		-
-			message: '#^Method FFI\:\:uiTableAppendImageTextColumn\(\) invoked with 3 parameters, 6 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: src/Table.php
-
-		-
 			message: '#^Property Libui\\Table\:\:\$retainedStructs is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -495,13 +483,13 @@ parameters:
 		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsBool\(\) with bool will always evaluate to true\.$#'
 			identifier: method.alreadyNarrowedType
-			count: 3
+			count: 4
 			path: tests/AAAWidgetTest.php
 
 		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsInt\(\) with int will always evaluate to true\.$#'
 			identifier: method.alreadyNarrowedType
-			count: 2
+			count: 1
 			path: tests/AAAWidgetTest.php
 
 		-
@@ -639,13 +627,7 @@ parameters:
 		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsBool\(\) with bool will always evaluate to true\.$#'
 			identifier: method.alreadyNarrowedType
-			count: 4
-			path: tests/ContainerTest.php
-
-		-
-			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsInt\(\) with int will always evaluate to true\.$#'
-			identifier: method.alreadyNarrowedType
-			count: 1
+			count: 5
 			path: tests/ContainerTest.php
 
 		-
