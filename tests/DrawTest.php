@@ -725,6 +725,17 @@ final class DrawTest extends TestCase
         $this->assertSame($path, $result);
     }
 
+    public function testPathQuadToThrowsWithoutCurrentPoint(): void
+    {
+        // No newFigure/lineTo first → the current point is undefined and exact
+        // quadratic→cubic promotion is impossible, so it must throw rather than
+        // silently draw the wrong curve.
+        $path = new Path();
+
+        $this->expectException(\LogicException::class);
+        $path->quadTo(50.0, 100.0, 100.0, 0.0);
+    }
+
     public function testPathBezierThroughBuilds(): void
     {
         $path = new Path();

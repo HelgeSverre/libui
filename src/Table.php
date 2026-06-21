@@ -103,7 +103,7 @@ final class Table extends Control
         $columns = array_values($columns);
 
         $positional = array_map(
-            static fn (array $row) => array_map(static fn (string $k) => $row[$k] ?? '', $columns),
+            static fn (array $row) => array_map(static fn (int|string $k) => $row[$k] ?? '', $columns),
             $rows,
         );
 

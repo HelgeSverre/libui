@@ -35,6 +35,13 @@ abstract class AreaDelegate
      * Bind this delegate to its Area. Called by {@see Area::__construct()};
      * not intended for direct use.
      *
+     * The strong reference is deliberate: the Area owns the native uiAreaHandler
+     * struct libui dereferences on every paint, and this delegate is itself pinned
+     * for the process lifetime (its draw/mouse closures are retained), so holding
+     * the Area here keeps that struct alive even if the caller drops their own
+     * reference. A weak reference would let the Area — and its handler — be freed
+     * out from under libui.
+     *
      * @internal
      */
     public function bindArea(Area $area): void

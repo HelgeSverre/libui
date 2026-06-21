@@ -22,6 +22,9 @@ final class Brush
     private ?\FFI\CData $stopsArray = null;
 
     /**
+     * Stops here are always normalized [pos,r,g,b,a] tuples — the public gradient
+     * factories convert any {@see Stop} objects via normalizeStops() first.
+     *
      * @param array<int, array{float,float,float,float,float}> $stops [pos,r,g,b,a]
      * @param array{float,float,float,float,float}             $gradient [x0,y0,x1,y1,outerRadius]
      */

@@ -700,7 +700,7 @@ A vector path, built then filled/stroked into a DrawContext.
 - `lineTo(float $x, float $y): Path`
 - `newFigure(float $x, float $y): Path`
 - `newFigureWithArc(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): Path` — Start a new figure on an arc (angles in radians, clockwise; $negative sweeps the other way). Combine with closeFigure() for a filled wedge.
-- `quadTo(float $cx, float $cy, float $endX, float $endY): Path` — A quadratic Bézier from the current point to ($endX,$endY) via control ($cx,$cy), expressed as the equivalent cubic for libui's bezierTo. Requires an active figure (call newFigure/lineTo first).
+- `quadTo(float $cx, float $cy, float $endX, float $endY): Path` — A quadratic Bézier from the current point to ($endX,$endY) via control ($cx,$cy), promoted to libui's cubic bezierTo *exactly* (libui has no native quadratic).
 - `roundedRect(float $x, float $y, float $width, float $height, float $radius): Path` — A rectangle with rounded corners. $radius is clamped to min(width,height)/2. Corners are quarter-arcs; edges are straight (arcTo continues the figure).
 
 ### `Stop`

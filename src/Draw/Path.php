@@ -19,6 +19,15 @@ final class Path
 
     private bool $freed = false;
 
+    /**
+     * The current pen position after the last point-producing op, or null when
+     * undefined (after a new figure on an arc, a rectangle, or closeFigure). Used
+     * by quadTo() to promote a quadratic Bézier to libui's cubic exactly.
+     */
+    private ?float $curX = null;
+
+    private ?float $curY = null;
+
     public function __construct(DrawFillMode $fillMode = DrawFillMode::Winding)
     {
         $this->path = Ffi::get()->uiDrawNewPath($fillMode->value);
@@ -32,24 +41,30 @@ final class Path
     public function newFigure(float $x, float $y): self
     {
         Ffi::get()->uiDrawPathNewFigure($this->path, $x, $y);
+        $this->curX = $x;
+        $this->curY = $y;
         return $this;
     }
 
     public function lineTo(float $x, float $y): self
     {
         Ffi::get()->uiDrawPathLineTo($this->path, $x, $y);
+        $this->curX = $x;
+        $this->curY = $y;
         return $this;
     }
 
     public function closeFigure(): self
     {
         Ffi::get()->uiDrawPathCloseFigure($this->path);
+        $this->curX = $this->curY = null;
         return $this;
     }
 
     public function addRectangle(float $x, float $y, float $width, float $height): self
     {
         Ffi::get()->uiDrawPathAddRectangle($this->path, $x, $y, $width, $height);
+        $this->curX = $this->curY = null;
         return $this;
     }
 
@@ -60,6 +75,7 @@ final class Path
     public function newFigureWithArc(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): self
     {
         Ffi::get()->uiDrawPathNewFigureWithArc($this->path, $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
+        $this->curX = $this->curY = null;
         return $this;
     }
 
@@ -67,6 +83,7 @@ final class Path
     public function arcTo(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): self
     {
         Ffi::get()->uiDrawPathArcTo($this->path, $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
+        $this->curX = $this->curY = null;
         return $this;
     }
 
@@ -74,6 +91,8 @@ final class Path
     public function bezierTo(float $c1x, float $c1y, float $c2x, float $c2y, float $endX, float $endY): self
     {
         Ffi::get()->uiDrawPathBezierTo($this->path, $c1x, $c1y, $c2x, $c2y, $endX, $endY);
+        $this->curX = $endX;
+        $this->curY = $endY;
         return $this;
     }
 
@@ -84,6 +103,7 @@ final class Path
     public function arc(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): self
     {
         Ffi::get()->uiDrawPathNewFigureWithArc($this->path, $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
+        $this->curX = $this->curY = null;
         return $this;
     }
 
@@ -153,18 +173,28 @@ final class Path
 
     /**
      * A quadratic Bézier from the current point to ($endX,$endY) via control
-     * ($cx,$cy), expressed as the equivalent cubic for libui's bezierTo.
-     * Requires an active figure (call newFigure/lineTo first).
+     * ($cx,$cy), promoted to libui's cubic bezierTo *exactly* (libui has no
+     * native quadratic).
      *
-     * Note: exact quadratic-to-cubic promotion needs the current point (P0),
-     * which uiDrawPath does not expose. This duplicates the quadratic control
-     * point as both cubic control points — a documented smooth-curve
-     * approximation. Callers needing exact promotion should track P0 and use
-     * {@see bezierTo()} directly.
+     * Requires a defined current point — call newFigure()/lineTo()/bezierTo()
+     * first; throws otherwise (an arc or rectangle leaves the point undefined).
      */
     public function quadTo(float $cx, float $cy, float $endX, float $endY): self
     {
-        $this->bezierTo($cx, $cy, $cx, $cy, $endX, $endY);
+        if ($this->curX === null || $this->curY === null) {
+            throw new \LogicException(
+                'Path::quadTo() needs a current point — call newFigure(), lineTo(), ' . 'or bezierTo() before it (arcs and rectangles leave it undefined).',
+            );
+        }
+
+        // Exact quadratic -> cubic promotion: C1 = P0 + 2/3(C-P0), C2 = P1 + 2/3(C-P1).
+        $twoThirds = 2.0 / 3.0;
+        $c1x = $this->curX + ($twoThirds * ($cx - $this->curX));
+        $c1y = $this->curY + ($twoThirds * ($cy - $this->curY));
+        $c2x = $endX + ($twoThirds * ($cx - $endX));
+        $c2y = $endY + ($twoThirds * ($cy - $endY));
+
+        $this->bezierTo($c1x, $c1y, $c2x, $c2y, $endX, $endY);
         return $this;
     }
 
