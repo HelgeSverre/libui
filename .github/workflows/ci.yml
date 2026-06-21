@@ -100,7 +100,15 @@ jobs:
 
       - name: Build libui from source (Linux/Windows)
         if: runner.os != 'macOS'
-        run: bash build-libui.sh
+        shell: bash
+        run: |
+          # Git Bash ships a GNU coreutils `link` in /usr/bin that shadows MSVC's
+          # link.exe on PATH and breaks meson's MSVC detection. Remove it (the
+          # runner is ephemeral) so the Visual Studio linker wins.
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            rm -f /usr/bin/link /usr/bin/link.exe || true
+          fi
+          bash build-libui.sh
 
       - run: composer install --no-interaction --prefer-dist --no-progress
 
