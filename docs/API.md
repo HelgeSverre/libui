@@ -95,15 +95,15 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `onContentSizeChanged(callable $cb): static` — Registers a callback for when the window content size is changed.
 - `onFocusChanged(callable $cb): static` — Registers a callback for when the window focus changes.
 - `onPositionChanged(callable $cb): static` — Registers a callback for when the window moved.
-- `position(CData $x, CData $y): static` — Gets the window position.
+- `position(CData $x, CData $y): static` — Gets the window position. Coordinates are measured from the top left corner of the screen.
 - `resizeable(): bool` — Returns whether or not the window is user resizeable.
 - `run(?callable $afterClose = null): void` — Show the window and run the event loop until it closes — the all-in-one entry point for a single-window app. Initialises libui if needed, wires the close button to quit (after any onClose() cleanup), and uninits on exit.
 - `setBorderless(bool $borderless): static` — Sets whether or not the window is borderless.
 - `setChild(Control $child): static` — Sets the window's child.
 - `setContentSize(int $width, int $height): static` — Sets the window content size.
 - `setFullscreen(bool $fullscreen): static` — Sets whether or not the window is full screen.
-- `setMargined(bool $margined): static` — Sets whether or not the window has a margin.
-- `setPosition(int $x, int $y): static` — Moves the window to the specified position.
+- `setMargined(bool $margined): static` — Sets whether or not the window has a margin. The margin size is determined by the OS defaults.
+- `setPosition(int $x, int $y): static` — Moves the window to the specified position. Coordinates are measured from the top left corner of the screen.
 - `setResizeable(bool $resizeable): static` — Sets whether or not the window is user resizeable.
 - `setTitle(string $title): static` — Sets the window title.
 - `title(): string` — Returns the window title.
@@ -242,7 +242,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `append(string $text): static` — Appends an item to the editable combo box.
 - `onChanged(callable $cb): static` — Registers a callback for when an editable combo box item is selected or user text changed.
 - `setText(string $text): static` — Sets the editable combo box text.
-- `text(): string` — Returns the text of the editable combo box.
+- `text(): string` — Returns the text of the editable combo box. This text is either the text of one of the predefined list items or the t...
 
 ### `Entry`
 
@@ -252,8 +252,8 @@ Entry widget. Hand-editable — add convenience methods here. Inherits the gener
 
 _Plus the common widget verbs from [`Control`](#control)._
 
-- `static password(): static` — Creates a new entry suitable for sensitive inputs like passwords.
-- `static search(): static` — Creates a new entry suitable for search.
+- `static password(): static` — Creates a new entry suitable for sensitive inputs like passwords. The entered text is NOT readable by the user but ma...
+- `static search(): static` — Creates a new entry suitable for search. Some systems will deliberately delay the uiEntryOnChanged() callback for a m...
 - `__construct()` — Creates a new entry.
 - `onChanged(callable $cb): static` — Registers a callback for when the user changes the entry's text.
 - `readOnly(): bool` — Returns whether or not the entry's text can be changed.
@@ -277,7 +277,7 @@ FontButton widget. Hand-editable — add convenience methods here. Inherits the 
 
 _Plus the common widget verbs from [`Control`](#control)._
 
-- `__construct()` — Creates a new font button.
+- `__construct()` — Creates a new font button. The default font is determined by the OS defaults.
 - `font(CData $desc): static` — Returns the selected font.
 - `onChanged(callable $cb): static` — Registers a callback for when the font is changed.
 
@@ -328,12 +328,12 @@ MenuItem widget. Hand-editable — add convenience methods here. Inherits the ge
 _Plus the common widget verbs from [`Control`](#control)._
 
 - `static fromGenerated(MenuItem $g): MenuItem` — Re-wrap a generated MenuItem handle as a hand-written Libui\MenuItem.
-- `checked(): bool` — Returns whether or not the menu item's checkbox is checked.
-- `disable(): static` — Disables the menu item.
+- `checked(): bool` — Returns whether or not the menu item's checkbox is checked. To be used only with items created via uiMenuAppendCheckI...
+- `disable(): static` — Disables the menu item. Menu item is grayed out and user interaction is not possible.
 - `enable(): static` — Enables the menu item.
 - `onClick(callable $cb): static` — Register a click handler that receives only this typed MenuItem.
 - `onClicked(callable $cb): static` — Registers a callback for when the menu item is clicked.
-- `setChecked(bool $checked): static` — Sets whether or not the menu item's checkbox is checked.
+- `setChecked(bool $checked): static` — Sets whether or not the menu item's checkbox is checked. To be used only with items created via uiMenuAppendCheckItem().
 
 ### `MultilineEntry`
 
@@ -361,7 +361,7 @@ ProgressBar widget. Hand-editable — add convenience methods here. Inherits the
 _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new progress bar.
-- `setValue(int $n): static` — Sets the progress bar value.
+- `setValue(int $n): static` — Sets the progress bar value. Valid values are `[0, 100]` for displaying a solid bar imitating a percent value. Use a...
 - `value(): int` — Returns the progress bar value.
 
 ### `RadioButtons`
@@ -397,7 +397,7 @@ Slider widget. Hand-editable — add convenience methods here. Inherits the gene
 
 _Plus the common widget verbs from [`Control`](#control)._
 
-- `__construct(int $min, int $max)` — Creates a new slider.
+- `__construct(int $min, int $max)` — Creates a new slider. The initial slider value equals the minimum value. In the current implementation $min and $max...
 - `hasToolTip(): bool` — Returns whether or not the slider has a tool tip.
 - `onChanged(callable $cb): static` — Registers a callback for when the slider value is changed by the user.
 - `onReleased(callable $cb): static` — Registers a callback for when the slider is released from dragging.
@@ -414,7 +414,7 @@ Spinbox widget. Hand-editable — add convenience methods here. Inherits the gen
 
 _Plus the common widget verbs from [`Control`](#control)._
 
-- `__construct(int $min, int $max)` — Creates a new spinbox.
+- `__construct(int $min, int $max)` — Creates a new spinbox. The initial spinbox value equals the minimum value. In the current implementation $min and $ma...
 - `onChanged(callable $cb): static` — Registers a callback for when the spinbox value is changed by the user.
 - `setValue(int $value): static` — Sets the spinbox value.
 - `value(): int` — Returns the spinbox value.
@@ -435,8 +435,8 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `appendStretchy(Control $child): static` — Append a child that grows to fill the box's main axis.
 - `delete(int $index): static` — Removes the control at $index from the box.
 - `numChildren(): int` — Returns the number of controls contained within the box.
-- `padded(): bool` — Returns whether or not controls within the box are padded.
-- `setPadded(bool $padded): static` — Sets whether or not controls within the box are padded.
+- `padded(): bool` — Returns whether or not controls within the box are padded. Padding is defined as space between individual controls.
+- `setPadded(bool $padded): static` — Sets whether or not controls within the box are padded. Padding is defined as space between individual controls. The...
 
 ### `Form`
 
@@ -447,11 +447,11 @@ Form widget. Hand-editable — add convenience methods here. Inherits the genera
 _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new form.
-- `append(string $label, Control $c, int $stretchy): static` — Appends a control with a label to the form.
+- `append(string $label, Control $c, int $stretchy): static` — Appends a control with a label to the form. Stretchy items expand to use the remaining space within the container. In...
 - `delete(int $index): static` — Removes the control at $index from the form.
 - `numChildren(): int` — Returns the number of controls contained within the form.
-- `padded(): bool` — Returns whether or not controls within the form are padded.
-- `setPadded(bool $padded): static` — Sets whether or not controls within the box are padded.
+- `padded(): bool` — Returns whether or not controls within the form are padded. Padding is defined as space between individual controls.
+- `setPadded(bool $padded): static` — Sets whether or not controls within the box are padded. Padding is defined as space between individual controls. The...
 
 ### `Grid`
 
@@ -464,8 +464,8 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `__construct()` — Creates a new grid.
 - `append(Control $c, int $left, int $top, int $xspan, int $yspan, int $hexpand, Align $halign, int $vexpand, Align $valign): static` — Appends a control to the grid.
 - `insertAt(Control $c, Control $existing, At $at, int $xspan, int $yspan, int $hexpand, Align $halign, int $vexpand, Align $valign): static` — Inserts a control positioned in relation to another control within the grid.
-- `padded(): bool` — Returns whether or not controls within the grid are padded.
-- `setPadded(bool $padded): static` — Sets whether or not controls within the grid are padded.
+- `padded(): bool` — Returns whether or not controls within the grid are padded. Padding is defined as space between individual controls.
+- `setPadded(bool $padded): static` — Sets whether or not controls within the grid are padded. Padding is defined as space between individual controls. The...
 
 ### `Group`
 
@@ -478,7 +478,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `__construct(string $title)` — Creates a new group.
 - `margined(): bool` — Returns whether or not the group has a margin.
 - `setChild(Control $c): static` — Sets the group's child.
-- `setMargined(bool $margined): static` — Sets whether or not the group has a margin.
+- `setMargined(bool $margined): static` — Sets whether or not the group has a margin. The margin size is determined by the OS defaults.
 - `setTitle(string $title): static` — Sets the group title.
 - `title(): string` — Returns the group title.
 
@@ -498,7 +498,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `numPages(): int` — Returns the number of pages contained.
 - `onSelected(callable $cb): static` — Registers a callback for when a tab is selected.
 - `selected(): int` — Returns the index of the tab selected.
-- `setMargined(int $index, bool $margined): static` — Sets whether or not the page/tab at $index has a margin.
+- `setMargined(int $index, bool $margined): static` — Sets whether or not the page/tab at $index has a margin. The margin size is determined by the OS defaults.
 - `setSelected(int $index): static` — Sets the tab selected.
 
 ## Tables
@@ -764,7 +764,7 @@ A string with per-range styling, wrapping uiAttributedString*.
 - `append(string $text, Attribute ...$attrs): AttributedString` — Append $text and apply each $attrs over exactly that new span.
 - `appendUnattributed(string $text): AttributedString`
 - `delete_(int $start, int $end): AttributedString`
-- `free(): void`
+- `free(): void` — Free the native string. Idempotent, and runs automatically on destruction.
 - `handle(): CData`
 - `insert(string $text, int $at): AttributedString`
 - `len(): int` — Current length in bytes (matches strlen of the underlying UTF-8).
@@ -860,11 +860,11 @@ Minimal cross-platform clipboard access.
 
 GENERATED facade for libui free functions (dialogs, etc.). DO NOT EDIT.
 
-- `static msgBox(Control $parent, string $title, string $description): void` — Message box dialog window.
-- `static msgBoxError(Control $parent, string $title, string $description): void` — Error message box dialog window.
+- `static msgBox(Control $parent, string $title, string $description): void` — Message box dialog window. A message box displayed in a new window indicating a common message.
+- `static msgBoxError(Control $parent, string $title, string $description): void` — Error message box dialog window. A message box displayed in a new window indicating an error. On some systems this ma...
 - `static openFile(Control $parent): string` — File chooser dialog window to select a single file.
 - `static openFolder(Control $parent): string` — Folder chooser dialog window to select a single folder.
-- `static saveFile(Control $parent): string` — Save file dialog window.
+- `static saveFile(Control $parent): string` — Save file dialog window. The user is asked to confirm overwriting existing files, should the chosen file path already...
 
 ## Enums
 
