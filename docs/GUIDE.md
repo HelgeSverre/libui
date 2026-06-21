@@ -489,12 +489,13 @@ assembles them into a measurable `TextLayout` without building the
 `AttributedString` by hand:
 
 ```php
+use Libui\Color;
 use Libui\Text\RichText;
 use Libui\Text\TextStyle;
 use Libui\Generated\Enum\TextWeight;
 
 $rich = RichText::create(new TextStyle(family: 'Helvetica', size: 16.0))
-    ->append('Bold ', new TextStyle(weight: TextWeight::Bold, color: [0.19, 0.17, 0.56]))
+    ->append('Bold ', new TextStyle(weight: TextWeight::Bold, color: Color::rgb(0x312B90)))
     ->append('and plain.');
 
 [$w, $h] = $rich->measure(width: 400.0); // lay out + measure in one call

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Libui\Text;
 
+use Libui\Color;
 use Libui\Generated\Enum\TextItalic;
 use Libui\Generated\Enum\TextStretch;
 use Libui\Generated\Enum\TextWeight;
@@ -15,9 +16,15 @@ use Libui\Generated\Enum\Underline;
  */
 final class TextStyle
 {
+    /** @var array{float,float,float,float}|null Normalized RGBA, or null. */
+    public readonly ?array $color;
+
+    /** @var array{float,float,float,float}|null Normalized RGBA, or null. */
+    public readonly ?array $background;
+
     /**
-     * @param array{float,float,float}|array{float,float,float,float}|null $color
-     * @param array{float,float,float}|array{float,float,float,float}|null $background
+     * @param Color|array{float,float,float}|array{float,float,float,float}|null $color
+     * @param Color|array{float,float,float}|array{float,float,float,float}|null $background
      */
     public function __construct(
         public readonly ?string $family = null,
@@ -25,14 +32,18 @@ final class TextStyle
         public readonly ?TextWeight $weight = null,
         public readonly ?TextItalic $italic = null,
         public readonly ?TextStretch $stretch = null,
-        public readonly ?array $color = null,
-        public readonly ?array $background = null,
+        Color|array|null $color = null,
+        Color|array|null $background = null,
         public readonly ?Underline $underline = null,
-    ) {}
+    ) {
+        // Accept a Color or a raw [r,g,b(,a)] array; store the normalized RGBA tuple.
+        $this->color = $color === null ? null : Color::from($color)->toArray();
+        $this->background = $background === null ? null : Color::from($background)->toArray();
+    }
 
     /**
-     * @param array{float,float,float}|array{float,float,float,float}|null $color
-     * @param array{float,float,float}|array{float,float,float,float}|null $background
+     * @param Color|array{float,float,float}|array{float,float,float,float}|null $color
+     * @param Color|array{float,float,float}|array{float,float,float,float}|null $background
      */
     public function with(
         ?string $family = null,
@@ -40,8 +51,8 @@ final class TextStyle
         ?TextWeight $weight = null,
         ?TextItalic $italic = null,
         ?TextStretch $stretch = null,
-        ?array $color = null,
-        ?array $background = null,
+        Color|array|null $color = null,
+        Color|array|null $background = null,
         ?Underline $underline = null,
     ): self {
         return new self(

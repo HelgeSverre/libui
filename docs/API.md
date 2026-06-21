@@ -212,8 +212,10 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `static dateOnly(): static` — Creates a new time picker.
 - `static timeOnly(): static` — Creates a new date and time picker.
 - `__construct()` — Creates a new date picker.
+- `getValue(): DateTimeImmutable` — The picked moment as a DateTimeImmutable (local wall-clock fields).
 - `onChanged(callable $cb): static` — Registers a callback for when the date time picker value is changed by the user.
 - `setTime(CData $time): static` — Sets date and time of the data time picker.
+- `setValue(DateTimeInterface $when): static` — Set the picker to $when (its broken-down local-time fields).
 - `time(CData $time): static` — Returns date and time stored in the data time picker.
 
 ### `Dialogs`
@@ -279,6 +281,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new font button. The default font is determined by the OS defaults.
 - `font(CData $desc): static` — Returns the selected font.
+- `getFont(): FontDescriptor` — The currently selected font as a typed {@see FontDescriptor}, wrapping the generated output-pointer getter and freeing libui's allocated copy.
 - `onChanged(callable $cb): static` — Registers a callback for when the font is changed.
 
 ### `Label`
@@ -463,8 +466,10 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new grid.
 - `append(Control $c, int $left, int $top, int $xspan, int $yspan, int $hexpand, Align $halign, int $vexpand, Align $valign): static` — Appends a control to the grid.
+- `appendAt(Control $control, int $left, int $top, int $xspan = 1, int $yspan = 1, bool $hexpand = false, Align $halign = Align::Fill, bool $vexpand = false, Align $valign = Align::Fill): static` — Friendlier placement over the generated 9-positional-arg append(): spans default to a single cell, the expand flags are real bools, and alignment defaults to Fill. $left is the column, $top the row.
 - `insertAt(Control $c, Control $existing, At $at, int $xspan, int $yspan, int $hexpand, Align $halign, int $vexpand, Align $valign): static` — Inserts a control positioned in relation to another control within the grid.
 - `padded(): bool` — Returns whether or not controls within the grid are padded. Padding is defined as space between individual controls.
+- `place(Control $control, int $column, int $row): static` — Place a control in a single, non-expanding cell at column $column, row $row.
 - `setPadded(bool $padded): static` — Sets whether or not controls within the grid are padded. Padding is defined as space between individual controls. The...
 
 ### `Group`
@@ -777,16 +782,22 @@ A string with per-range styling, wrapping uiAttributedString*.
 
 The default font for a TextLayout, wrapping the uiFontDescriptor struct {Family char*, Size double, Weight, Italic, Stretch}.
 
+- `static fromCData(CData $descriptor): FontDescriptor` — Build a FontDescriptor from an existing uiFontDescriptor struct (e.g. the one FontButton fills). The family name is copied into a PHP-owned buffer, so the source struct may be freed afterwards (libui's uiFreeFontButtonFont).
 - `__construct(string $family = 'Arial', float $size = 14, TextWeight $weight = TextWeight::Normal, TextItalic $italic = TextItalic::Normal, TextStretch $stretch = TextStretch::Normal)`
 - `addr(): CData`
+- `family(): string`
 - `free(): void`
 - `handle(): CData`
+- `italic(): TextItalic`
 - `setFamily(string $family): FontDescriptor`
 - `setItalic(TextItalic $italic): FontDescriptor`
 - `setSize(float $size): FontDescriptor`
 - `setStretch(TextStretch $stretch): FontDescriptor`
 - `setWeight(TextWeight $weight): FontDescriptor`
+- `size(): float`
+- `stretch(): TextStretch`
 - `toCData(): CData`
+- `weight(): TextWeight`
 
 ### `RichText`
 
@@ -823,10 +834,10 @@ A laid-out, ready-to-draw block of attributed text, wrapping uiDrawTextLayout*.
 
 High-level text style that can produce both a default layout font and span attributes for an AttributedString.
 
-- `__construct(?string $family = null, ?float $size = null, ?TextWeight $weight = null, ?TextItalic $italic = null, ?TextStretch $stretch = null, ?array $color = null, ?array $background = null, ?Underline $underline = null)`
+- `__construct(?string $family = null, ?float $size = null, ?TextWeight $weight = null, ?TextItalic $italic = null, ?TextStretch $stretch = null, Color|array|null $color = null, Color|array|null $background = null, ?Underline $underline = null)`
 - `attributes(): array`
 - `font(): FontDescriptor`
-- `with(?string $family = null, ?float $size = null, ?TextWeight $weight = null, ?TextItalic $italic = null, ?TextStretch $stretch = null, ?array $color = null, ?array $background = null, ?Underline $underline = null): TextStyle`
+- `with(?string $family = null, ?float $size = null, ?TextWeight $weight = null, ?TextItalic $italic = null, ?TextStretch $stretch = null, Color|array|null $color = null, Color|array|null $background = null, ?Underline $underline = null): TextStyle`
 
 ## Async & utilities
 

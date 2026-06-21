@@ -616,6 +616,28 @@ final class TextTest extends TestCase
         $this->assertSame([], new TextStyle()->attributes());
     }
 
+    public function testTextStyleAcceptsColorObjectsAndNormalizesToArray(): void
+    {
+        $style = new TextStyle(color: Color::rgb(0xFF_8000), background: Color::white());
+
+        $this->assertSame([1.0, 0x80 / 255, 0.0, 1.0], $style->color);
+        $this->assertSame([1.0, 1.0, 1.0, 1.0], $style->background);
+    }
+
+    public function testTextStyleStillAcceptsColorArrays(): void
+    {
+        $style = new TextStyle(color: [0.1, 0.2, 0.3]);
+
+        $this->assertSame([0.1, 0.2, 0.3, 1.0], $style->color);
+    }
+
+    public function testTextStyleWithAcceptsColor(): void
+    {
+        $derived = new TextStyle(color: [0.0, 0.0, 0.0])->with(color: Color::rgb(0x00_FF00));
+
+        $this->assertSame([0.0, 1.0, 0.0, 1.0], $derived->color);
+    }
+
     public function testTextStyleFontFallsBackToDefaults(): void
     {
         $font = new TextStyle()->font();
