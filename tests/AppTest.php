@@ -109,6 +109,10 @@ final class AppTest extends LibuiTestCase
      */
     public function testAppFullLifecycleInSubprocess(): void
     {
+        if (\PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped('Backgrounding (`&`) and the /tmp flag-file handshake are POSIX-only.');
+        }
+
         // Create a temporary script that runs the app
         $autoloadPath = __DIR__ . '/../vendor/autoload.php';
         $script = <<<PHP

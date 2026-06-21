@@ -26,12 +26,13 @@ final class TableModelTest extends TestCase
         // ("…/Application Support/Herd/bin/php85"), which the shell would split.
         $cmd = escapeshellarg(\PHP_BINARY) . ' ' . escapeshellarg(__DIR__ . '/table_lifecycle.php') . ' ' . escapeshellarg($mode);
 
-        // 2>/dev/null swallows libui's "[libui] You have a bug" leak line. The
-        // 'leak' runner converts libui's SIGTRAP into a clean exit itself (see
-        // table_lifecycle.php), so no signal-death noise reaches this shell.
+        // Swallow libui's "[libui] You have a bug" leak line. The 'leak' runner
+        // converts libui's SIGTRAP into a clean exit itself (see table_lifecycle.php),
+        // so no signal-death noise reaches this shell. The null device differs by OS.
+        $null = \PHP_OS_FAMILY === 'Windows' ? 'NUL' : '/dev/null';
         $output = [];
         $code = 0;
-        exec($cmd . ' 2>/dev/null', $output, $code);
+        exec($cmd . ' 2>' . $null, $output, $code);
 
         return $code;
     }
