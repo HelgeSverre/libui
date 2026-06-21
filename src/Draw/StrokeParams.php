@@ -46,6 +46,42 @@ final class StrokeParams
         return new self(thickness: $thickness);
     }
 
+    public function thickness(float $thickness): self
+    {
+        $this->thickness = $thickness;
+        return $this;
+    }
+
+    public function cap(DrawLineCap $cap): self
+    {
+        $this->cap = $cap;
+        return $this;
+    }
+
+    public function join(DrawLineJoin $join): self
+    {
+        $this->join = $join;
+        return $this;
+    }
+
+    public function miterLimit(float $limit): self
+    {
+        $this->miterLimit = $limit;
+        return $this;
+    }
+
+    /**
+     * Set the dash on/off pattern and optional phase. Empty $dashes = solid line.
+     *
+     * @param float[] $dashes on/off lengths
+     */
+    public function dashed(array $dashes, float $phase = 0.0): self
+    {
+        $this->dashes = $dashes;
+        $this->dashPhase = $phase;
+        return $this;
+    }
+
     public function toCData(): \FFI\CData
     {
         $ffi = Ffi::get();

@@ -65,6 +65,40 @@ final class DrawContext
         $this->stroke($path, $brush, $stroke);
     }
 
+    /** Coerce a paint argument to a Brush (Color -> solid Brush). */
+    private static function brush(Brush|Color $paint): Brush
+    {
+        return $paint instanceof Brush ? $paint : Brush::color($paint);
+    }
+
+    public function fillRect(float $x, float $y, float $width, float $height, Brush|Color $paint): void
+    {
+        $this->fillPath(self::brush($paint), static fn (Path $p) => $p->addRectangle($x, $y, $width, $height));
+    }
+
+    public function strokeRect(float $x, float $y, float $width, float $height, Brush|Color $paint, ?StrokeParams $stroke = null): void
+    {
+        $this->strokePath(
+            self::brush($paint),
+            $stroke ?? StrokeParams::solid(1.0),
+            static fn (Path $p) => $p->addRectangle($x, $y, $width, $height),
+        );
+    }
+
+    public function fillCircle(float $cx, float $cy, float $radius, Brush|Color $paint): void
+    {
+        $this->fillPath(self::brush($paint), static fn (Path $p) => $p->circle($cx, $cy, $radius));
+    }
+
+    public function strokeCircle(float $cx, float $cy, float $radius, Brush|Color $paint, ?StrokeParams $stroke = null): void
+    {
+        $this->strokePath(
+            self::brush($paint),
+            $stroke ?? StrokeParams::solid(1.0),
+            static fn (Path $p) => $p->circle($cx, $cy, $radius),
+        );
+    }
+
     /** Push the current clip/transform state onto libui's stack. */
     public function save(): void
     {

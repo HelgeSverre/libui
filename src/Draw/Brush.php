@@ -52,20 +52,52 @@ final class Brush
         return self::color(Color::rgb($hex, $a));
     }
 
-    /** @param array<int, array{float,float,float,float,float}> $stops */
+    /** @param list<Stop|array{float,float,float,float,float}> $stops */
     public static function linearGradient(float $x0, float $y0, float $x1, float $y1, array $stops): self
     {
-        return new self(DrawBrushType::LinearGradient->value, 0, 0, 0, 1, [$x0, $y0, $x1, $y1, 0.0], $stops);
+        return new self(
+            DrawBrushType::LinearGradient->value,
+            0,
+            0,
+            0,
+            1,
+            [$x0, $y0, $x1, $y1, 0.0],
+            self::normalizeStops($stops),
+        );
     }
 
     /**
-     * Radial gradient centred at ($cx, $cy) out to $radius. Stops are [pos,r,g,b,a].
+     * Radial gradient centred at ($cx, $cy) out to $radius. Stops are {@see Stop}
+     * objects or [pos,r,g,b,a] tuples (or a mix).
      *
-     * @param array<int, array{float,float,float,float,float}> $stops
+     * @param list<Stop|array{float,float,float,float,float}> $stops
      */
     public static function radialGradient(float $cx, float $cy, float $radius, array $stops): self
     {
-        return new self(DrawBrushType::RadialGradient->value, 0, 0, 0, 1, [$cx, $cy, $cx, $cy, $radius], $stops);
+        return new self(
+            DrawBrushType::RadialGradient->value,
+            0,
+            0,
+            0,
+            1,
+            [$cx, $cy, $cx, $cy, $radius],
+            self::normalizeStops($stops),
+        );
+    }
+
+    /**
+     * Normalize a stops array to the internal [pos,r,g,b,a] tuple list, accepting
+     * either {@see Stop} objects or raw [pos,r,g,b,a] tuples (or a mix).
+     *
+     * @param array<array-key, Stop|array{float,float,float,float,float}> $stops
+     * @return list<array{float,float,float,float,float}>
+     */
+    private static function normalizeStops(array $stops): array
+    {
+        return array_map(
+            static fn (Stop|array $stop): array => $stop instanceof Stop ? $stop->toArray() : $stop,
+            array_values($stops),
+        );
     }
 
     public function toCData(): \FFI\CData

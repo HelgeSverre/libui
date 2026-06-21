@@ -30,6 +30,8 @@ final class Area extends Control
         $this->handle = $scrollWidth !== null
             ? $ffi->uiNewScrollingArea(\FFI::addr($this->handler), $scrollWidth, $scrollHeight ?? 0)
             : $ffi->uiNewArea(\FFI::addr($this->handler));
+
+        $delegate->bindArea($this); // let the delegate call $this->redraw()
     }
 
     public static function scrolling(AreaDelegate $delegate, int $width, int $height): self

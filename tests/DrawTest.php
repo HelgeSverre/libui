@@ -8,6 +8,7 @@ use Libui\Color;
 use Libui\Draw\Brush;
 use Libui\Draw\Matrix;
 use Libui\Draw\Path;
+use Libui\Draw\Stop;
 use Libui\Draw\StrokeParams;
 use Libui\Generated\Enum\DrawBrushType;
 use Libui\Generated\Enum\DrawFillMode;
@@ -512,5 +513,270 @@ final class DrawTest extends TestCase
 
         $cdata = $matrix->toCData();
         $this->assertInstanceOf(\FFI\CData::class, $cdata);
+    }
+
+    // ========================================================================
+    // STOP TESTS
+    // ========================================================================
+
+    public function testStopAtStoresPosAndColor(): void
+    {
+        $color = Color::rgb(0x31_2B90);
+        $stop = Stop::at(0.25, $color);
+
+        $this->assertSame(0.25, $stop->pos);
+        $this->assertSame($color, $stop->color);
+    }
+
+    public function testStopToArrayMatchesTupleForm(): void
+    {
+        $stop = Stop::at(0.25, Color::rgb255(49, 43, 144, 0.5));
+
+        $this->assertEqualsWithDelta(
+            [0.25, 49 / 255, 43 / 255, 144 / 255, 0.5],
+            $stop->toArray(),
+            1e-9,
+        );
+    }
+
+    // ========================================================================
+    // BRUSH GRADIENT OVERLOAD TESTS
+    // ========================================================================
+
+    public function testLinearGradientAcceptsStopObjects(): void
+    {
+        $brush = Brush::linearGradient(0.0, 0.0, 0.0, 200.0, [
+            Stop::at(0.0, Color::rgb(0x31_2B90)),
+            Stop::at(1.0, Color::rgb(0x0F_172A)),
+        ]);
+        $cdata = $brush->toCData();
+
+        $this->assertSame(2, $cdata->NumStops);
+        $this->assertSame(0.0, $cdata->Stops[0]->Pos);
+        $this->assertSame(1.0, $cdata->Stops[1]->Pos);
+        $this->assertEqualsWithDelta(0x31 / 255, $cdata->Stops[0]->R, 1e-9);
+        $this->assertEqualsWithDelta(0x0F / 255, $cdata->Stops[1]->R, 1e-9);
+    }
+
+    public function testLinearGradientStillAcceptsTuples(): void
+    {
+        $brush = Brush::linearGradient(0.0, 0.0, 100.0, 100.0, [
+            [0.0, 1.0, 0.0, 0.0, 1.0],
+            [1.0, 0.0, 0.0, 1.0, 1.0],
+        ]);
+        $cdata = $brush->toCData();
+
+        $this->assertSame(2, $cdata->NumStops);
+        $this->assertSame(0.0, $cdata->Stops[0]->Pos);
+        $this->assertSame(1.0, $cdata->Stops[0]->R);
+        $this->assertSame(1.0, $cdata->Stops[1]->Pos);
+        $this->assertSame(1.0, $cdata->Stops[1]->B);
+    }
+
+    public function testRadialGradientAcceptsStopObjects(): void
+    {
+        $brush = Brush::radialGradient(50.0, 50.0, 100.0, [
+            Stop::at(0.0, Color::white()),
+            Stop::at(1.0, Color::black()),
+        ]);
+        $cdata = $brush->toCData();
+
+        $this->assertSame(2, $cdata->NumStops);
+        $this->assertSame(100.0, $cdata->OuterRadius);
+        $this->assertSame(1.0, $cdata->Stops[0]->R);
+        $this->assertSame(0.0, $cdata->Stops[1]->R);
+    }
+
+    public function testGradientMixedStopAndTupleArray(): void
+    {
+        $brush = Brush::linearGradient(0.0, 0.0, 0.0, 200.0, [
+            Stop::at(0.0, Color::rgb(0xFF_0000)),
+            [1.0, 0.0, 0.0, 1.0, 1.0],
+        ]);
+        $cdata = $brush->toCData();
+
+        $this->assertSame(2, $cdata->NumStops);
+        $this->assertSame(1.0, $cdata->Stops[0]->R);
+        $this->assertSame(1.0, $cdata->Stops[1]->B);
+    }
+
+    public function testGradientStopsArrayRetainedAfterToCData(): void
+    {
+        $brush = Brush::linearGradient(0.0, 0.0, 0.0, 200.0, [
+            Stop::at(0.0, Color::rgb(0x31_2B90)),
+            Stop::at(1.0, Color::rgb(0x0F_172A)),
+        ]);
+        $cdata = $brush->toCData();
+
+        // Read again after the call: the CData (and stops array) is kept alive.
+        $this->assertSame(1.0, $cdata->Stops[1]->Pos);
+    }
+
+    // ========================================================================
+    // STROKE PARAMS BUILDER TESTS
+    // ========================================================================
+
+    public function testStrokeParamsFluentBuilder(): void
+    {
+        $params = StrokeParams::solid(2.0)
+            ->cap(DrawLineCap::Round)
+            ->join(DrawLineJoin::Round)
+            ->miterLimit(4.0)
+            ->dashed([3.0, 2.0], 1.0);
+        $cdata = $params->toCData();
+
+        $this->assertSame(DrawLineCap::Round->value, $cdata->Cap);
+        $this->assertSame(DrawLineJoin::Round->value, $cdata->Join);
+        $this->assertSame(2.0, $cdata->Thickness);
+        $this->assertSame(4.0, $cdata->MiterLimit);
+        $this->assertSame(1.0, $cdata->DashPhase);
+        $this->assertSame(2, $cdata->NumDashes);
+    }
+
+    public function testStrokeParamsThicknessReturnsSelf(): void
+    {
+        $params = new StrokeParams();
+        $result = $params->thickness(5.0);
+
+        $this->assertSame($params, $result);
+        $this->assertSame(5.0, $params->thickness);
+    }
+
+    public function testStrokeParamsDashedSetsDashesAndPhase(): void
+    {
+        $params = new StrokeParams()->dashed([4.0, 4.0], 2.0);
+        $cdata = $params->toCData();
+
+        $this->assertSame(2, $cdata->NumDashes);
+        $this->assertSame(2.0, $cdata->DashPhase);
+        $this->assertSame([4.0, 4.0], $params->dashes);
+    }
+
+    public function testStrokeParamsBuilderDoesNotBreakConstructor(): void
+    {
+        $params = new StrokeParams(
+            cap: DrawLineCap::Square,
+            join: DrawLineJoin::Bevel,
+            thickness: 3.0,
+        );
+
+        $this->assertSame(3.0, $params->thickness);
+        $this->assertSame(DrawLineCap::Square, $params->cap);
+        $this->assertSame(DrawLineJoin::Bevel, $params->join);
+    }
+
+    // ========================================================================
+    // PATH SUGAR TESTS
+    // ========================================================================
+
+    public function testPathLineCreatesFigure(): void
+    {
+        $path = new Path();
+        $result = $path->line(0.0, 0.0, 100.0, 100.0);
+        $path->end();
+
+        $this->assertSame($path, $result);
+    }
+
+    public function testPathCircleBuildsClosedFigure(): void
+    {
+        $path = new Path();
+        $result = $path->circle(50.0, 50.0, 25.0);
+        $path->end();
+
+        $this->assertSame($path, $result);
+    }
+
+    public function testPathEllipseBuilds(): void
+    {
+        $path = new Path();
+        $result = $path->ellipse(50.0, 50.0, 40.0, 20.0);
+        $path->end();
+
+        $this->assertSame($path, $result);
+    }
+
+    public function testPathRoundedRectBuilds(): void
+    {
+        $path = new Path();
+        $result = $path->roundedRect(0.0, 0.0, 100.0, 60.0, 10.0);
+        $path->end();
+
+        $this->assertSame($path, $result);
+    }
+
+    public function testPathRoundedRectClampsRadius(): void
+    {
+        $path = new Path();
+        // Radius larger than half the smaller side; should clamp, not error.
+        $result = $path->roundedRect(0.0, 0.0, 40.0, 20.0, 1000.0);
+        $path->end();
+
+        $this->assertSame($path, $result);
+    }
+
+    public function testPathQuadToBuilds(): void
+    {
+        $path = new Path();
+        $path->newFigure(0.0, 0.0);
+        $result = $path->quadTo(50.0, 100.0, 100.0, 0.0);
+        $path->end();
+
+        $this->assertSame($path, $result);
+    }
+
+    public function testPathBezierThroughBuilds(): void
+    {
+        $path = new Path();
+        $result = $path->bezierThrough(0.0, 0.0, 25.0, 50.0, 75.0, 50.0, 100.0, 0.0);
+        $path->end();
+
+        $this->assertSame($path, $result);
+    }
+
+    public function testPathSugarChaining(): void
+    {
+        $path = new Path();
+        $result = $path
+            ->line(0.0, 0.0, 10.0, 10.0)
+            ->circle(50.0, 50.0, 20.0)
+            ->roundedRect(0.0, 0.0, 30.0, 30.0, 5.0);
+        $path->end();
+
+        $this->assertSame($path, $result);
+    }
+
+    // ========================================================================
+    // DRAWCONTEXT PAINT COERCION (seam)
+    // ========================================================================
+
+    public function testDrawContextPaintCoercionColorToBrush(): void
+    {
+        // DrawContext::brush() simply delegates to Brush::color(); assert the
+        // equivalence on the reachable seam.
+        $color = Color::rgb(0x80_4020, 0.5);
+        // Hold the Brush: toCData() retains the struct on the instance.
+        $brush = Brush::color($color);
+        $cdata = $brush->toCData();
+
+        $this->assertSame(DrawBrushType::Solid->value, $cdata->Type);
+        $this->assertEqualsWithDelta(0x80 / 255, $cdata->R, 1e-9);
+        $this->assertEqualsWithDelta(0x40 / 255, $cdata->G, 1e-9);
+        $this->assertEqualsWithDelta(0x20 / 255, $cdata->B, 1e-9);
+        $this->assertEqualsWithDelta(0.5, $cdata->A, 1e-9);
+    }
+
+    // ========================================================================
+    // AREA DELEGATE (no-area no-op; live cases in AreaDelegateTest)
+    // ========================================================================
+
+    public function testAreaDelegateRedrawNoAreaIsNoop(): void
+    {
+        $delegate = new class extends \Libui\AreaDelegate {};
+
+        $this->assertNull($delegate->area());
+        $delegate->redraw(); // no Area bound yet; must be a silent no-op
+
+        $this->assertNull($delegate->area());
     }
 }

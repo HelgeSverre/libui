@@ -729,31 +729,85 @@ parameters:
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$A\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 4
 			path: tests/DrawTest.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$B\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 4
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Cap\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$DashPhase\.$#'
+			identifier: property.notFound
+			count: 2
 			path: tests/DrawTest.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$G\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 4
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Join\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$MiterLimit\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$NumDashes\.$#'
+			identifier: property.notFound
+			count: 2
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$NumStops\.$#'
+			identifier: property.notFound
+			count: 4
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$OuterRadius\.$#'
+			identifier: property.notFound
+			count: 1
 			path: tests/DrawTest.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$R\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 4
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Stops\.$#'
+			identifier: property.notFound
+			count: 13
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Thickness\.$#'
+			identifier: property.notFound
+			count: 1
 			path: tests/DrawTest.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Type\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 2
 			path: tests/DrawTest.php
 
 		-
