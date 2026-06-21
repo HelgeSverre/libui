@@ -308,15 +308,14 @@ $dash = new class($ncpu) extends AreaDelegate {
         $thickness = max(10.0, $radius * 0.22);
         $start = M_PI; // 180° — left
         $end = 2 * M_PI; // 360° — right (top semicircle)
-        $segments = 30;
 
         // Background track.
-        $this->arc($ctx, $cx, $cy, $radius, $start, $end, $segments, Brush::rgb(GRID), $thickness);
+        $this->arc($ctx, $cx, $cy, $radius, $start, $end, Brush::rgb(GRID), $thickness);
 
         // Filled portion proportional to load/ncpu, clamped to one full ring.
         $frac = $this->ncpu > 0 ? max(0.0, min(1.0, $value / $this->ncpu)) : 0.0;
         if ($frac > 0.0) {
-            $this->arc($ctx, $cx, $cy, $radius, $start, $start + (($end - $start) * $frac), $segments, Brush::rgb($color), $thickness);
+            $this->arc($ctx, $cx, $cy, $radius, $start, $start + (($end - $start) * $frac), Brush::rgb($color), $thickness);
         }
 
         // Tick marks at 0, 0.5, 1.0 of capacity.
@@ -335,10 +334,7 @@ $dash = new class($ncpu) extends AreaDelegate {
         $this->label($ctx, sprintf('%.2f / %d', $value, $this->ncpu), $cx - 60, $cy - 4, 12.0, MUTED, TextWeight::Normal, 120, DrawTextAlign::Center);
     }
 
-    /**
-     * Draw an arc as a thick stroked polyline approximating the curve with
-     * straight segments (the Path wrapper exposes no arc primitive).
-     */
+    /** Draw a thick, round-capped stroked arc from $start to $end (radians). */
     private function arc(
         DrawContext $ctx,
         float $cx,
@@ -346,25 +342,17 @@ $dash = new class($ncpu) extends AreaDelegate {
         float $radius,
         float $start,
         float $end,
-        int $segments,
         Brush $brush,
         float $thickness,
     ): void {
         $stroke = StrokeParams::solid($thickness)
             ->cap(DrawLineCap::Round)
             ->join(DrawLineJoin::Round);
-        $ctx->strokePath($brush, $stroke, static function (Path $p) use ($cx, $cy, $radius, $start, $end, $segments): void {
-            for ($i = 0; $i <= $segments; $i++) {
-                $a = $start + (($end - $start) * ($i / $segments));
-                $px = $cx + (cos($a) * $radius);
-                $py = $cy + (sin($a) * $radius);
-                if ($i === 0) {
-                    $p->newFigure($px, $py);
-                } else {
-                    $p->lineTo($px, $py);
-                }
-            }
-        });
+        $ctx->strokePath(
+            $brush,
+            $stroke,
+            static fn (Path $p) => $p->arc($cx, $cy, $radius, $start, $end - $start, false),
+        );
     }
 
     /**

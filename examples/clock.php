@@ -43,15 +43,8 @@ $delegate = new class extends AreaDelegate {
         $cy = $h / 2;
         $radius = min($w, $h) * 0.40;
 
-        // clock face
-        $face = static function (Path $p) use ($cx, $cy, $radius) {
-            $p->newFigure($cx + $radius, $cy);
-            for ($i = 1; $i <= 64; $i++) {
-                $a = ($i / 64) * 2 * M_PI;
-                $p->lineTo($cx + (cos($a) * $radius), $cy + (sin($a) * $radius));
-            }
-            $p->closeFigure();
-        };
+        // clock face — a native circle (was a 64-segment polyline)
+        $face = static fn (Path $p) => $p->circle($cx, $cy, $radius);
         $ctx->fillPath(Brush::rgb(0x1E_293B), $face);
         $ctx->strokePath(Brush::rgb(0x38_BDF8), StrokeParams::solid(3.0), $face);
 

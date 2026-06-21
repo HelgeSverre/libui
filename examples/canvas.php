@@ -14,11 +14,13 @@ require __DIR__ . '/../vendor/autoload.php';
 use Libui\Area;
 use Libui\AreaDelegate;
 use Libui\Box;
+use Libui\Color;
 use Libui\Draw\Brush;
 use Libui\Draw\DrawContext;
 use Libui\Draw\Params\AreaDrawParams;
 use Libui\Draw\Params\AreaMouseEvent;
 use Libui\Draw\Path;
+use Libui\Draw\Stop;
 use Libui\Draw\StrokeParams;
 use Libui\Ffi;
 use Libui\Window;
@@ -50,8 +52,8 @@ $delegate = new class extends AreaDelegate {
             ->lineTo(0, $h)
             ->closeFigure();
         $ctx->fillPath(Brush::linearGradient(0, 0, 0, $h, [
-            [0.0, 0.31, 0.27, 0.90, 1.0], // indigo
-            [1.0, 0.02, 0.71, 0.83, 1.0], // cyan
+            Stop::at(0.0, Color::rgba(0.31, 0.27, 0.90)), // indigo
+            Stop::at(1.0, Color::rgba(0.02, 0.71, 0.83)), // cyan
         ]), $mountain);
         $ctx->strokePath(Brush::rgb(0xFF_FFFF), StrokeParams::solid(2.0), $mountain);
 

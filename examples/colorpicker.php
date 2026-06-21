@@ -19,11 +19,13 @@ require __DIR__ . '/../vendor/autoload.php';
 use Libui\Area;
 use Libui\AreaDelegate;
 use Libui\Box;
+use Libui\Color;
 use Libui\Draw\Brush;
 use Libui\Draw\DrawContext;
 use Libui\Draw\Params\AreaDrawParams;
 use Libui\Draw\Params\AreaMouseEvent;
 use Libui\Draw\Path;
+use Libui\Draw\Stop;
 use Libui\Draw\StrokeParams;
 use Libui\Ffi;
 use Libui\Generated\Enum\TextWeight;
@@ -163,21 +165,24 @@ $picker = new class extends AreaDelegate {
         }
         // saturation: white centre -> transparent rim
         $ctx->fillPath(
-            Brush::radialGradient($this->cx, $this->cy, $this->radius, [[0.0, 1, 1, 1, 1.0], [1.0, 1, 1, 1, 0.0]]),
-            fn (Path $disc) => $disc->newFigureWithArc($this->cx, $this->cy, $this->radius, 0, 2 * \M_PI),
+            Brush::radialGradient($this->cx, $this->cy, $this->radius, [
+                Stop::at(0.0, Color::white()),
+                Stop::at(1.0, Color::white()->withAlpha(0.0)),
+            ]),
+            fn (Path $disc) => $disc->circle($this->cx, $this->cy, $this->radius),
         );
         // selection marker
         $ang = ($this->hue / 360.0) * 2 * \M_PI;
         $mx = $this->cx + (cos($ang) * $this->sat * $this->radius);
         $my = $this->cy + (sin($ang) * $this->sat * $this->radius);
-        $ctx->strokePath(Brush::rgb(0xFF_FFFF), StrokeParams::solid(2.5), static fn (Path $mk) => $mk->newFigureWithArc($mx, $my, 7, 0, 2 * \M_PI));
+        $ctx->strokePath(Brush::rgb(0xFF_FFFF), StrokeParams::solid(2.5), static fn (Path $mk) => $mk->circle($mx, $my, 7));
 
         // value bar
         [$fr, $fg, $fb] = hsv($this->hue, $this->sat, 1.0);
         $ctx->fillPath(
             Brush::linearGradient($this->barX, $this->barY, $this->barX, $this->barY + $this->barH, [
-                [0.0, $fr, $fg, $fb, 1.0],
-                [1.0, 0,   0,   0,   1.0],
+                Stop::at(0.0, Color::rgba($fr, $fg, $fb)),
+                Stop::at(1.0, Color::black()),
             ]),
             fn (Path $bar) => $bar->addRectangle($this->barX, $this->barY, $this->barW, $this->barH),
         );
