@@ -64,6 +64,17 @@ final class AAAWidgetTest extends LibuiTestCase
         $this->assertFalse(\FFI::isNull($picker->handle()));
     }
 
+    public function testDateTimePickerValueRoundTrips(): void
+    {
+        $picker = new DateTimePicker();
+        $picker->setValue(new \DateTimeImmutable('2026-06-21 14:30:45'));
+
+        $got = $picker->getValue();
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $got);
+        $this->assertSame('2026-06-21 14:30:45', $got->format('Y-m-d H:i:s'));
+    }
+
     public function testDateTimePickerDateOnlyFactory(): void
     {
         $picker = DateTimePicker::dateOnly();
@@ -86,6 +97,16 @@ final class AAAWidgetTest extends LibuiTestCase
     {
         $button = new FontButton();
         $this->assertFalse(\FFI::isNull($button->handle()));
+    }
+
+    public function testFontButtonGetFontReturnsTypedDescriptor(): void
+    {
+        $button = new FontButton();
+        $font = $button->getFont();
+
+        $this->assertInstanceOf(\Libui\Text\FontDescriptor::class, $font);
+        $this->assertNotSame('', $font->family()); // a default font is selected
+        $this->assertGreaterThan(0.0, $font->size());
     }
 
     public function testEditableComboboxConstructsSuccessfully(): void

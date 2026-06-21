@@ -88,6 +88,47 @@ final class FontDescriptor
         return $this;
     }
 
+    /**
+     * Build a FontDescriptor from an existing uiFontDescriptor struct (e.g. the one
+     * FontButton fills). The family name is copied into a PHP-owned buffer, so the
+     * source struct may be freed afterwards (libui's uiFreeFontButtonFont).
+     */
+    public static function fromCData(\FFI\CData $descriptor): self
+    {
+        return new self(
+            \FFI::string($descriptor->Family),
+            $descriptor->Size,
+            TextWeight::from($descriptor->Weight),
+            TextItalic::from($descriptor->Italic),
+            TextStretch::from($descriptor->Stretch),
+        );
+    }
+
+    public function family(): string
+    {
+        return \FFI::string($this->descriptor->Family);
+    }
+
+    public function size(): float
+    {
+        return $this->descriptor->Size;
+    }
+
+    public function weight(): TextWeight
+    {
+        return TextWeight::from($this->descriptor->Weight);
+    }
+
+    public function italic(): TextItalic
+    {
+        return TextItalic::from($this->descriptor->Italic);
+    }
+
+    public function stretch(): TextStretch
+    {
+        return TextStretch::from($this->descriptor->Stretch);
+    }
+
     public function toCData(): \FFI\CData
     {
         return $this->descriptor;

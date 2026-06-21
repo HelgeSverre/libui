@@ -49,6 +49,48 @@ parameters:
 			path: src/Control.php
 
 		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$tm_hour\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/DateTimePicker.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$tm_isdst\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/DateTimePicker.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$tm_mday\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/DateTimePicker.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$tm_min\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/DateTimePicker.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$tm_mon\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/DateTimePicker.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$tm_sec\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/DateTimePicker.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$tm_year\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/DateTimePicker.php
+
+		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$A\.$#'
 			identifier: property.notFound
 			count: 1
@@ -411,31 +453,31 @@ parameters:
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Family\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 4
 			path: src/Text/FontDescriptor.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Italic\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 4
 			path: src/Text/FontDescriptor.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Size\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 4
 			path: src/Text/FontDescriptor.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Stretch\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 4
 			path: src/Text/FontDescriptor.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Weight\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 4
 			path: src/Text/FontDescriptor.php
 
 		-

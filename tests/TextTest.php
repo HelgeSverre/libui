@@ -275,6 +275,27 @@ final class TextTest extends TestCase
         $this->assertInstanceOf(FontDescriptor::class, $font);
     }
 
+    public function testFontDescriptorGettersReadBackTheStruct(): void
+    {
+        $font = new FontDescriptor('Helvetica', 18.0, TextWeight::Bold, TextItalic::Italic, TextStretch::Expanded);
+
+        $this->assertSame('Helvetica', $font->family());
+        $this->assertSame(18.0, $font->size());
+        $this->assertSame(TextWeight::Bold, $font->weight());
+        $this->assertSame(TextItalic::Italic, $font->italic());
+        $this->assertSame(TextStretch::Expanded, $font->stretch());
+    }
+
+    public function testFontDescriptorFromCDataRoundTrips(): void
+    {
+        $original = new FontDescriptor('Courier', 12.0, weight: TextWeight::Medium);
+        $copy = FontDescriptor::fromCData($original->toCData());
+
+        $this->assertSame('Courier', $copy->family());
+        $this->assertSame(12.0, $copy->size());
+        $this->assertSame(TextWeight::Medium, $copy->weight());
+    }
+
     public function testFontDescriptorSetFamily(): void
     {
         $font = new FontDescriptor();
