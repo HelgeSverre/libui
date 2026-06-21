@@ -213,8 +213,7 @@ $dash = new class($ncpu) extends AreaDelegate {
     private function panel(DrawContext $ctx, float $x, float $y, float $w, float $h): void
     {
         $ctx->fillPath(Brush::rgb(PANEL), static fn (Path $p) => $p->addRectangle($x, $y, $w, $h));
-        $stroke = StrokeParams::solid(1.0);
-        $stroke->join = DrawLineJoin::Round;
+        $stroke = StrokeParams::solid(1.0)->join(DrawLineJoin::Round);
         $ctx->strokePath(Brush::rgb(PANEL_EDGE), $stroke, static fn (Path $p) => $p
             ->newFigure($x + 0.5, $y + 0.5)
             ->lineTo($x + $w - 0.5, $y + 0.5)
@@ -351,9 +350,9 @@ $dash = new class($ncpu) extends AreaDelegate {
         Brush $brush,
         float $thickness,
     ): void {
-        $stroke = StrokeParams::solid($thickness);
-        $stroke->cap = DrawLineCap::Round;
-        $stroke->join = DrawLineJoin::Round;
+        $stroke = StrokeParams::solid($thickness)
+            ->cap(DrawLineCap::Round)
+            ->join(DrawLineJoin::Round);
         $ctx->strokePath($brush, $stroke, static function (Path $p) use ($cx, $cy, $radius, $start, $end, $segments): void {
             for ($i = 0; $i <= $segments; $i++) {
                 $a = $start + (($end - $start) * ($i / $segments));
