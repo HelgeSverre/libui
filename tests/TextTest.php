@@ -109,6 +109,32 @@ final class TextTest extends TestCase
         $this->assertTrue(true, 'AttributedString::free() should complete without error');
     }
 
+    public function testAttributedStringFreeIsIdempotent(): void
+    {
+        $str = new AttributedString('Test');
+        $str->free();
+        $str->free(); // must be a no-op, not a double uiFreeAttributedString abort
+
+        $this->assertTrue(true, 'free() twice did not abort');
+    }
+
+    public function testTextLayoutOutlivesItsSourceStringScope(): void
+    {
+        // The source AttributedString's only local reference is dropped inside the
+        // closure. TextLayout must RETAIN it — otherwise AttributedString::__destruct
+        // frees the string while the layout still points at it (use-after-free).
+        $layout = (static function (): TextLayout {
+            $string = new AttributedString('Hello world');
+            return new TextLayout($string, new FontDescriptor(), 200.0);
+        })();
+        gc_collect_cycles();
+
+        $extents = $layout->extents();
+
+        $this->assertCount(2, $extents);
+        $this->assertGreaterThan(0.0, $extents[0]); // measured a real, non-garbage width
+    }
+
     // ========================================================================
     // ATTRIBUTE TESTS
     // ========================================================================

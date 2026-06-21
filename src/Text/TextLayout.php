@@ -23,6 +23,16 @@ final class TextLayout
     private bool $freed = false;
     private float $width;
 
+    /**
+     * The source string and font, retained for this layout's lifetime: the params
+     * struct holds raw pointers into them (and AttributedString frees itself on
+     * destruction), so without this reference they could be freed out from under
+     * the layout — a use-after-free.
+     */
+    private readonly AttributedString $string;
+
+    private readonly FontDescriptor $font;
+
     public function __construct(
         AttributedString $string,
         ?FontDescriptor $font = null,
@@ -38,7 +48,9 @@ final class TextLayout
         $params->Width = $width;
         $params->Align = $align->value;
 
-        $this->params = $params; // keep params alive for the call (and referenced objects via props)
+        $this->string = $string; // retain — see the property docblock above
+        $this->font = $font;
+        $this->params = $params; // keep params alive for the call
         $this->layout = $ffi->uiDrawNewTextLayout(\FFI::addr($params));
         $this->width = $width;
     }

@@ -17,6 +17,8 @@ final class AttributedString
 {
     private \FFI\CData $string;
 
+    private bool $freed = false;
+
     public function __construct(string $initial = '')
     {
         $this->string = Ffi::get()->uiNewAttributedString($initial);
@@ -89,8 +91,24 @@ final class AttributedString
         return $this;
     }
 
+    /**
+     * Free the native string. Idempotent, and runs automatically on destruction.
+     *
+     * A TextLayout built from this string retains it (see TextLayout), so the
+     * layout is always freed before the string it references — do not free a
+     * string yourself while a live TextLayout still uses it.
+     */
     public function free(): void
     {
+        if ($this->freed) {
+            return;
+        }
         Ffi::get()->uiFreeAttributedString($this->string);
+        $this->freed = true;
+    }
+
+    public function __destruct()
+    {
+        $this->free();
     }
 }
