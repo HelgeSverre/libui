@@ -5,7 +5,6 @@
 /examples               export-ignore
 /docs                   export-ignore
 /tools                  export-ignore
-/website                export-ignore
 /build-libui.sh         export-ignore
 /phpunit.xml            export-ignore
 /phpstan.neon           export-ignore
