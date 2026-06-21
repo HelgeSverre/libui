@@ -31,6 +31,12 @@ parameters:
 			path: src/Area.php
 
 		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$cdata\.$#'
+			identifier: property.notFound
+			count: 4
+			path: src/ColorButton.php
+
+		-
 			message: '#^Property Libui\\Control\:\:\$callbacks type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -719,6 +725,36 @@ parameters:
 			identifier: method.alreadyNarrowedType
 			count: 1
 			path: tests/ControlTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$A\.$#'
+			identifier: property.notFound
+			count: 3
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$B\.$#'
+			identifier: property.notFound
+			count: 3
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$G\.$#'
+			identifier: property.notFound
+			count: 3
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$R\.$#'
+			identifier: property.notFound
+			count: 3
+			path: tests/DrawTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/DrawTest.php
 
 		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Complex path should…'' will always evaluate to true\.$#'

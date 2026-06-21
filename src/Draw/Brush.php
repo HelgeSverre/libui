@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Libui\Draw;
 
+use Libui\Color;
 use Libui\Ffi;
 use Libui\Generated\Enum\DrawBrushType;
 
@@ -39,10 +40,16 @@ final class Brush
         return new self(DrawBrushType::Solid->value, $r, $g, $b, $a);
     }
 
+    /** Build a solid brush from a {@see Color}. */
+    public static function color(Color $color): self
+    {
+        return new self(DrawBrushType::Solid->value, $color->r, $color->g, $color->b, $color->a);
+    }
+
     /** Build a solid brush from a 0xRRGGBB integer. */
     public static function rgb(int $hex, float $a = 1.0): self
     {
-        return self::solid((($hex >> 16) & 0xFF) / 255, (($hex >> 8) & 0xFF) / 255, ($hex & 0xFF) / 255, $a);
+        return self::color(Color::rgb($hex, $a));
     }
 
     /** @param array<int, array{float,float,float,float,float}> $stops */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Libui\Tests;
 
+use Libui\Color;
 use Libui\Draw\Brush;
 use Libui\Draw\Matrix;
 use Libui\Draw\Path;
@@ -193,6 +194,33 @@ final class DrawTest extends TestCase
 
         $this->assertInstanceOf(\FFI\CData::class, $cdata);
         $this->assertFalse(\FFI::isNull($cdata));
+    }
+
+    public function testBrushColorMarshalsColorChannels(): void
+    {
+        // Hold the Brush: toCData() retains the struct on the instance, so the
+        // returned pointer is only valid while the Brush is alive.
+        $brush = Brush::color(Color::rgb(0x80_4020, 0.5));
+        $cdata = $brush->toCData();
+
+        $this->assertEqualsWithDelta(0x80 / 255, $cdata->R, 1e-9);
+        $this->assertEqualsWithDelta(0x40 / 255, $cdata->G, 1e-9);
+        $this->assertEqualsWithDelta(0x20 / 255, $cdata->B, 1e-9);
+        $this->assertEqualsWithDelta(0.5, $cdata->A, 1e-9);
+        $this->assertSame(DrawBrushType::Solid->value, $cdata->Type);
+    }
+
+    public function testBrushRgbEqualsBrushFromColor(): void
+    {
+        $rgbBrush = Brush::rgb(0x12_3456);
+        $colorBrush = Brush::color(Color::rgb(0x12_3456));
+        $viaRgb = $rgbBrush->toCData();
+        $viaColor = $colorBrush->toCData();
+
+        $this->assertSame($viaRgb->R, $viaColor->R);
+        $this->assertSame($viaRgb->G, $viaColor->G);
+        $this->assertSame($viaRgb->B, $viaColor->B);
+        $this->assertSame($viaRgb->A, $viaColor->A);
     }
 
     // ========================================================================

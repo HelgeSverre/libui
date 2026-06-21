@@ -98,6 +98,8 @@ see [Development](#development) to run them.
 - **19 PHP enums + bit-flags** (`Align`, `TextWeight`, `DrawFillMode`, …),
   generated 1:1 from libui's C enums.
 - **Native dialogs** — message boxes and open/save/folder pickers.
+- **Typed colours** — one `Color` value type (`Color::rgb(0x312B90)`, `::hex()`,
+  `::rgba()`, `::rgb255()`, named) accepted across brushes, text and colour buttons.
 - **Custom 2D drawing** — vector `Path`s, solid/gradient `Brush`es,
   `StrokeParams`, affine `Matrix`, clipping, and a `DrawContext` to draw into.
 - **Attributed text** — `AttributedString` with per-range colour/weight/italic/

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Libui\Text;
 
+use Libui\Color;
 use Libui\Ffi;
 use Libui\Generated\Enum\AttributeType;
 use Libui\Generated\Enum\TextItalic;
@@ -149,15 +150,27 @@ final class Attribute
         return new self(AttributeType::Color, 0, 0, $r, $g, $b, $a);
     }
 
+    /** Text colour from a {@see Color}. */
+    public static function fromColor(Color $color): self
+    {
+        return self::color($color->r, $color->g, $color->b, $color->a);
+    }
+
     /** Colour from a 0xRRGGBB integer (mirrors Brush::rgb). */
     public static function rgb(int $hex, float $a = 1.0): self
     {
-        return self::color((($hex >> 16) & 0xFF) / 255, (($hex >> 8) & 0xFF) / 255, ($hex & 0xFF) / 255, $a);
+        return self::fromColor(Color::rgb($hex, $a));
     }
 
     public static function background(float $r, float $g, float $b, float $a = 1.0): self
     {
         return new self(AttributeType::Background, 0, 0, $r, $g, $b, $a);
+    }
+
+    /** Background colour from a {@see Color}. */
+    public static function backgroundFromColor(Color $color): self
+    {
+        return self::background($color->r, $color->g, $color->b, $color->a);
     }
 
     public static function underline(Underline $underline = Underline::Single): self

@@ -16,6 +16,7 @@ have PHP 8.5+ with FFI. For *why* the library is built the way it is, read
 - [Dialogs](#dialogs)
 - [Menus](#menus)
 - [Async — the event loop](#async--the-event-loop)
+- [Colours](#colours)
 - [Custom drawing](#custom-drawing)
 - [Attributed text](#attributed-text)
 - [Tables (data grids)](#tables-data-grids)
@@ -339,6 +340,40 @@ Loop::defer(fn () => $statusLabel->setText('done'));
 See [`examples/async_http.php`](../examples/async_http.php) for the pattern.
 
 ---
+
+## Colours
+
+`Libui\Color` is the one typed way to express a colour. Construct it however you
+think about colour — it stores normalized `0..1` channels internally (what libui
+wants):
+
+```php
+use Libui\Color;
+
+Color::rgb(0x312B90);            // hex int
+Color::hex('#312B90');           // string: #RGB / #RRGGBB / #RRGGBBAA
+Color::rgba(0.19, 0.17, 0.56);   // 0..1 floats
+Color::rgb255(49, 43, 144);      // 8-bit ints
+Color::black(); Color::white(); Color::transparent();
+
+$faded = Color::rgb(0x312B90)->withAlpha(0.5);   // immutable — returns a new Color
+```
+
+Out-of-range floats are clamped to `0..1`; bad hex/8-bit values throw an
+`InvalidArgumentException` (almost always a typo). A `Color` is accepted anywhere
+the binding takes a colour:
+
+```php
+Brush::color(Color::hex('#312B90'));               // fills
+Attribute::fromColor(Color::rgb(0xE01515));        // text colour
+Attribute::backgroundFromColor(Color::white());    // text background
+$ctx->drawString('Hi', $font, Color::white(), 10, 10);  // also still accepts [r,g,b,a]
+$colorButton->setColor(Color::rgb(0x3380E6));
+$current = $colorButton->getColor();               // returns a Color
+```
+
+The older float/hex forms (`Brush::solid()`, `Brush::rgb()`, `[r, g, b, a]`
+arrays) all still work — `Color` is additive.
 
 ## Custom drawing
 

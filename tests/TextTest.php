@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Libui\Tests;
 
+use Libui\Color;
 use Libui\Generated\Enum\AttributeType;
 use Libui\Generated\Enum\TextItalic;
 use Libui\Generated\Enum\TextStretch;
@@ -168,6 +169,22 @@ final class TextTest extends TestCase
     {
         $attr = new Attribute(AttributeType::Stretch, 0, 10, TextStretch::Expanded);
         $this->assertInstanceOf(Attribute::class, $attr);
+    }
+
+    public function testAttributeFromColorBuildsValidColorAttribute(): void
+    {
+        $attr = Attribute::fromColor(Color::rgb(0x80_4020, 0.5));
+
+        $this->assertInstanceOf(Attribute::class, $attr);
+        $this->assertFalse(\FFI::isNull($attr->handle()));
+    }
+
+    public function testAttributeBackgroundFromColorBuildsValidAttribute(): void
+    {
+        $attr = Attribute::backgroundFromColor(Color::white());
+
+        $this->assertInstanceOf(Attribute::class, $attr);
+        $this->assertFalse(\FFI::isNull($attr->handle()));
     }
 
     public function testTextStyleBuildsStretchAttribute(): void

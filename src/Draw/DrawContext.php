@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Libui\Draw;
 
+use Libui\Color;
 use Libui\Ffi;
 use Libui\Generated\Enum\DrawFillMode;
 use Libui\Generated\Enum\DrawTextAlign;
@@ -101,19 +102,19 @@ final class DrawContext
      * Pass $width to wrap/align within a box (needed for Center/Right alignment);
      * leave it null for an un-wrapped single line.
      *
-     * @param array{float,float,float}|array{float,float,float,float} $color
+     * @param Color|array{float,float,float}|array{float,float,float,float} $color
      */
     public function drawString(
         string $text,
         FontDescriptor $font,
-        array $color,
+        Color|array $color,
         float $x,
         float $y,
         ?float $width = null,
         DrawTextAlign $align = DrawTextAlign::Left,
     ): void {
         $string = new AttributedString();
-        $string->append($text, Attribute::color($color[0], $color[1], $color[2], $color[3] ?? 1.0));
+        $string->append($text, Attribute::fromColor(Color::from($color)));
         $layout = new TextLayout($string, $font, $width ?? 1.0e6, $align);
         $this->text($layout, $x, $y);
     }

@@ -6,6 +6,7 @@ namespace Libui\Tests;
 
 use Libui\Button;
 use Libui\Checkbox;
+use Libui\Color;
 use Libui\ColorButton;
 use Libui\DateTimePicker;
 use Libui\EditableCombobox;
@@ -391,6 +392,20 @@ final class AAAWidgetTest extends LibuiTestCase
         $result = $button->setColor(1.0, 0.5, 0.25, 1.0); // RGBA
 
         $this->assertSame($button, $result);
+    }
+
+    public function testColorButtonSetColorFromColorRoundTrips(): void
+    {
+        $button = new ColorButton();
+        $result = $button->setColor(Color::rgb(0x80_4020, 0.5));
+        $got = $button->getColor();
+
+        $this->assertSame($button, $result);
+        $this->assertInstanceOf(Color::class, $got);
+        $this->assertEqualsWithDelta(0x80 / 255, $got->r, 1e-6);
+        $this->assertEqualsWithDelta(0x40 / 255, $got->g, 1e-6);
+        $this->assertEqualsWithDelta(0x20 / 255, $got->b, 1e-6);
+        $this->assertEqualsWithDelta(0.5, $got->a, 1e-6);
     }
 
     public function testColorButtonOnChanged(): void

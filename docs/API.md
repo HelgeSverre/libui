@@ -135,6 +135,24 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `setText(string $text): static` — Sets the checkbox label text.
 - `text(): string` — Returns the checkbox label text.
 
+### `Color`
+
+`Libui\Color`
+
+An immutable RGBA colour, stored as normalized 0..1 channels (libui-native).
+
+- `static black(): Color`
+- `static from(Color|array $color): Color` — Coerce a Color or an `[r, g, b]` / `[r, g, b, a]` float array into a Color.
+- `static hex(string $hex): Color` — Colour from a `#RGB`, `#RRGGBB`, or `#RRGGBBAA` string (leading `#` optional).
+- `static rgb(int $hex, float $a = 1): Color` — Colour from a `0xRRGGBB` integer, with optional 0..1 alpha.
+- `static rgb255(int $r, int $g, int $b, float $a = 1): Color` — Colour from 8-bit (0-255) channels, with optional 0..1 alpha.
+- `static rgba(float $r, float $g, float $b, float $a = 1): Color` — Colour from 0..1 float channels. Out-of-range values are clamped.
+- `static transparent(): Color`
+- `static white(): Color`
+- `toArray(): array` — The channels as a `[r, g, b, a]` float array, for the float-array APIs.
+- `toHex(): int` — The colour as a `0xRRGGBB` integer (alpha dropped).
+- `withAlpha(float $a): Color` — A copy with a different alpha (0..1, clamped).
+
 ### `ColorButton`
 
 `Libui\ColorButton`
@@ -145,8 +163,9 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new color button.
 - `color(CData $r, CData $g, CData $bl, CData $a): static` — Returns the color button color.
+- `getColor(): Color` — The currently selected colour as a {@see Color}, wrapping the generated output-pointer getter.
 - `onChanged(callable $cb): static` — Registers a callback for when the color is changed.
-- `setColor(float $r, float $g, float $bl, float $a): static` — Sets the color button color.
+- `setColor(Color|float $r, float $g = 0, float $b = 0, float $a = 1): static` — Set the button colour from a {@see Color}, or from raw 0..1 float channels (the generated signature still works).
 
 ### `Combobox`
 
@@ -525,6 +544,7 @@ Override the methods you need to drive a custom-drawn Area. All default to no-op
 
 A paint source for filling/stroking. Build one with a factory, then hand it to DrawContext::fill()/stroke().
 
+- `static color(Color $color): Brush` — Build a solid brush from a {@see Color}.
 - `static linearGradient(float $x0, float $y0, float $x1, float $y1, array $stops): Brush`
 - `static radialGradient(float $cx, float $cy, float $radius, array $stops): Brush` — Radial gradient centred at ($cx, $cy) out to $radius. Stops are [pos,r,g,b,a].
 - `static rgb(int $hex, float $a = 1): Brush` — Build a solid brush from a 0xRRGGBB integer.
@@ -539,7 +559,7 @@ The drawing surface handed to an area's draw handler. Wraps a uiDrawContext*; on
 
 - `__construct(CData $ctx)`
 - `clip(Path $path): void` — Intersect the current clip region with the given path.
-- `drawString(string $text, FontDescriptor $font, array $color, float $x, float $y, ?float $width = null, DrawTextAlign $align = DrawTextAlign::Left): void` — Convenience for the common case: draw a single string in one colour and font at ($x, $y) — no manual AttributedString / TextLayout dance.
+- `drawString(string $text, FontDescriptor $font, Color|array $color, float $x, float $y, ?float $width = null, DrawTextAlign $align = DrawTextAlign::Left): void` — Convenience for the common case: draw a single string in one colour and font at ($x, $y) — no manual AttributedString / TextLayout dance.
 - `fill(Path $path, Brush $brush): void`
 - `fillPath(Brush $brush, callable $build, DrawFillMode $fillMode = DrawFillMode::Winding): void` — Build a path with $build, fill it, and free it — no manual end()/free().
 - `restore(): void` — Pop the most recently saved clip/transform state.
@@ -636,8 +656,10 @@ Stroke styling for DrawContext::stroke().
 A single text attribute (a family, size, weight, colour, …) built via one of the static factories and applied to a range of an AttributedString.
 
 - `static background(float $r, float $g, float $b, float $a = 1): Attribute`
+- `static backgroundFromColor(Color $color): Attribute` — Background colour from a {@see Color}.
 - `static color(float $r, float $g, float $b, float $a = 1): Attribute`
 - `static family(string $family): Attribute`
+- `static fromColor(Color $color): Attribute` — Text colour from a {@see Color}.
 - `static italic(TextItalic $italic): Attribute`
 - `static rgb(int $hex, float $a = 1): Attribute` — Colour from a 0xRRGGBB integer (mirrors Brush::rgb).
 - `static size(float $size): Attribute`
