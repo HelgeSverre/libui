@@ -17,7 +17,9 @@ jobs:
       matrix:
         include:
           - { os: macos-latest,     label: darwin,        out: lib/darwin/libui.dylib }
-          - { os: ubuntu-latest,    label: linux-x86_64,  out: lib/linux-x86_64/libui.so }
+          # Build the committed x86_64 .so on the OLDEST supported LTS so it links an
+          # older glibc and stays loadable on 22.04+ (glibc is forward-compatible only).
+          - { os: ubuntu-22.04,     label: linux-x86_64,  out: lib/linux-x86_64/libui.so }
           - { os: ubuntu-24.04-arm, label: linux-aarch64, out: lib/linux-aarch64/libui.so }
           - { os: windows-latest,   label: windows-x86_64, out: lib/windows-x86_64/libui.dll }
     steps:
