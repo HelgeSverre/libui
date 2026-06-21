@@ -145,8 +145,14 @@ jobs:
 
           echo "Attaching artifacts to release: $TAG"
 
+          # Both Linux jobs emit a file literally named libui.so, which collide as
+          # release assets — rename each to a descriptive, arch-tagged name.
+          cp artifacts/libui-linux-x86_64/libui.so   libui-linux-x86_64.so
+          cp artifacts/libui-linux-aarch64/libui.so  libui-linux-aarch64.so
+          cp artifacts/libui-windows-x86_64/libui.dll libui-windows-x86_64.dll
+
           gh release upload "$TAG" \
-            artifacts/libui-linux-x86_64/libui.so \
-            artifacts/libui-linux-aarch64/libui.so \
-            artifacts/libui-windows-x86_64/libui.dll \
+            libui-linux-x86_64.so \
+            libui-linux-aarch64.so \
+            libui-windows-x86_64.dll \
             --clobber
