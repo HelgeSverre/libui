@@ -77,7 +77,7 @@ $window->run(); // init → show → loop → uninit
 ```
 
 Pass an `$afterClose` callback to free native resources that must outlive the
-window's child controls (see [the table gotcha](#tables-must-outlive-their-model)):
+window's child controls (see [the table gotcha](#model-lifetime-is-handled-for-you)):
 
 ```php
 $window->run(function () use ($model) {
@@ -482,6 +482,28 @@ memory; they free themselves on destruction, but you can call `free()` explicitl
 See [`examples/text.php`](../examples/text.php) and
 [`examples/markdown.php`](../examples/markdown.php).
 
+### `RichText` + `TextStyle` — styled text without the dance
+
+For styled runs, `TextStyle` bundles a font + colour + attributes, and `RichText`
+assembles them into a measurable `TextLayout` without building the
+`AttributedString` by hand:
+
+```php
+use Libui\Text\RichText;
+use Libui\Text\TextStyle;
+use Libui\Generated\Enum\TextWeight;
+
+$rich = RichText::create(new TextStyle(family: 'Helvetica', size: 16.0))
+    ->append('Bold ', new TextStyle(weight: TextWeight::Bold, color: [0.19, 0.17, 0.56]))
+    ->append('and plain.');
+
+[$w, $h] = $rich->measure(width: 400.0); // lay out + measure in one call
+$ctx->text($rich->layout(400.0), 10, 10); // or draw it
+```
+
+`TextStyle` is immutable — derive variants with `->with(...)`. `RichText::height()`
+is a shortcut for the measured height (handy for wrapping text in a custom Area).
+
 ---
 
 ## Tables (data grids)
@@ -674,8 +696,8 @@ always fully qualified. If you `use Libui\Ffi;` don't also import `\FFI`.
 - **Linux**: needs **GTK 3** at runtime. Build `libui.so` (`composer build-lib`)
   or point `$LIBUI_LIB` at a system-installed one. GUI tests run headless under
   `xvfb`.
-- **Windows**: build `libui.dll` or supply a prebuilt one; point `$LIBUI_LIB` at
-  it. Currently experimental in CI.
+- **Windows** (x86_64): a prebuilt `libui.dll` (built with MSVC) ships in the
+  package under `lib/windows-x86_64/` — nothing to install; works out of the box.
 
 Override the library path at any time with the `$LIBUI_LIB` environment variable.
 See the README's [Platform support](../README.md#platform-support) table for the

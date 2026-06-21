@@ -87,7 +87,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `centered(?int $screenWidth = null, ?int $screenHeight = null): static` — Centre the window on the primary display.
 - `contentSize(CData $width, CData $height): static` — Gets the window content size.
 - `dialogs(): Dialogs` — A Dialogs facade bound to this window as the parent.
-- `focused(): int` — Returns whether or not the window is focused.
+- `focused(): bool` — Returns whether or not the window is focused.
 - `fullscreen(): bool` — Returns whether or not the window is full screen.
 - `margined(): bool` — Returns whether or not the window has a margin.
 - `onClose(callable $cb): static` — Run cleanup when the window is closed, before the app quits. Unlike the raw onClosing(), you don't manage the loop or return a value.
@@ -494,11 +494,11 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `append(string $name, Control $c): static` — Appends a control in form of a page/tab with label.
 - `delete(int $index): static` — Removes the control at $index.
 - `insertAt(string $name, int $index, Control $c): static` — Inserts a control in form of a page/tab with label at $index.
-- `margined(int $index): int` — Returns whether or not the page/tab at $index has a margin.
+- `margined(int $index): bool` — Returns whether or not the page/tab at $index has a margin.
 - `numPages(): int` — Returns the number of pages contained.
 - `onSelected(callable $cb): static` — Registers a callback for when a tab is selected.
 - `selected(): int` — Returns the index of the tab selected.
-- `setMargined(int $index, int $margined): static` — Sets whether or not the page/tab at $index has a margin.
+- `setMargined(int $index, bool $margined): static` — Sets whether or not the page/tab at $index has a margin.
 - `setSelected(int $index): static` — Sets the tab selected.
 
 ## Tables
@@ -518,9 +518,9 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `__construct(TableModel $model, ?int $rowBackgroundModelColumn = null)`
 - `appendButtonColumn(string $name, int $modelColumn, ?int $clickableModelColumn = null): static` — Append a button column titled $name that reads from model column $modelColumn.
 - `appendCheckboxColumn(string $name, int $modelColumn, ?int $editableModelColumn = null): static` — Append a checkbox column titled $name that reads from model column $modelColumn. The model should return bool values for this column.
-- `appendCheckboxTextColumn(string $name, int $modelColumn): static` — Append a checkbox+text column titled $name that reads from model column $modelColumn. The model should return bool values for the checkbox part.
+- `appendCheckboxTextColumn(string $name, int $checkboxModelColumn, int $textModelColumn, ?int $checkboxEditableModelColumn = null, ?int $textEditableModelColumn = null): static` — Append a checkbox+text column titled $name. The checkbox is read from $checkboxModelColumn (model returns bool) and the text from $textModelColumn (model returns string). Pass the editable-column args to allow toggling/editing.
 - `appendImageColumn(string $name, int $imageModelColumn): static` — Append a read-only image column titled $name that reads from model column $imageModelColumn. The model should return Image instances or null for this column.
-- `appendImageTextColumn(string $name, int $imageModelColumn): static` — Append a read-only image+text column titled $name that reads from model column $imageModelColumn. The model should return Image instances for the image part.
+- `appendImageTextColumn(string $name, int $imageModelColumn, int $textModelColumn, ?int $textEditableModelColumn = null): static` — Append an image+text column titled $name. The image is read from $imageModelColumn (model returns Image) and the text from $textModelColumn (model returns string). Pass $textEditableModelColumn to make the text editable.
 - `appendProgressBarColumn(string $name, int $modelColumn): static` — Append a progress bar column titled $name that reads from model column $modelColumn. The model should return int values (0-100) for this column.
 - `appendTextColumn(string $name, int $modelColumn, ?int $editableModelColumn = null, ?int $colorModelColumn = null): static` — Append a read-only text column titled $name that reads from model column $modelColumn (String or Int values are both rendered as text).
 - `headerVisible(): bool` — Whether the column header row is shown.

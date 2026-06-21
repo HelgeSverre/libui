@@ -107,7 +107,8 @@ see [Development](#development) to run them.
   sugar), solid/gradient `Brush`es with typed `Stop`s, a fluent `StrokeParams`
   builder, affine `Matrix`, clipping, and `DrawContext` fill/stroke shape helpers.
 - **Attributed text** — `AttributedString` with per-range colour/weight/italic/
-  underline attributes, a `FontDescriptor`, and a drawable `TextLayout`.
+  underline attributes, a `FontDescriptor`, and a drawable `TextLayout`; plus a
+  `RichText` builder + `TextStyle` value object for one-call styled text.
 - **Data-grid table** — `Table::fromRows()` / `fromAssoc()` for static data (no
   delegate), or a `TableModelDelegate` for dynamic data; checkbox/progress/button/
   image columns, row-index click callbacks, and automatic model lifetime.

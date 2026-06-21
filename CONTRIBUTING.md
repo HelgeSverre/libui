@@ -20,9 +20,10 @@ The library is split into two layers:
   and documentation that survives regeneration. Edit these freely.
 
 - The hand-written runtime — `src/Ffi.php`, `src/Control.php`, `src/Area.php`,
-  `src/AreaDelegate.php`, and `src/Draw/**` — is also hand-maintained. The
-  generator scaffolds a sugar stub only when one is missing; it never clobbers an
-  existing hand-written file.
+  `src/AreaDelegate.php`, `src/Draw/**`, `src/Text/**`, the table subsystem
+  (`src/Table.php`, `src/TableModel.php`, `src/TableModelDelegate.php`), and the
+  `src/Color.php` value type — is also hand-maintained. The generator scaffolds a
+  sugar stub only when one is missing; it never clobbers an existing hand-written file.
 
 ## Regenerating
 
