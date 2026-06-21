@@ -54,6 +54,24 @@ final class ContainerTest extends LibuiTestCase
         $this->assertSame($box, $result);
     }
 
+    public function testBoxAppendAcceptsBoolStretchy(): void
+    {
+        $box = new Box();
+
+        $this->assertSame($box, $box->append(new Button('a'), stretchy: true));
+        $this->assertSame($box, $box->append(new Button('b'), stretchy: false));
+        $this->assertSame($box, $box->append(new Button('c'), stretchy: 1)); // int still works
+    }
+
+    public function testFormAppendAcceptsBoolStretchyAndStretchyHelper(): void
+    {
+        $form = new Form();
+
+        $this->assertSame($form, $form->append('Name', new Entry()));
+        $this->assertSame($form, $form->append('Bio', new Entry(), stretchy: true));
+        $this->assertSame($form, $form->appendStretchy('Notes', new Entry()));
+    }
+
     public function testBoxAppendMultipleChildren(): void
     {
         $box = new Box();

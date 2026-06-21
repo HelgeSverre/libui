@@ -58,12 +58,12 @@ $language->setText('PHP');
 $born = new DateTimePicker();
 
 $inputs
-    ->append('Name', $name, 0)
-    ->append('Password', $password, 0)
-    ->append('Age', $age, 0)
-    ->append('Country', $country, 0)
-    ->append('Language', $language, 0)
-    ->append('Born', $born, 0);
+    ->append('Name', $name)
+    ->append('Password', $password)
+    ->append('Age', $age)
+    ->append('Country', $country)
+    ->append('Language', $language)
+    ->append('Born', $born);
 
 $tab->append('Inputs', $inputs);
 

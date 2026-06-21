@@ -27,10 +27,10 @@ class Box extends Generated\Box
         return $box;
     }
 
-    /** Append a child; $stretchy defaults to non-stretching. */
-    public function append(Control $child, int $stretchy = 0): static
+    /** Append a child; $stretchy (bool, or the raw 0/1 int) defaults to non-stretching. */
+    public function append(Control $child, bool|int $stretchy = false): static
     {
-        return parent::append($child, $stretchy);
+        return parent::append($child, (int) $stretchy);
     }
 
     /** Append a child that grows to fill the box's main axis. */
