@@ -38,7 +38,7 @@ class EditableCombobox extends Control
     }
 
     /**
-     * Returns the text of the editable combo box.
+     * Returns the text of the editable combo box. This text is either the text of one of the predefined list items or the t...
      *
      * @return string The editable combo box text.
      *

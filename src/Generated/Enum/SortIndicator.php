@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Libui\Generated\Enum;
 
 /**
- * Sort indicators.
+ * Sort indicators. Generic sort indicators to display sorting direction.
  *
  * GENERATED from libui `uiSortIndicator`. DO NOT EDIT.
  *

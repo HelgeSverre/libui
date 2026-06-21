@@ -67,7 +67,7 @@ class Grid extends Control
     }
 
     /**
-     * Returns whether or not controls within the grid are padded.
+     * Returns whether or not controls within the grid are padded. Padding is defined as space between individual controls.
      *
      * @return bool `TRUE` if controls are padded, `FALSE` otherwise.
      *
@@ -79,7 +79,7 @@ class Grid extends Control
     }
 
     /**
-     * Sets whether or not controls within the grid are padded.
+     * Sets whether or not controls within the grid are padded. Padding is defined as space between individual controls. The...
      *
      * @param bool $padded `TRUE` to make controls padded, `FALSE` otherwise.
      *

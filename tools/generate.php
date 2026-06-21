@@ -209,6 +209,37 @@ function docFromBlock(array $blockLines): array
 {
     $doc = emptyDoc();
 
+    // Accumulate the active tag so continuation lines (those with no leading @)
+    // extend it instead of being dropped or mis-attributed to the summary. Each
+    // active entry is ['kind' => 'param'|'return'|'note'|'warning', 'key' => ?string, 'text' => string].
+    $current = null;
+    $summaryParts = [];
+    $seenTag = false;
+
+    $flush = static function (?array &$current, array &$doc): void {
+        if ($current === null) {
+            return;
+        }
+        $description = sanitizeDocText($current['text']);
+        if ($description !== '') {
+            switch ($current['kind']) {
+                case 'param':
+                    $doc['params'][$current['key']] = $description;
+                    break;
+                case 'return':
+                    $doc['return'] = $description;
+                    break;
+                case 'note':
+                    $doc['notes'][] = $description;
+                    break;
+                case 'warning':
+                    $doc['warnings'][] = $description;
+                    break;
+            }
+        }
+        $current = null;
+    };
+
     foreach ($blockLines as $raw) {
         $text = trim($raw);
         $text = preg_replace('#^/\*\*?#', '', $text);
@@ -220,39 +251,48 @@ function docFromBlock(array $blockLines): array
         }
 
         if (preg_match('/^@param\s+([A-Za-z_]\w*)\s*(.*)$/', $text, $matches)) {
-            $description = sanitizeDocText($matches[2]);
-            if ($description !== '') {
-                $doc['params'][$matches[1]] = $description;
-            }
+            $flush($current, $doc);
+            $seenTag = true;
+            $current = ['kind' => 'param', 'key' => $matches[1], 'text' => $matches[2]];
             continue;
         }
         if (preg_match('/^@returns?\s+(.*)$/', $text, $matches)) {
-            $description = sanitizeDocText($matches[1]);
-            if ($description !== '') {
-                $doc['return'] = $description;
-            }
+            $flush($current, $doc);
+            $seenTag = true;
+            $current = ['kind' => 'return', 'key' => null, 'text' => $matches[1]];
             continue;
         }
         if (preg_match('/^@note\s+(.*)$/', $text, $matches)) {
-            $description = sanitizeDocText($matches[1]);
-            if ($description !== '') {
-                $doc['notes'][] = $description;
-            }
+            $flush($current, $doc);
+            $seenTag = true;
+            $current = ['kind' => 'note', 'key' => null, 'text' => $matches[1]];
             continue;
         }
         if (preg_match('/^@warning\s+(.*)$/', $text, $matches)) {
-            $description = sanitizeDocText($matches[1]);
-            if ($description !== '') {
-                $doc['warnings'][] = $description;
-            }
+            $flush($current, $doc);
+            $seenTag = true;
+            $current = ['kind' => 'warning', 'key' => null, 'text' => $matches[1]];
             continue;
         }
         if ($text[0] === '@') {
+            // An unrecognised tag ends any active accumulation.
+            $flush($current, $doc);
+            $seenTag = true;
             continue;
         }
-        if ($doc['summary'] === '') {
-            $doc['summary'] = sanitizeSummary($text);
+
+        // A continuation line: extend the active tag, or build the leading summary.
+        if ($current !== null) {
+            $current['text'] .= ' ' . $text;
+        } elseif (! $seenTag) {
+            $summaryParts[] = $text;
         }
+    }
+
+    $flush($current, $doc);
+
+    if ($summaryParts !== []) {
+        $doc['summary'] = sanitizeSummary(implode(' ', $summaryParts));
     }
 
     return $doc;
@@ -319,6 +359,17 @@ function sanitizeDocText(string $text): string
     // libui leaves some defaults unfilled as `[Default: `TODO`]` — drop the
     // placeholder, but keep real documented defaults like `[Default: `FALSE`]`.
     $text = preg_replace('/\s*\[Default:?\s*`?TODO`?\]/i', '', $text);
+    // Strip libui's recurring string-ownership boilerplate wherever it appears —
+    // multi-line continuation lines append it to otherwise-useful descriptions.
+    $text = preg_replace(
+        [
+            '/\s*A (?:valid,?\s+)?`?NUL`? terminated UTF-8 string\.?/i',
+            '/\s*Data is copied internally\.?\s*Ownership is not transferred\.?/i',
+            '/\s*Caller is responsible for freeing the data with `?uiFreeText\(\)`?\.?/i',
+        ],
+        '',
+        $text,
+    );
     $text = preg_replace('/\s+/', ' ', $text);
     $text = trim($text, " \t\n\r\0\x0B\\");
     if ($text === '') {
@@ -331,9 +382,6 @@ function sanitizeDocText(string $text): string
         '/^User data to be passed to the callback\.$/',
         '/^Back reference to the instance that (triggered|initiated) the callback\.$/',
         '/^User data registered with the sender instance\.$/',
-        '/^A valid,?\s+`?NUL`? terminated UTF-8 string\.$/',
-        '/^Data is copied internally\. Ownership is not transferred\.$/',
-        '/^Caller is responsible for freeing the data with `?uiFreeText\(\)`?\.$/',
     ];
     if (array_filter($fluffPatterns, fn (string $pattern): bool => preg_match($pattern, $text) === 1) !== []) {
         return '';

@@ -37,7 +37,7 @@ class ProgressBar extends Control
     }
 
     /**
-     * Sets the progress bar value.
+     * Sets the progress bar value. Valid values are `[0, 100]` for displaying a solid bar imitating a percent value. Use a...
      *
      * @param int $n Value to set. Integer in the range of `[-1, 100]`.
      *

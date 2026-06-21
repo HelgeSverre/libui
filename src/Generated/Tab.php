@@ -40,7 +40,7 @@ class Tab extends Control
      * Sets the tab selected.
      *
      * @param int $index Index of the tab to be selected
-     * @note The $index must be in the range [0, uiTabNumPages(t) - 1].
+     * @note The $index must be in the range [0, uiTabNumPages(t) - 1]. If out of bounds, the selection is not changed.
      *
      * @see uiTabSetSelected
      */
@@ -141,7 +141,7 @@ class Tab extends Control
     }
 
     /**
-     * Sets whether or not the page/tab at $index has a margin.
+     * Sets whether or not the page/tab at $index has a margin. The margin size is determined by the OS defaults.
      *
      * @param int $index Index of the tab/page to un/set margin for.
      * @param bool $margined `TRUE` to set a margin for tab at $index, `FALSE` otherwise.

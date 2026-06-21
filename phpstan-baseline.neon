@@ -469,7 +469,19 @@ parameters:
 			path: src/Text/TextLayout.php
 
 		-
+			message: '#^Property Libui\\Text\\TextLayout\:\:\$font is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Text/TextLayout.php
+
+		-
 			message: '#^Property Libui\\Text\\TextLayout\:\:\$params is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Text/TextLayout.php
+
+		-
+			message: '#^Property Libui\\Text\\TextLayout\:\:\$string is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
 			path: src/Text/TextLayout.php
@@ -980,6 +992,12 @@ parameters:
 
 		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''TextLayout\:\:free\(\)…'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/TextTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''free\(\) twice did…'' will always evaluate to true\.$#'
 			identifier: method.alreadyNarrowedType
 			count: 1
 			path: tests/TextTest.php

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Libui\Generated\Enum;
 
 /**
- * Table selection modes.
+ * Table selection modes. Table selection that enforce how a user can interact with a table.
  *
  * GENERATED from libui `uiTableSelectionMode`. DO NOT EDIT.
  *

@@ -76,7 +76,7 @@ class MultilineEntry extends Control
      * Registers a callback for when the user changes the multi line entry's text.
      *
      * @param callable(static): void $cb Receives this widget.
-     * @note The callback is not triggered when calling uiMultilineEntrySetText()
+     * @note The callback is not triggered when calling uiMultilineEntrySetText() or uiMultilineEntryAppend().
      * @note Only one callback can be registered at a time.
      *
      * @see uiMultilineEntryOnChanged

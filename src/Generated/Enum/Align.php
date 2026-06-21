@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Libui\Generated\Enum;
 
 /**
- * Alignment specifiers to define placement within the reserved area.
+ * Alignment specifiers to define placement within the reserved area. Used in uiGrid.
  *
  * GENERATED from libui `uiAlign`. DO NOT EDIT.
  *

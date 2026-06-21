@@ -25,7 +25,7 @@ class Entry extends Control
     }
 
     /**
-     * Creates a new entry suitable for sensitive inputs like passwords.
+     * Creates a new entry suitable for sensitive inputs like passwords. The entered text is NOT readable by the user but ma...
      *
      * @see uiNewPasswordEntry
      */
@@ -35,7 +35,7 @@ class Entry extends Control
     }
 
     /**
-     * Creates a new entry suitable for search.
+     * Creates a new entry suitable for search. Some systems will deliberately delay the uiEntryOnChanged() callback for a m...
      *
      * @see uiNewSearchEntry
      */

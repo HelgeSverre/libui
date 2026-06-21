@@ -16,7 +16,7 @@ final class Ui
      *
      * @param \Libui\Control $parent Parent window.
      * @note File paths are separated by the underlying OS file path separator.
-     * @return string File path, `NULL` on cancel.
+     * @return string File path, `NULL` on cancel. If path is not `NULL`: TODO: clarify string encoding.
      *
      * @see uiOpenFile
      */
@@ -30,7 +30,7 @@ final class Ui
      *
      * @param \Libui\Control $parent Parent window.
      * @note File paths are separated by the underlying OS file path separator.
-     * @return string Folder path, `NULL` on cancel.
+     * @return string Folder path, `NULL` on cancel. If path is not `NULL`: TODO: clarify string encoding.
      *
      * @see uiOpenFolder
      */
@@ -40,11 +40,11 @@ final class Ui
     }
 
     /**
-     * Save file dialog window.
+     * Save file dialog window. The user is asked to confirm overwriting existing files, should the chosen file path already...
      *
      * @param \Libui\Control $parent Parent window.
      * @note File paths are separated by the underlying OS file path separator.
-     * @return string File path, `NULL` on cancel.
+     * @return string File path, `NULL` on cancel. If path is not `NULL`: TODO: clarify string encoding.
      *
      * @see uiSaveFile
      */
@@ -54,7 +54,7 @@ final class Ui
     }
 
     /**
-     * Message box dialog window.
+     * Message box dialog window. A message box displayed in a new window indicating a common message.
      *
      * @param \Libui\Control $parent Parent window.
      * @param string $title Dialog window title text.
@@ -68,7 +68,7 @@ final class Ui
     }
 
     /**
-     * Error message box dialog window.
+     * Error message box dialog window. A message box displayed in a new window indicating an error. On some systems this ma...
      *
      * @param \Libui\Control $parent Parent window.
      * @param string $title Dialog window title text.

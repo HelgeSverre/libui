@@ -77,7 +77,7 @@ class Group extends Control
     }
 
     /**
-     * Sets whether or not the group has a margin.
+     * Sets whether or not the group has a margin. The margin size is determined by the OS defaults.
      *
      * @param bool $margined `TRUE` to set a margin, `FALSE` otherwise.
      *

@@ -15,7 +15,7 @@ use Libui\Control;
 class Menu extends Control
 {
     /**
-     * Creates a new menu.
+     * Creates a new menu. Typical values are `File`, `Edit`, `Help`.
      *
      * @param string $name Menu label.
      *

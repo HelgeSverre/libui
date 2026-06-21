@@ -56,7 +56,7 @@ class Window extends Control
     }
 
     /**
-     * Gets the window position.
+     * Gets the window position. Coordinates are measured from the top left corner of the screen.
      *
      * @param \FFI\CData $x Output pointer written by libui.
      * @param \FFI\CData $y Output pointer written by libui.
@@ -71,7 +71,7 @@ class Window extends Control
     }
 
     /**
-     * Moves the window to the specified position.
+     * Moves the window to the specified position. Coordinates are measured from the top left corner of the screen.
      *
      * @param int $x New x position of the window.
      * @param int $y New y position of the window.
@@ -294,7 +294,7 @@ class Window extends Control
     }
 
     /**
-     * Sets whether or not the window has a margin.
+     * Sets whether or not the window has a margin. The margin size is determined by the OS defaults.
      *
      * @param bool $margined `TRUE` to set a window margin, `FALSE` otherwise.
      *

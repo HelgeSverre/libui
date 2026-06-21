@@ -26,7 +26,7 @@ class MenuItem extends Control
     }
 
     /**
-     * Disables the menu item.
+     * Disables the menu item. Menu item is grayed out and user interaction is not possible.
      *
      * @see uiMenuItemDisable
      */
@@ -58,7 +58,7 @@ class MenuItem extends Control
     }
 
     /**
-     * Returns whether or not the menu item's checkbox is checked.
+     * Returns whether or not the menu item's checkbox is checked. To be used only with items created via uiMenuAppendCheckI...
      *
      * @return bool `TRUE` if checked, `FALSE` otherwise. [Default: `FALSE`]
      *
@@ -70,7 +70,7 @@ class MenuItem extends Control
     }
 
     /**
-     * Sets whether or not the menu item's checkbox is checked.
+     * Sets whether or not the menu item's checkbox is checked. To be used only with items created via uiMenuAppendCheckItem().
      *
      * @param bool $checked `TRUE` to check menu item checkbox, `FALSE` otherwise.
      *

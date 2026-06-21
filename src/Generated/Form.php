@@ -25,7 +25,7 @@ class Form extends Control
     }
 
     /**
-     * Appends a control with a label to the form.
+     * Appends a control with a label to the form. Stretchy items expand to use the remaining space within the container. In...
      *
      * @param string $label Label text.
      * @param \Libui\Control $c Control to append.
@@ -64,7 +64,7 @@ class Form extends Control
     }
 
     /**
-     * Returns whether or not controls within the form are padded.
+     * Returns whether or not controls within the form are padded. Padding is defined as space between individual controls.
      *
      * @return bool `TRUE` if controls are padded, `FALSE` otherwise.
      *
@@ -76,7 +76,7 @@ class Form extends Control
     }
 
     /**
-     * Sets whether or not controls within the box are padded.
+     * Sets whether or not controls within the box are padded. Padding is defined as space between individual controls. The...
      *
      * @param bool $padded `TRUE` to make controls padded, `FALSE` otherwise.
      *

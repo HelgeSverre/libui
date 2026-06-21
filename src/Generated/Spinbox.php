@@ -15,7 +15,7 @@ use Libui\Control;
 class Spinbox extends Control
 {
     /**
-     * Creates a new spinbox.
+     * Creates a new spinbox. The initial spinbox value equals the minimum value. In the current implementation $min and $ma...
      *
      * @param int $min Minimum value.
      * @param int $max Maximum value.

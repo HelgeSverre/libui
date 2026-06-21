@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Libui\Generated\Enum;
 
 /**
- * Placement specifier to define placement in relation to another control.
+ * Placement specifier to define placement in relation to another control. Used in uiGrid.
  *
  * GENERATED from libui `uiAt`. DO NOT EDIT.
  *

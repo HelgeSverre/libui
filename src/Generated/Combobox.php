@@ -55,7 +55,7 @@ class Combobox extends Control
      * Deletes an item at $index from the combo box.
      *
      * @param int $index Index of the item to be deleted.
-     * @note Deleting the index of the item currently selected will move the
+     * @note Deleting the index of the item currently selected will move the selection to the next item in the combo box or `-1` if no such item exists.
      *
      * @see uiComboboxDelete
      */
@@ -117,7 +117,7 @@ class Combobox extends Control
      * Registers a callback for when a combo box item is selected.
      *
      * @param callable(static): void $cb Receives this widget.
-     * @note The callback is not triggered when calling uiComboboxSetSelected(),
+     * @note The callback is not triggered when calling uiComboboxSetSelected(), uiComboboxInsertAt(), uiComboboxDelete(), or uiComboboxClear().
      * @note Only one callback can be registered at a time.
      *
      * @see uiComboboxOnSelected

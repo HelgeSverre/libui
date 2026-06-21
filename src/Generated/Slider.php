@@ -15,7 +15,7 @@ use Libui\Control;
 class Slider extends Control
 {
     /**
-     * Creates a new slider.
+     * Creates a new slider. The initial slider value equals the minimum value. In the current implementation $min and $max...
      *
      * @param int $min Minimum value.
      * @param int $max Maximum value.

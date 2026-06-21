@@ -15,7 +15,7 @@ use Libui\Control;
 class FontButton extends Control
 {
     /**
-     * Creates a new font button.
+     * Creates a new font button. The default font is determined by the OS defaults.
      *
      * @see uiNewFontButton
      */
@@ -27,7 +27,7 @@ class FontButton extends Control
     /**
      * Returns the selected font.
      *
-     * @note Make sure to call `uiFreeFontButtonFont()` to free all allocated
+     * @note Make sure to call `uiFreeFontButtonFont()` to free all allocated resources within $desc.
      *
      * @see uiFontButtonFont
      */

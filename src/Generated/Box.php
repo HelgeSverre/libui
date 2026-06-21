@@ -15,7 +15,7 @@ use Libui\Control;
 class Box extends Control
 {
     /**
-     * Creates a new vertical box.
+     * Creates a new vertical box. Controls within the box are placed next to each other vertically.
      *
      * @see uiNewVerticalBox
      */
@@ -25,7 +25,7 @@ class Box extends Control
     }
 
     /**
-     * Creates a new horizontal box.
+     * Creates a new horizontal box. Controls within the box are placed next to each other horizontally.
      *
      * @see uiNewHorizontalBox
      */
@@ -35,7 +35,7 @@ class Box extends Control
     }
 
     /**
-     * Appends a control to the box.
+     * Appends a control to the box. Stretchy items expand to use the remaining space within the box. In the case of multipl...
      *
      * @param \Libui\Control $child Control instance to append.
      * @param int $stretchy `TRUE` to stretch control, `FALSE` otherwise.
@@ -75,7 +75,7 @@ class Box extends Control
     }
 
     /**
-     * Returns whether or not controls within the box are padded.
+     * Returns whether or not controls within the box are padded. Padding is defined as space between individual controls.
      *
      * @return bool `TRUE` if controls are padded, `FALSE` otherwise.
      *
@@ -87,7 +87,7 @@ class Box extends Control
     }
 
     /**
-     * Sets whether or not controls within the box are padded.
+     * Sets whether or not controls within the box are padded. Padding is defined as space between individual controls. The...
      *
      * @param bool $padded `TRUE` to make controls padded, `FALSE` otherwise.
      *
