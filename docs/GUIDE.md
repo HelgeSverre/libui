@@ -271,25 +271,32 @@ A cancelled chooser returns an empty string.
 
 ## Menus
 
-Menus are application-global and **must be created before the first window**:
+Menus are application-global and **must be created before the first window** —
+this is now enforced: constructing a `Menu` after a `Window` exists throws a
+`MenuOrderException` instead of silently doing nothing.
+
+Wire items with `onClick(fn (MenuItem $item) => …)` — a clean handler that doesn't
+leak libui's raw window pointer. Pair it with a `Dialogs` facade bound to your
+window so you don't pass the parent on every call (and `openFile()`/`saveFile()`
+return `null` on cancel, distinct from an empty pick):
 
 ```php
 use Libui\Menu;
-use Libui\Generated\Ui;
+use Libui\Dialogs;
 
 $file = new Menu('File');
-$open = $file->appendItem('Open');
-$file->appendQuitItem();
+$file->appendItem('Open…');            // wire onClick after the window exists (below)
+$file->appendQuitItem();               // standard items support onClick() too
 
-$open->onClicked(function () use ($window) {
-    $path = Ui::openFile($window);
-    if ($path !== '') {
-        Ui::msgBox($window, 'You picked', $path);
+$window = new Window('App', 640, 480, hasMenubar: true);
+$dialogs = Dialogs::for($window);
+
+$file->appendItem('Save As…')->onClick(function () use ($dialogs) {
+    $path = $dialogs->saveFile();
+    if ($path !== null) {
+        $dialogs->msgBox('Saved', $path);
     }
 });
-
-// Construct the window with a menubar:
-$window = new Window('App', 640, 480, hasMenubar: true);
 ```
 
 See [`examples/menu.php`](../examples/menu.php) for a full menubar wired to
@@ -424,6 +431,19 @@ Key pieces:
 - **`save()` / `restore()` / `clip()` / `transform()`** manage clip and transform
   state with a `Matrix`.
 
+Shape & shortcut sugar (all additive — the primitives above still work):
+
+- **`Path`** has `line()`, `circle()`, `arc()`, `roundedRect()`, and bézier
+  helpers, so you rarely hand-roll `newFigure`/`lineTo`/`arcTo` sequences.
+- **`DrawContext`** has `fillRect()`, `strokeRect()`, `fillCircle()`,
+  `strokeCircle()` — each takes a `Brush` *or* a `Color` directly.
+- **Gradients** accept typed `Stop`s built from `Color`:
+  `Brush::linearGradient($x0, $y0, $x1, $y1, [Stop::at(0.0, Color::rgb(0x312B90)), Stop::at(1.0, Color::rgb(0x0296C3))])`.
+- **`StrokeParams`** has a fluent builder:
+  `StrokeParams::solid(2.0)->cap(DrawLineCap::Round)->join(DrawLineJoin::Round)`.
+- **`AreaDelegate::redraw()`** repaints the bound area without you stashing the
+  `Area` reference yourself.
+
 See [`examples/canvas.php`](../examples/canvas.php),
 [`examples/flowfield.php`](../examples/flowfield.php), and
 [`examples/clock.php`](../examples/clock.php).
@@ -466,7 +486,26 @@ See [`examples/text.php`](../examples/text.php) and
 
 ## Tables (data grids)
 
-A `Table` displays data pulled lazily from a model you implement by extending
+For static data, skip the delegate entirely — `Table::fromRows()` (positional) and
+`Table::fromAssoc()` (associative, headers from the keys) build the model and
+columns for you:
+
+```php
+use Libui\Table;
+
+$table = Table::fromRows(
+    [['Ada', '36'], ['Alan', '41']],
+    headers: ['Name', 'Age'],
+);
+
+// or from associative rows — headers come from the keys
+$table = Table::fromAssoc([
+    ['name' => 'Ada', 'age' => 36],
+    ['name' => 'Alan', 'age' => 41],
+]);
+```
+
+For dynamic or computed data, implement a model by extending
 `TableModelDelegate`:
 
 ```php
@@ -516,16 +555,12 @@ $table->onRowDoubleClicked(fn (Table $t) => /* … */ null);
 For an editable text column, pass the editable model column and override
 `cellEditable()` + `setCellValue()` in your delegate.
 
-> ### Tables must outlive their model
-> libui **aborts the process** if a `TableModel` is freed while its `Table` is
-> still alive. Free the model *after* the loop returns and the table is destroyed
-> — use the `$afterClose` hook:
->
-> ```php
-> $window->run(function () use ($table) {
->     $table->model()->free();
-> });
-> ```
+> ### Model lifetime is handled for you
+> libui **aborts the process** if a `TableModel` is leaked past `uiUninit()` (its
+> leak checker) — or freed while its `Table` is still alive. You no longer have to
+> manage this: every `TableModel` registers itself, and `Ffi::uninit()` frees any
+> still-live models just before tearing libui down (after your windows have
+> closed). Calling `$table->model()->free()` yourself still works and is idempotent.
 
 See [`examples/table.php`](../examples/table.php).
 
@@ -613,9 +648,9 @@ After `Ffi::main()` returns, libui is torn down. You can't reuse widgets created
 before `uninit()`. `Window::run()` and `App::run()` handle this for you (and now
 do so in a `try/finally`, so a throwing cleanup hook still uninits).
 
-### Tables must outlive their model
-See [above](#tables-must-outlive-their-model) — free the model in `$afterClose`,
-never mid-loop.
+### Table model lifetime is automatic
+See [above](#model-lifetime-is-handled-for-you) — `Ffi::uninit()` frees registered
+models for you; an explicit `model()->free()` is optional and idempotent.
 
 ### `DrawContext` is single-use
 It's only valid during the one `draw()` call it's handed to. Don't store it across

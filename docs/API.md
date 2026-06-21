@@ -80,10 +80,13 @@ Top-level window. Adds lifecycle sugar on top of the generated API: sensible con
 
 _Plus the common widget verbs from [`Control`](#control)._
 
+- `static menusLocked(): bool` — Whether any Window has been created (after which new Menus are illegal).
+- `static resetMenuLock(): void` — Reset the menu-ordering lock so a fresh libui session (after Ffi::uninit()) may build menus again. Called automatically by Ffi::uninit(); also useful directly in tests that need to construct a Menu after a Window already exists.
 - `__construct(string $title, int $width = 640, int $height = 480, bool $hasMenubar = false)`
 - `borderless(): bool` — Returns whether or not the window is borderless.
 - `centered(?int $screenWidth = null, ?int $screenHeight = null): static` — Centre the window on the primary display.
 - `contentSize(CData $width, CData $height): static` — Gets the window content size.
+- `dialogs(): Dialogs` — A Dialogs facade bound to this window as the parent.
 - `focused(): int` — Returns whether or not the window is focused.
 - `fullscreen(): bool` — Returns whether or not the window is full screen.
 - `margined(): bool` — Returns whether or not the window has a margin.
@@ -106,6 +109,19 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `title(): string` — Returns the window title.
 
 ## Widgets
+
+### `ArrayTableModelDelegate`
+
+`Libui\ArrayTableModelDelegate` — extends `TableModelDelegate`
+
+A ready-made {@see TableModelDelegate} over an in-memory, row-major array.
+
+- `__construct(array $rows, array $headers, array $types = [])`
+- `cellValue(int $row, int $column): Color|Image|string|int|bool|null`
+- `columnType(int $column): TableValueType`
+- `headers(): array`
+- `numColumns(): int`
+- `numRows(): int`
 
 ### `Button`
 
@@ -200,6 +216,20 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `setTime(CData $time): static` — Sets date and time of the data time picker.
 - `time(CData $time): static` — Returns date and time stored in the data time picker.
 
+### `Dialogs`
+
+`Libui\Dialogs`
+
+Dialog helpers bound to a parent Window, so call sites don't repeat $parent.
+
+- `static for(Window $parent): Dialogs`
+- `__construct(Window $parent)`
+- `error(string $title, string $description): void`
+- `msgBox(string $title, string $description): void`
+- `openFile(): ?string`
+- `openFolder(): ?string`
+- `saveFile(): ?string`
+
 ### `EditableCombobox`
 
 `Libui\EditableCombobox`
@@ -231,6 +261,14 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `setText(string $text): static` — Sets the entry's text.
 - `text(): string` — Returns the entry's text.
 
+### `MenuOrderException`
+
+`Libui\Exception\MenuOrderException` — extends `LogicException`
+
+Thrown when a Menu is created after a Window already exists.
+
+_No public methods._
+
 ### `FontButton`
 
 `Libui\FontButton`
@@ -255,6 +293,16 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `setText(string $text): static` — Sets the label text.
 - `text(): string` — Returns the label text.
 
+### `Lifecycle`
+
+`Libui\Lifecycle`
+
+Process-wide registry of native resources that must be released before uiUninit(). Today: uiTableModels — libui's leak checker aborts in uiUninit() if a model is left unfreed, so {@see Ffi::uninit()} drains this registry first.
+
+- `static freeAll(): void` — Free every still-live registered model exactly once.
+- `static registerModel(TableModel $model): void`
+- `static unregisterModel(TableModel $model): void`
+
 ### `Menu`
 
 `Libui\Menu`
@@ -263,12 +311,12 @@ Menu widget. Hand-editable — add convenience methods here. Inherits the genera
 
 _Plus the common widget verbs from [`Control`](#control)._
 
-- `__construct(string $name)` — Creates a new menu.
-- `appendAboutItem(): MenuItem` — Appends a new `About` menu item.
-- `appendCheckItem(string $name): MenuItem` — Appends a generic menu item with a checkbox.
-- `appendItem(string $name): MenuItem` — Appends a generic menu item.
-- `appendPreferencesItem(): MenuItem` — Appends a new `Preferences` menu item.
-- `appendQuitItem(): MenuItem` — Appends a new `Quit` menu item.
+- `__construct(string $name)`
+- `appendAboutItem(): MenuItem` — The platform About item, as a hand-wrapped {@see MenuItem}.
+- `appendCheckItem(string $name, ?callable $onClick = null): MenuItem` — Append a check item, optionally wiring a clean fn(MenuItem $item) handler.
+- `appendItem(string $name, ?callable $onClick = null): MenuItem` — Append a clickable item, optionally wiring a clean fn(MenuItem $item) handler.
+- `appendPreferencesItem(): MenuItem` — The platform Preferences item, as a hand-wrapped {@see MenuItem}.
+- `appendQuitItem(): MenuItem` — The platform Quit item, as a hand-wrapped {@see MenuItem} so `onClick()` is available like every other append helper.
 - `appendSeparator(): static` — Appends a new separator.
 
 ### `MenuItem`
@@ -279,9 +327,11 @@ MenuItem widget. Hand-editable — add convenience methods here. Inherits the ge
 
 _Plus the common widget verbs from [`Control`](#control)._
 
+- `static fromGenerated(MenuItem $g): MenuItem` — Re-wrap a generated MenuItem handle as a hand-written Libui\MenuItem.
 - `checked(): bool` — Returns whether or not the menu item's checkbox is checked.
 - `disable(): static` — Disables the menu item.
 - `enable(): static` — Enables the menu item.
+- `onClick(callable $cb): static` — Register a click handler that receives only this typed MenuItem.
 - `onClicked(callable $cb): static` — Registers a callback for when the menu item is clicked.
 - `setChecked(bool $checked): static` — Sets whether or not the menu item's checkbox is checked.
 
@@ -461,16 +511,18 @@ A data-grid widget backed by a {@see TableModel}.
 
 _Plus the common widget verbs from [`Control`](#control)._
 
-- `static fromDelegate(TableModelDelegate $delegate): Table` — Convenience: build the model from a delegate and wrap it in a table.
-- `static fromModel(TableModel $model): Table` — Convenience: wrap an existing TableModel in a table.
-- `__construct(TableModel $model)`
-- `appendButtonColumn(string $name, int $modelColumn): static` — Append a button column titled $name that reads from model column $modelColumn.
-- `appendCheckboxColumn(string $name, int $modelColumn): static` — Append a checkbox column titled $name that reads from model column $modelColumn. The model should return bool values for this column.
+- `static fromAssoc(array $rows, ?array $columns = null): static` — Build a read-only table from a list of associative rows.
+- `static fromDelegate(TableModelDelegate $delegate, ?int $rowBackgroundModelColumn = null): Table` — Convenience: build the model from a delegate and wrap it in a table.
+- `static fromModel(TableModel $model, ?int $rowBackgroundModelColumn = null): Table` — Convenience: wrap an existing TableModel in a table.
+- `static fromRows(array $rows, array $headers = []): static` — Build a read-only table from a list of positional rows.
+- `__construct(TableModel $model, ?int $rowBackgroundModelColumn = null)`
+- `appendButtonColumn(string $name, int $modelColumn, ?int $clickableModelColumn = null): static` — Append a button column titled $name that reads from model column $modelColumn.
+- `appendCheckboxColumn(string $name, int $modelColumn, ?int $editableModelColumn = null): static` — Append a checkbox column titled $name that reads from model column $modelColumn. The model should return bool values for this column.
 - `appendCheckboxTextColumn(string $name, int $modelColumn): static` — Append a checkbox+text column titled $name that reads from model column $modelColumn. The model should return bool values for the checkbox part.
 - `appendImageColumn(string $name, int $imageModelColumn): static` — Append a read-only image column titled $name that reads from model column $imageModelColumn. The model should return Image instances or null for this column.
 - `appendImageTextColumn(string $name, int $imageModelColumn): static` — Append a read-only image+text column titled $name that reads from model column $imageModelColumn. The model should return Image instances for the image part.
 - `appendProgressBarColumn(string $name, int $modelColumn): static` — Append a progress bar column titled $name that reads from model column $modelColumn. The model should return int values (0-100) for this column.
-- `appendTextColumn(string $name, int $modelColumn, ?int $editableModelColumn = null): static` — Append a read-only text column titled $name that reads from model column $modelColumn (String or Int values are both rendered as text).
+- `appendTextColumn(string $name, int $modelColumn, ?int $editableModelColumn = null, ?int $colorModelColumn = null): static` — Append a read-only text column titled $name that reads from model column $modelColumn (String or Int values are both rendered as text).
 - `headerVisible(): bool` — Whether the column header row is shown.
 - `model(): TableModel` — The TableModel backing this table.
 - `onRowClicked(callable $cb): static` — Register a callback for when a row is clicked.
@@ -480,6 +532,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `selectionMode(): TableSelectionMode` — Get the current selection mode for the table.
 - `setColumnWidth(int $column, int $width): static` — Set a column's width in pixels.
 - `setHeaderVisible(bool $visible): static`
+- `setRowBackground(int $colorModelColumn): static` — Point the table at a Color model column for per-row background. This is NOT a live setter: uiTableParams.RowBackgroundColorModelColumn is read once by uiNewTable() and cannot change afterward. The method exists only to point you at the constructor argument, and always throws.
 - `setSelectedRows(array $rows): static` — Set the selected rows programmatically.
 - `setSelectionMode(TableSelectionMode $mode): static` — Set the selection mode for the table.
 
@@ -504,7 +557,7 @@ Bridges a {@see TableModelDelegate} to libui's uiTableModel.
 Drives a {@see TableModel} — implement this to feed a {@see Table} its data.
 
 - `cellEditable(int $row, int $column): ?bool` — Whether a cell is editable. Defaults to null (not editable). Return true for editable cells, false for read-only.
-- `cellValue(int $row, int $column): string|int` — The value to display at a cell. Return a string for String columns and an int for Int columns (it is marshalled into the matching uiTableValue).
+- `cellValue(int $row, int $column): Color|Image|string|int|bool|null` — The value to display at a cell. Return a string for String columns, an int for Int/checkbox/progress columns, a {@see Color} for Color columns, or an {@see Image} for Image columns (marshalled into the matching uiTableValue). bool is accepted for checkbox columns and cast to 0/1 via the Int branch.
 - `cellValueChanged(int $row, int $column): void` — Called after a cell value has been changed. No-op by default.
 - `columnType(int $column): TableValueType` — The value type of a column, deciding how libui renders/marshals it. Defaults to String — override only for Int (or Color) columns.
 - `numColumns(): int` — Total number of columns the model exposes.
@@ -532,11 +585,14 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 Override the methods you need to drive a custom-drawn Area. All default to no-ops so a draw-only delegate just overrides draw().
 
+- `area(): ?Area` — The Area this delegate drives, or null if not yet bound.
+- `bindArea(Area $area): void` — Bind this delegate to its Area. Called by {@see Area::__construct()}; not intended for direct use.
 - `dragBroken(): void`
 - `draw(DrawContext $ctx, AreaDrawParams $params): void`
 - `key(AreaKeyEvent $event): bool` — Return true if the key event was handled.
 - `mouse(AreaMouseEvent $event): void`
 - `mouseCrossed(bool $left): void`
+- `redraw(): void` — Queue a full repaint of the bound Area. No-op if the delegate has not been bound to an Area yet. Subclasses call $this->redraw() from event handlers instead of storing an Area and calling queueRedrawAll().
 
 ### `Brush`
 
@@ -546,7 +602,7 @@ A paint source for filling/stroking. Build one with a factory, then hand it to D
 
 - `static color(Color $color): Brush` — Build a solid brush from a {@see Color}.
 - `static linearGradient(float $x0, float $y0, float $x1, float $y1, array $stops): Brush`
-- `static radialGradient(float $cx, float $cy, float $radius, array $stops): Brush` — Radial gradient centred at ($cx, $cy) out to $radius. Stops are [pos,r,g,b,a].
+- `static radialGradient(float $cx, float $cy, float $radius, array $stops): Brush` — Radial gradient centred at ($cx, $cy) out to $radius. Stops are {@see Stop} objects or [pos,r,g,b,a] tuples (or a mix).
 - `static rgb(int $hex, float $a = 1): Brush` — Build a solid brush from a 0xRRGGBB integer.
 - `static solid(float $r, float $g, float $b, float $a = 1): Brush`
 - `toCData(): CData`
@@ -561,11 +617,15 @@ The drawing surface handed to an area's draw handler. Wraps a uiDrawContext*; on
 - `clip(Path $path): void` — Intersect the current clip region with the given path.
 - `drawString(string $text, FontDescriptor $font, Color|array $color, float $x, float $y, ?float $width = null, DrawTextAlign $align = DrawTextAlign::Left): void` — Convenience for the common case: draw a single string in one colour and font at ($x, $y) — no manual AttributedString / TextLayout dance.
 - `fill(Path $path, Brush $brush): void`
+- `fillCircle(float $cx, float $cy, float $radius, Brush|Color $paint): void`
 - `fillPath(Brush $brush, callable $build, DrawFillMode $fillMode = DrawFillMode::Winding): void` — Build a path with $build, fill it, and free it — no manual end()/free().
+- `fillRect(float $x, float $y, float $width, float $height, Brush|Color $paint): void`
 - `restore(): void` — Pop the most recently saved clip/transform state.
 - `save(): void` — Push the current clip/transform state onto libui's stack.
 - `stroke(Path $path, Brush $brush, StrokeParams $stroke): void`
+- `strokeCircle(float $cx, float $cy, float $radius, Brush|Color $paint, ?StrokeParams $stroke = null): void`
 - `strokePath(Brush $brush, StrokeParams $stroke, callable $build, DrawFillMode $fillMode = DrawFillMode::Winding): void` — Build a path with $build, stroke it, and free it.
+- `strokeRect(float $x, float $y, float $width, float $height, Brush|Color $paint, ?StrokeParams $stroke = null): void`
 - `text(TextLayout $layout, float $x, float $y): void` — Draw a laid-out text block with its top-left corner at ($x, $y).
 - `transform(Matrix $matrix): void` — Compose the given affine transform onto the current matrix.
 
@@ -628,14 +688,30 @@ A vector path, built then filled/stroked into a DrawContext.
 - `addRectangle(float $x, float $y, float $width, float $height): Path`
 - `arc(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): Path` — Add an arc to the current figure (angles in radians, clockwise; $negative sweeps the other way). This starts a new figure if one isn't active.
 - `arcTo(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): Path` — Line from the current point to the arc's start, then the arc itself.
+- `bezierThrough(float $x0, float $y0, float $c1x, float $c1y, float $c2x, float $c2y, float $endX, float $endY): Path` — A cubic Bézier that also opens the figure at ($x0,$y0). Convenience for the common "move then curve" pair.
 - `bezierTo(float $c1x, float $c1y, float $c2x, float $c2y, float $endX, float $endY): Path` — Cubic Bézier curve to (endX, endY) via the two control points.
+- `circle(float $cx, float $cy, float $radius): Path` — A full circle as a closed figure (single 0..2π arc).
 - `closeFigure(): Path`
+- `ellipse(float $cx, float $cy, float $rx, float $ry): Path` — An axis-aligned ellipse approximated with four cubic Béziers (kappa method). Paths have no transform, so a circle-plus-scale is not available here.
 - `end(): Path` — Finalise the path; required before it can be drawn.
 - `free(): void` — Free the native path. Idempotent, and runs automatically on destruction.
 - `handle(): CData`
+- `line(float $x0, float $y0, float $x1, float $y1): Path` — A standalone line segment as its own figure.
 - `lineTo(float $x, float $y): Path`
 - `newFigure(float $x, float $y): Path`
 - `newFigureWithArc(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): Path` — Start a new figure on an arc (angles in radians, clockwise; $negative sweeps the other way). Combine with closeFigure() for a filled wedge.
+- `quadTo(float $cx, float $cy, float $endX, float $endY): Path` — A quadratic Bézier from the current point to ($endX,$endY) via control ($cx,$cy), expressed as the equivalent cubic for libui's bezierTo. Requires an active figure (call newFigure/lineTo first).
+- `roundedRect(float $x, float $y, float $width, float $height, float $radius): Path` — A rectangle with rounded corners. $radius is clamped to min(width,height)/2. Corners are quarter-arcs; edges are straight (arcTo continues the figure).
+
+### `Stop`
+
+`Libui\Draw\Stop`
+
+A single gradient colour stop: a position along the gradient (0..1) and a {@see Color}. The typed replacement for hand-built [pos, r, g, b, a] tuples passed to {@see Brush::linearGradient()} / {@see Brush::radialGradient()}.
+
+- `static at(float $pos, Color $color): Stop`
+- `__construct(float $pos, Color $color)`
+- `toArray(): array` — The stop as the [pos, r, g, b, a] tuple that {@see Brush::toCData()} already consumes.
 
 ### `StrokeParams`
 
@@ -645,6 +721,11 @@ Stroke styling for DrawContext::stroke().
 
 - `static solid(float $thickness): StrokeParams`
 - `__construct(float $thickness = 1, DrawLineCap $cap = DrawLineCap::Flat, DrawLineJoin $join = DrawLineJoin::Miter, float $miterLimit = 10, array $dashes = [], float $dashPhase = 0)`
+- `cap(DrawLineCap $cap): StrokeParams`
+- `dashed(array $dashes, float $phase = 0): StrokeParams` — Set the dash on/off pattern and optional phase. Empty $dashes = solid line.
+- `join(DrawLineJoin $join): StrokeParams`
+- `miterLimit(float $limit): StrokeParams`
+- `thickness(float $thickness): StrokeParams`
 - `toCData(): CData`
 
 ## Text

@@ -97,14 +97,20 @@ see [Development](#development) to run them.
   date/time pickers, colour & font buttons, separators, menus and menu items.
 - **19 PHP enums + bit-flags** (`Align`, `TextWeight`, `DrawFillMode`, …),
   generated 1:1 from libui's C enums.
-- **Native dialogs** — message boxes and open/save/folder pickers.
+- **Native dialogs** — message boxes, open/save/folder pickers, plus a
+  parent-bound `Dialogs` facade so you don't repeat the window on every call.
+- **Safe menus** — a `Menu` builder that enforces libui's "menus before the first
+  window" rule (throws instead of silently breaking) and clean `onClick()` handlers.
 - **Typed colours** — one `Color` value type (`Color::rgb(0x312B90)`, `::hex()`,
   `::rgba()`, `::rgb255()`, named) accepted across brushes, text and colour buttons.
-- **Custom 2D drawing** — vector `Path`s, solid/gradient `Brush`es,
-  `StrokeParams`, affine `Matrix`, clipping, and a `DrawContext` to draw into.
+- **Custom 2D drawing** — vector `Path`s (with `line`/`circle`/`arc`/`roundedRect`
+  sugar), solid/gradient `Brush`es with typed `Stop`s, a fluent `StrokeParams`
+  builder, affine `Matrix`, clipping, and `DrawContext` fill/stroke shape helpers.
 - **Attributed text** — `AttributedString` with per-range colour/weight/italic/
   underline attributes, a `FontDescriptor`, and a drawable `TextLayout`.
-- **Data-grid table** — `Table` backed by a `TableModelDelegate` you implement.
+- **Data-grid table** — `Table::fromRows()` / `fromAssoc()` for static data (no
+  delegate), or a `TableModelDelegate` for dynamic data; checkbox/progress/button/
+  image columns, row-index click callbacks, and automatic model lifetime.
 - **Images** — `Image::fromPng()` (via GD) or `Image::fromRgba()` for table image
   columns and area drawing.
 - **App lifecycle** — `App` facade for multi-window apps + an `onShouldQuit()`
@@ -166,13 +172,15 @@ runtime and calls it through FFI, so there's no extension to compile.
 - **23 of 26 widget types** have typed classes. The other three are hand-written:
   `uiControl` is the base class, `uiArea` is the drawing adapter, and `uiTable`
   is the data grid.
-- Custom drawing covers paths, gradients, stroking, clipping and transforms;
+- Custom drawing covers paths (incl. `line`/`circle`/`arc`/`roundedRect`/bézier
+  sugar), solid & gradient brushes with typed `Stop`s, a fluent `StrokeParams`
+  builder, `DrawContext` shape helpers, stroking, clipping and transforms;
   attributed text has a full sugar layer.
-- `Image` has a sugar class (`fromPng`/`fromRgba`); tables, the `App`/`Loop`
-  lifecycle, and `Clipboard` all have typed helpers too.
-- Still raw-only (no sugar yet): editable / checkbox / progress / button
-  **table columns**, some table selection and row callbacks, OpenGL areas, and
-  the less-common drawing primitives (arcs/béziers).
+- `Image` has a sugar class (`fromPng`/`fromRgba`); tables (factories, typed
+  columns, row-index callbacks, automatic model lifetime), the `App`/`Loop`
+  lifecycle, menus/dialogs, and `Clipboard` all have typed helpers too.
+- Still raw-only (no sugar yet): OpenGL areas, and a synchronous yes/no `confirm()`
+  dialog (libui has no native modal — use `Ui::msgBox` or a custom window).
 
 See the **[user guide](docs/GUIDE.md)** for a task-by-task walkthrough and the
 gotchas (FFI lifetime, callback retention, string ownership, table teardown).
