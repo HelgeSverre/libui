@@ -123,8 +123,16 @@ jobs:
       - name: Install Meson and Ninja
         run: pip install meson ninja
 
+      # libui-ng only builds a shared DLL with MSVC (MinGW is static-only).
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Build libui
-        run: bash build-libui.sh
+        shell: bash
+        run: |
+          # Git Bash's GNU /usr/bin/link.exe shadows MSVC's linker on PATH.
+          rm -f /usr/bin/link /usr/bin/link.exe || true
+          bash build-libui.sh
 
       - name: Verify artifact
         run: |

@@ -35,8 +35,19 @@ jobs:
         if: runner.os == 'Windows'
         run: pip install meson ninja
 
+      # libui-ng only builds a shared DLL with MSVC (MinGW is static-only).
+      - name: Set up MSVC (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Build libui
-        run: bash build-libui.sh
+        shell: bash
+        run: |
+          # Git Bash's GNU /usr/bin/link.exe shadows MSVC's linker on PATH.
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            rm -f /usr/bin/link /usr/bin/link.exe || true
+          fi
+          bash build-libui.sh
 
       - uses: actions/upload-artifact@v4
         with:
