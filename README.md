@@ -23,8 +23,8 @@ composer require helgesverre/libui
 
 Requires **PHP 8.5+** with the **FFI** extension (enabled by default on the CLI).
 On macOS a prebuilt universal `libui` ships inside the package — there's nothing
-else to install. Linux and Windows need a `libui` shared library for your
-platform; see [Platform support](#platform-support).
+else to install. Windows ships a prebuilt `libui.dll` too. Linux needs a `libui`
+shared library for your platform (GTK 3); see [Platform support](#platform-support).
 
 ## Quick start
 
@@ -155,7 +155,7 @@ The loader resolves the right binary for the current OS + architecture from
 |---|---|---|
 | **macOS** (arm64 + x86_64) | Prebuilt, ships in the package | Universal `lib/darwin/libui.dylib`; works out of the box. |
 | **Linux** (x86_64 / aarch64) | Build it (prebuilt coming soon) | Needs **GTK 3** at runtime; build `libui.so` (see [Development](#development)) and point `$LIBUI_LIB` at it, or set `$LIBUI_LIB` to a system-installed `libui.so`. |
-| **Windows** (x86_64) | Build it (prebuilt coming soon) | Build `libui.dll` and point `$LIBUI_LIB` at it, or use a prebuilt DLL. |
+| **Windows** (x86_64) | Prebuilt, ships in the package | `lib/windows-x86_64/libui.dll` (built with MSVC); works out of the box. |
 
 ## Why not the `ext-ui` from php.net?
 
