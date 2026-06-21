@@ -2,7 +2,7 @@
 
 A task-by-task guide to building native desktop apps with `helgesverre/libui`. It
 assumes you've installed the package (`composer require helgesverre/libui`) and
-have PHP 8.3+ with FFI. For *why* the library is built the way it is, read
+have PHP 8.5+ with FFI. For *why* the library is built the way it is, read
 [ARCHITECTURE.md](ARCHITECTURE.md); for the API reference, generate the API docs
 (`composer docs:api`) or read the docblocks in your IDE.
 

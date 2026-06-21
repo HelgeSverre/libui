@@ -7,7 +7,7 @@
 
 [![CI](https://github.com/HelgeSverre/libui/actions/workflows/ci.yml/badge.svg)](https://github.com/HelgeSverre/libui/actions/workflows/ci.yml)
 [![Packagist Version](https://img.shields.io/packagist/v/helgesverre/libui)](https://packagist.org/packages/helgesverre/libui)
-![PHP](https://img.shields.io/badge/php-8.3%2B-777bb3)
+![PHP](https://img.shields.io/badge/php-8.5%2B-777bb3)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <p align="center">
@@ -21,7 +21,7 @@
 composer require helgesverre/libui
 ```
 
-Requires **PHP 8.3+** with the **FFI** extension (enabled by default on the CLI).
+Requires **PHP 8.5+** with the **FFI** extension (enabled by default on the CLI).
 On macOS a prebuilt universal `libui` ships inside the package — there's nothing
 else to install. Linux and Windows need a `libui` shared library for your
 platform; see [Platform support](#platform-support).

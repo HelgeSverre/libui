@@ -1,7 +1,6 @@
 {
   "name": "helgesverre/libui",
-  "description": "Native desktop GUI for PHP 8.3+ via libui-ng and FFI.",
-  "version": "0.1.0",
+  "description": "Native desktop GUI for PHP 8.5+ via libui-ng and FFI.",
   "type": "library",
   "license": "MIT",
   "keywords": [

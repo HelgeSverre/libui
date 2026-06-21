@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ['8.3', '8.4', '8.5']
+        php: ['8.5']
     steps:
       - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
@@ -37,7 +37,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        php: ['8.3', '8.4', '8.5']
+        php: ['8.5']
     steps:
       - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
@@ -63,17 +63,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-latest,     label: darwin-arm64,      php: '8.3' }
-          - { os: macos-latest,     label: darwin-arm64,      php: '8.4' }
           - { os: macos-latest,     label: darwin-arm64,      php: '8.5' }
-          - { os: ubuntu-latest,    label: linux-x86_64,     php: '8.3' }
-          - { os: ubuntu-latest,    label: linux-x86_64,     php: '8.4' }
           - { os: ubuntu-latest,    label: linux-x86_64,     php: '8.5' }
-          - { os: ubuntu-24.04-arm, label: linux-aarch64,     php: '8.3' }
-          - { os: ubuntu-24.04-arm, label: linux-aarch64,     php: '8.4' }
           - { os: ubuntu-24.04-arm, label: linux-aarch64,     php: '8.5' }
-          - { os: windows-latest,   label: windows-x86_64,   php: '8.3', experimental: true }
-          - { os: windows-latest,   label: windows-x86_64,   php: '8.4', experimental: true }
           - { os: windows-latest,   label: windows-x86_64,   php: '8.5', experimental: true }
     steps:
       - uses: actions/checkout@v5

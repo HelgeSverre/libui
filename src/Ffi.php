@@ -128,7 +128,7 @@ final class Ffi
             $lib = self::libPath();
 
             if (! \extension_loaded('FFI')) {
-                throw new \RuntimeException('The FFI extension is required (it ships enabled on PHP 8.5 CLI).');
+                throw new \RuntimeException('The FFI extension is required (it ships enabled on the PHP CLI).');
             }
             if (! is_file($header)) {
                 throw new \RuntimeException("Generated header missing at {$header} (run: composer regen).");

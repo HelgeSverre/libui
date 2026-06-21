@@ -19,7 +19,7 @@ install ui` fails at `configure`. There is no maintained native-GUI extension fo
 modern PHP.
 
 The opportunity: the actively-maintained fork [`libui-ng`](https://github.com/libui-ng/libui-ng)
-still ships a clean C library, and PHP 8.3+ has a capable built-in **FFI**
+still ships a clean C library, and PHP 8.5+ has a capable built-in **FFI**
 extension. So instead of compiling a PHP extension, we load `libui-ng`'s shared
 library at runtime and call it directly from PHP. No C toolchain on the user's
 machine, no PECL, no Zend API — just a `.dylib`/`.so`/`.dll` and a header.
