@@ -139,6 +139,11 @@ final class Attribute
         return new self(AttributeType::Italic, 0, 0, $italic);
     }
 
+    public static function stretch(TextStretch $stretch): self
+    {
+        return new self(AttributeType::Stretch, 0, 0, $stretch);
+    }
+
     public static function color(float $r, float $g, float $b, float $a = 1.0): self
     {
         return new self(AttributeType::Color, 0, 0, $r, $g, $b, $a);

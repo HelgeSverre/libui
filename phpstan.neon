@@ -3,6 +3,14 @@ includes:
 
 parameters:
     level: 6
+    typeAliases:
+        DocData: 'array{summary: string, params: array<string, string>, return: string, notes: list<string>, warnings: list<string>}'
+        ParsedParam: 'array{raw: string, isCallback: bool, type: string, name: string}'
+        ParsedFunction: 'array{name: string, ret: string, params: list<ParsedParam>}'
+        Classification: 'array{kind: string, name?: string, scalarOut?: bool}'
+        ConstructorConfig: 'array{primary?: string|null, factories?: array<string, string>}'
+        GeneratorAnnotations: 'array{skip_types: list<string>, constructors: array<string, ConstructorConfig>, bool_funcs: list<string>, flag_enums: list<string>, facade_funcs: list<string>, deviating_callbacks: array<string, string>}'
+        GeneratorContext: 'array{enums: array<string, array<string, int>>, types: list<string>, generatedTypes: list<string>, functions: array<string, ParsedFunction>, annotations: GeneratorAnnotations, docs: array<string, DocData>}'
     paths:
         - src
         - tools

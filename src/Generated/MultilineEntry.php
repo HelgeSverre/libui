@@ -37,6 +37,8 @@ class MultilineEntry extends Control
     /**
      * Returns the multi line entry's text.
      *
+     * @return string The containing text.
+     *
      * @see uiMultilineEntryText
      */
     public function text(): string
@@ -46,6 +48,8 @@ class MultilineEntry extends Control
 
     /**
      * Sets the multi line entry's text.
+     *
+     * @param string $text Single/multi line text.
      *
      * @see uiMultilineEntrySetText
      */
@@ -58,6 +62,8 @@ class MultilineEntry extends Control
     /**
      * Appends text to the multi line entry's text.
      *
+     * @param string $text Text to append.
+     *
      * @see uiMultilineEntryAppend
      */
     public function append(string $text): static
@@ -69,6 +75,10 @@ class MultilineEntry extends Control
     /**
      * Registers a callback for when the user changes the multi line entry's text.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiMultilineEntrySetText()
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiMultilineEntryOnChanged
      */
     public function onChanged(callable $cb): static
@@ -76,8 +86,8 @@ class MultilineEntry extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiMultilineEntryOnChanged($this->handle, $fn, null);
@@ -86,6 +96,8 @@ class MultilineEntry extends Control
 
     /**
      * Returns whether or not the multi line entry's text can be changed.
+     *
+     * @return bool `TRUE` if read only, `FALSE` otherwise. [Default: `FALSE`]
      *
      * @see uiMultilineEntryReadOnly
      */
@@ -96,6 +108,8 @@ class MultilineEntry extends Control
 
     /**
      * Sets whether or not the multi line entry's text is read only.
+     *
+     * @param bool $readonly `TRUE` to make read only, `FALSE` otherwise.
      *
      * @see uiMultilineEntrySetReadOnly
      */

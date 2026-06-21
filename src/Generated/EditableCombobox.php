@@ -27,6 +27,8 @@ class EditableCombobox extends Control
     /**
      * Appends an item to the editable combo box.
      *
+     * @param string $text Item text.
+     *
      * @see uiEditableComboboxAppend
      */
     public function append(string $text): static
@@ -38,6 +40,8 @@ class EditableCombobox extends Control
     /**
      * Returns the text of the editable combo box.
      *
+     * @return string The editable combo box text.
+     *
      * @see uiEditableComboboxText
      */
     public function text(): string
@@ -47,6 +51,8 @@ class EditableCombobox extends Control
 
     /**
      * Sets the editable combo box text.
+     *
+     * @param string $text Text field text.
      *
      * @see uiEditableComboboxSetText
      */
@@ -59,6 +65,10 @@ class EditableCombobox extends Control
     /**
      * Registers a callback for when an editable combo box item is selected or user text changed.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiEditableComboboxSetText().
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiEditableComboboxOnChanged
      */
     public function onChanged(callable $cb): static
@@ -66,8 +76,8 @@ class EditableCombobox extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiEditableComboboxOnChanged($this->handle, $fn, null);

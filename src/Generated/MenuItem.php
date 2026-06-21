@@ -39,6 +39,9 @@ class MenuItem extends Control
     /**
      * Registers a callback for when the menu item is clicked.
      *
+     * @param callable(static, \FFI\CData): void $cb Receives this menu item and the source uiWindow handle.
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiMenuItemOnClicked
      */
     public function onClicked(callable $cb): static
@@ -46,8 +49,8 @@ class MenuItem extends Control
         $fn = static::keep(function ($sender, $window, $data) use ($cb) {
             try {
                 $cb($this, $window);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onClicked] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onClicked] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiMenuItemOnClicked($this->handle, $fn, null);
@@ -56,6 +59,8 @@ class MenuItem extends Control
 
     /**
      * Returns whether or not the menu item's checkbox is checked.
+     *
+     * @return bool `TRUE` if checked, `FALSE` otherwise. [Default: `FALSE`]
      *
      * @see uiMenuItemChecked
      */
@@ -66,6 +71,8 @@ class MenuItem extends Control
 
     /**
      * Sets whether or not the menu item's checkbox is checked.
+     *
+     * @param bool $checked `TRUE` to check menu item checkbox, `FALSE` otherwise.
      *
      * @see uiMenuItemSetChecked
      */

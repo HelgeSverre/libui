@@ -27,6 +27,16 @@ class Grid extends Control
     /**
      * Appends a control to the grid.
      *
+     * @param \Libui\Control $c The control to insert.
+     * @param int $left Placement as number of columns from the left. Integer in range of `[INT_MIN, INT_MAX]`.
+     * @param int $top Placement as number of rows from the top. Integer in range of `[INT_MIN, INT_MAX]`.
+     * @param int $xspan Number of columns to span. Integer in range of `[0, INT_MAX]`.
+     * @param int $yspan Number of rows to span. Integer in range of `[0, INT_MAX]`.
+     * @param int $hexpand `TRUE` to expand reserved area horizontally, `FALSE` otherwise.
+     * @param \Libui\Generated\Enum\Align $halign Horizontal alignment of the control within the reserved space.
+     * @param int $vexpand `TRUE` to expand reserved area vertically, `FALSE` otherwise.
+     * @param \Libui\Generated\Enum\Align $valign Vertical alignment of the control within the reserved space.
+     *
      * @see uiGridAppend
      */
     public function append(\Libui\Control $c, int $left, int $top, int $xspan, int $yspan, int $hexpand, \Libui\Generated\Enum\Align $halign, int $vexpand, \Libui\Generated\Enum\Align $valign): static
@@ -37,6 +47,16 @@ class Grid extends Control
 
     /**
      * Inserts a control positioned in relation to another control within the grid.
+     *
+     * @param \Libui\Control $c The control to insert.
+     * @param \Libui\Control $existing The existing control to position relatively to.
+     * @param \Libui\Generated\Enum\At $at Placement specifier in relation to $existing control.
+     * @param int $xspan Number of columns to span. Integer in range of `[0, INT_MAX]`.
+     * @param int $yspan Number of rows to span. Integer in range of `[0, INT_MAX]`.
+     * @param int $hexpand `TRUE` to expand reserved area horizontally, `FALSE` otherwise.
+     * @param \Libui\Generated\Enum\Align $halign Horizontal alignment of the control within the reserved space.
+     * @param int $vexpand `TRUE` to expand reserved area vertically, `FALSE` otherwise.
+     * @param \Libui\Generated\Enum\Align $valign Vertical alignment of the control within the reserved space.
      *
      * @see uiGridInsertAt
      */
@@ -49,6 +69,8 @@ class Grid extends Control
     /**
      * Returns whether or not controls within the grid are padded.
      *
+     * @return bool `TRUE` if controls are padded, `FALSE` otherwise.
+     *
      * @see uiGridPadded
      */
     public function padded(): bool
@@ -58,6 +80,8 @@ class Grid extends Control
 
     /**
      * Sets whether or not controls within the grid are padded.
+     *
+     * @param bool $padded `TRUE` to make controls padded, `FALSE` otherwise.
      *
      * @see uiGridSetPadded
      */

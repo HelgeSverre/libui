@@ -27,6 +27,10 @@ class Form extends Control
     /**
      * Appends a control with a label to the form.
      *
+     * @param string $label Label text.
+     * @param \Libui\Control $c Control to append.
+     * @param int $stretchy `TRUE` to stretch control, `FALSE` otherwise.
+     *
      * @see uiFormAppend
      */
     public function append(string $label, \Libui\Control $c, int $stretchy): static
@@ -46,7 +50,10 @@ class Form extends Control
     }
 
     /**
-     * Removes the control at @p index from the form.
+     * Removes the control at $index from the form.
+     *
+     * @param int $index Index of the control to be removed.
+     * @note The control is neither destroyed nor freed.
      *
      * @see uiFormDelete
      */
@@ -59,6 +66,8 @@ class Form extends Control
     /**
      * Returns whether or not controls within the form are padded.
      *
+     * @return bool `TRUE` if controls are padded, `FALSE` otherwise.
+     *
      * @see uiFormPadded
      */
     public function padded(): bool
@@ -68,6 +77,8 @@ class Form extends Control
 
     /**
      * Sets whether or not controls within the box are padded.
+     *
+     * @param bool $padded `TRUE` to make controls padded, `FALSE` otherwise.
      *
      * @see uiFormSetPadded
      */

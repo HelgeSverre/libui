@@ -27,6 +27,8 @@ class RadioButtons extends Control
     /**
      * Appends a radio button.
      *
+     * @param string $text Radio button text.
+     *
      * @see uiRadioButtonsAppend
      */
     public function append(string $text): static
@@ -38,6 +40,8 @@ class RadioButtons extends Control
     /**
      * Returns the index of the item selected.
      *
+     * @return int Index of the item selected, `-1` on empty selection.
+     *
      * @see uiRadioButtonsSelected
      */
     public function selected(): int
@@ -47,6 +51,8 @@ class RadioButtons extends Control
 
     /**
      * Sets the item selected.
+     *
+     * @param int $index Index of the item to be selected, `-1` to clear selection.
      *
      * @see uiRadioButtonsSetSelected
      */
@@ -59,6 +65,10 @@ class RadioButtons extends Control
     /**
      * Registers a callback for when radio button is selected.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiRadioButtonsSetSelected().
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiRadioButtonsOnSelected
      */
     public function onSelected(callable $cb): static
@@ -66,8 +76,8 @@ class RadioButtons extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onSelected] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onSelected] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiRadioButtonsOnSelected($this->handle, $fn, null);

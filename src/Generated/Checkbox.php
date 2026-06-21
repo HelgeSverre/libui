@@ -17,6 +17,8 @@ class Checkbox extends Control
     /**
      * Creates a new checkbox.
      *
+     * @param string $text Label text.
+     *
      * @see uiNewCheckbox
      */
     public function __construct(string $text)
@@ -27,6 +29,8 @@ class Checkbox extends Control
     /**
      * Returns the checkbox label text.
      *
+     * @return string The text of the label.
+     *
      * @see uiCheckboxText
      */
     public function text(): string
@@ -36,6 +40,8 @@ class Checkbox extends Control
 
     /**
      * Sets the checkbox label text.
+     *
+     * @param string $text Label text.
      *
      * @see uiCheckboxSetText
      */
@@ -48,6 +54,10 @@ class Checkbox extends Control
     /**
      * Registers a callback for when the checkbox is toggled by the user.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiCheckboxSetChecked().
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiCheckboxOnToggled
      */
     public function onToggled(callable $cb): static
@@ -55,8 +65,8 @@ class Checkbox extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onToggled] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onToggled] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiCheckboxOnToggled($this->handle, $fn, null);
@@ -65,6 +75,8 @@ class Checkbox extends Control
 
     /**
      * Returns whether or the checkbox is checked.
+     *
+     * @return bool `TRUE` if checked, `FALSE` otherwise. [Default: `FALSE`]
      *
      * @see uiCheckboxChecked
      */
@@ -75,6 +87,8 @@ class Checkbox extends Control
 
     /**
      * Sets whether or not the checkbox is checked.
+     *
+     * @param bool $checked `TRUE` to check box, `FALSE` otherwise.
      *
      * @see uiCheckboxSetChecked
      */

@@ -70,7 +70,7 @@ count = 1
 file = "examples/markdown.php"
 code = "literal-named-argument"
 message = "Literal argument `14.5` should be passed as a named argument for clarity."
-count = 3
+count = 6
 
 [[issues]]
 file = "examples/markdown.php"
@@ -308,21 +308,15 @@ count = 1
 
 [[issues]]
 file = "tools/generate.php"
-code = "block-statement"
-message = "`else if` statement should use a block body."
+code = "function-name"
+message = "Function name `buildConstructorMaps` should be in snake case."
 count = 1
 
 [[issues]]
 file = "tools/generate.php"
-code = "block-statement"
-message = "`foreach` statement should use a block body."
-count = 2
-
-[[issues]]
-file = "tools/generate.php"
-code = "block-statement"
-message = "`if` statement should use a block body."
-count = 44
+code = "function-name"
+message = "Function name `callbackDocTags` should be in snake case."
+count = 1
 
 [[issues]]
 file = "tools/generate.php"
@@ -339,6 +333,42 @@ count = 1
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
+message = "Function name `docFromBlock` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `docFromLineComments` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `docHasSignal` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `dropNoiseLines` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitAllEnums` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitAllWidgets` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
 message = "Function name `emitEnum` should be in snake case."
 count = 1
 
@@ -346,6 +376,24 @@ count = 1
 file = "tools/generate.php"
 code = "function-name"
 message = "Function name `emitFacade` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitFfiContracts` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitFfiFunctionsInterface` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `emitFfiStub` should be in snake case."
 count = 1
 
 [[issues]]
@@ -369,7 +417,13 @@ count = 1
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
-message = "Function name `enumClass` should be in snake case."
+message = "Function name `emptyDoc` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `enumClassName` should be in snake case."
 count = 1
 
 [[issues]]
@@ -381,13 +435,37 @@ count = 1
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
-message = "Function name `evalEnumExpr` should be in snake case."
+message = "Function name `evaluateEnumExpression` should be in snake case."
 count = 1
 
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
-message = "Function name `extractSummary` should be in snake case."
+message = "Function name `eventHandlerBody` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `extractDoc` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `ffiMethodLines` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `ffiTypeForParam` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `ffiTypeForReturn` should be in snake case."
 count = 1
 
 [[issues]]
@@ -417,6 +495,24 @@ count = 1
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
+message = "Function name `methodParamDoc` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `methodReturnDoc` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `noteDocTags` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
 message = "Function name `parseEnums` should be in snake case."
 count = 1
 
@@ -429,25 +525,67 @@ count = 1
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
-message = "Function name `parseParams` should be in snake case."
+message = "Function name `parseParameters` should be in snake case."
 count = 1
 
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
-message = "Function name `phpParamType` should be in snake case."
+message = "Function name `partitionFunctions` should be in snake case."
 count = 1
 
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
-message = "Function name `phpReturnType` should be in snake case."
+message = "Function name `phpDocType` should be in snake case."
 count = 1
 
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
-message = "Function name `returnStmt` should be in snake case."
+message = "Function name `phpTypeForParam` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `phpTypeForReturn` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `prependGenerationNotice` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `printReport` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `readInput` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `removeDirectory` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `returnStatement` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "function-name"
+message = "Function name `sanitizeDocText` should be in snake case."
 count = 1
 
 [[issues]]
@@ -459,19 +597,13 @@ count = 1
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
-message = "Function name `shortName` should be in snake case."
+message = "Function name `shouldDropLine` should be in snake case."
 count = 1
 
 [[issues]]
 file = "tools/generate.php"
 code = "function-name"
-message = "Function name `summaryFromBlock` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `summaryFromLineComments` should be in snake case."
+message = "Function name `stripUiPrefix` should be in snake case."
 count = 1
 
 [[issues]]
@@ -484,6 +616,12 @@ count = 1
 file = "tools/generate.php"
 code = "function-name"
 message = "Function name `writeFile` should be in snake case."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
+message = 'Literal argument `" \t\n\r\0\x0B\\"` should be passed as a named argument for clarity.'
 count = 1
 
 [[issues]]
@@ -519,8 +657,14 @@ count = 2
 [[issues]]
 file = "tools/generate.php"
 code = "literal-named-argument"
+message = "Literal argument `'$1'` should be passed as a named argument for clarity."
+count = 1
+
+[[issues]]
+file = "tools/generate.php"
+code = "literal-named-argument"
 message = "Literal argument `''` should be passed as a named argument for clarity."
-count = 8
+count = 7
 
 [[issues]]
 file = "tools/generate.php"
@@ -586,7 +730,7 @@ count = 1
 file = "tools/generate.php"
 code = "literal-named-argument"
 message = "Literal argument `true` should be passed as a named argument for clarity."
-count = 10
+count = 11
 
 [[issues]]
 file = "tools/generate.php"
@@ -596,42 +740,18 @@ count = 8
 
 [[issues]]
 file = "tools/generate.php"
-code = "no-multi-assignments"
-message = "Avoid multiple assignments in a single statement."
-count = 2
-
-[[issues]]
-file = "tools/generate.php"
 code = "no-shorthand-ternary"
 message = "Use of the shorthand ternary operator."
 count = 5
 
 [[issues]]
 file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitFfiFunctionsInterface` should be in snake case."
+code = "prefer-early-continue"
+message = "Consider using early continue pattern to reduce nesting."
 count = 1
 
 [[issues]]
 file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitFfiStub` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `ffiMethodLines` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `ffiParamType` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `ffiReturnType` should be in snake case."
-count = 1
+code = "semantics"
+message = "The pipe operator (`|>`) is not available in your configured PHP version (8.4.0)."
+count = 13

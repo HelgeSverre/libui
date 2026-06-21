@@ -21,6 +21,28 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('smoke')]
 final class GeneratorRegressionTest extends LibuiTestCase
 {
+    public function testGeneratedPhpSourcesAreSyntaxValid(): void
+    {
+        $directory = new \RecursiveDirectoryIterator(Ffi::root() . '/src/Generated');
+        $iterator = new \RecursiveIteratorIterator($directory);
+        $failures = [];
+
+        foreach ($iterator as $file) {
+            if (! $file->isFile() || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $command = escapeshellarg(PHP_BINARY) . ' -l ' . escapeshellarg($file->getPathname()) . ' 2>&1';
+            $output = [];
+            exec($command, $output, $status);
+            if ($status !== 0) {
+                $failures[] = $file->getPathname() . "\n" . implode("\n", $output);
+            }
+        }
+
+        $this->assertSame([], $failures);
+    }
+
     public function testWindowContentSizeOutPointerRoundTrip(): void
     {
         $window = new Window('Regression', 320, 240, false);

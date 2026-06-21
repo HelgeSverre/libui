@@ -27,6 +27,11 @@ class ColorButton extends Control
     /**
      * Returns the color button color.
      *
+     * @param \FFI\CData $r Output pointer written by libui.
+     * @param \FFI\CData $g Output pointer written by libui.
+     * @param \FFI\CData $bl Output pointer written by libui.
+     * @param \FFI\CData $a Output pointer written by libui.
+     *
      * @see uiColorButtonColor
      */
     public function color(\FFI\CData $r, \FFI\CData $g, \FFI\CData $bl, \FFI\CData $a): static
@@ -37,6 +42,11 @@ class ColorButton extends Control
 
     /**
      * Sets the color button color.
+     *
+     * @param float $r Red. Double in range of [0, 1.0].
+     * @param float $g Green. Double in range of [0, 1.0].
+     * @param float $bl Blue. Double in range of [0, 1.0].
+     * @param float $a Alpha. Double in range of [0, 1.0].
      *
      * @see uiColorButtonSetColor
      */
@@ -49,6 +59,10 @@ class ColorButton extends Control
     /**
      * Registers a callback for when the color is changed.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiColorButtonSetColor().
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiColorButtonOnChanged
      */
     public function onChanged(callable $cb): static
@@ -56,8 +70,8 @@ class ColorButton extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiColorButtonOnChanged($this->handle, $fn, null);

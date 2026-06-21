@@ -27,6 +27,8 @@ class FontButton extends Control
     /**
      * Returns the selected font.
      *
+     * @note Make sure to call `uiFreeFontButtonFont()` to free all allocated
+     *
      * @see uiFontButtonFont
      */
     public function font(\FFI\CData $desc): static
@@ -38,6 +40,9 @@ class FontButton extends Control
     /**
      * Registers a callback for when the font is changed.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiFontButtonOnChanged
      */
     public function onChanged(callable $cb): static
@@ -45,8 +50,8 @@ class FontButton extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiFontButtonOnChanged($this->handle, $fn, null);

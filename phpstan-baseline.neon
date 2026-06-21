@@ -871,6 +871,12 @@ parameters:
 			path: tests/TextTest.php
 
 		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertContainsOnlyInstancesOf\(\) with ''Libui\\\\Text\\\\Attribute'' and list\<Libui\\Text\\Attribute\> will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/TextTest.php
+
+		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsArray\(\) with array\{float, float\} will always evaluate to true\.$#'
 			identifier: method.alreadyNarrowedType
 			count: 1
@@ -879,7 +885,7 @@ parameters:
 		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsFloat\(\) with float will always evaluate to true\.$#'
 			identifier: method.alreadyNarrowedType
-			count: 4
+			count: 7
 			path: tests/TextTest.php
 
 		-
@@ -929,189 +935,3 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: tests/table_lifecycle.php
-
-		-
-			message: '#^Function classify\(\) has parameter \$enums with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function classify\(\) has parameter \$types with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function classify\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function docBlock\(\) has parameter \$docs with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitEnum\(\) has parameter \$docs with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitEnum\(\) has parameter \$members with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitFacade\(\) has parameter \$ctx with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitFacade\(\) has parameter \$fns with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitFlags\(\) has parameter \$members with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitMethod\(\) has parameter \$ctx with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitMethod\(\) has parameter \$fn with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitWidget\(\) has parameter \$ctor with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitWidget\(\) has parameter \$ctx with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function emitWidget\(\) has parameter \$members with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function enumDocBlock\(\) has parameter \$docs with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function evalEnumExpr\(\) has parameter \$prior with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function extractSummary\(\) has parameter \$lines with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function harvestDocs\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function longestCommonPrefix\(\) has parameter \$strings with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function marshalArg\(\) has parameter \$c with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function parseEnums\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function parseFunctions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function parseParams\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function phpParamType\(\) has parameter \$c with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function phpReturnType\(\) has parameter \$c with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function phpReturnType\(\) has parameter \$generatedTypes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function returnStmt\(\) has parameter \$c with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function returnStmt\(\) has parameter \$generatedTypes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function summaryFromBlock\(\) has parameter \$blockLines with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function summaryFromLineComments\(\) has parameter \$commentLines with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php
-
-		-
-			message: '#^Function typeList\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tools/generate.php

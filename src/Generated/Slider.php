@@ -17,6 +17,9 @@ class Slider extends Control
     /**
      * Creates a new slider.
      *
+     * @param int $min Minimum value.
+     * @param int $max Maximum value.
+     *
      * @see uiNewSlider
      */
     public function __construct(int $min, int $max)
@@ -27,6 +30,8 @@ class Slider extends Control
     /**
      * Returns the slider value.
      *
+     * @return int Slider value.
+     *
      * @see uiSliderValue
      */
     public function value(): int
@@ -36,6 +41,8 @@ class Slider extends Control
 
     /**
      * Sets the slider value.
+     *
+     * @param int $value Value to set.
      *
      * @see uiSliderSetValue
      */
@@ -48,6 +55,8 @@ class Slider extends Control
     /**
      * Returns whether or not the slider has a tool tip.
      *
+     * @return bool `TRUE` if a tool tip is present, `FALSE` otherwise. [Default `TRUE`]
+     *
      * @see uiSliderHasToolTip
      */
     public function hasToolTip(): bool
@@ -57,6 +66,8 @@ class Slider extends Control
 
     /**
      * Sets whether or not the slider has a tool tip.
+     *
+     * @param bool $hasToolTip `TRUE` to display a tool tip, `FALSE` to display no tool tip.
      *
      * @see uiSliderSetHasToolTip
      */
@@ -69,6 +80,10 @@ class Slider extends Control
     /**
      * Registers a callback for when the slider value is changed by the user.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiSliderSetValue().
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiSliderOnChanged
      */
     public function onChanged(callable $cb): static
@@ -76,8 +91,8 @@ class Slider extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiSliderOnChanged($this->handle, $fn, null);
@@ -87,6 +102,9 @@ class Slider extends Control
     /**
      * Registers a callback for when the slider is released from dragging.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiSliderOnReleased
      */
     public function onReleased(callable $cb): static
@@ -94,8 +112,8 @@ class Slider extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onReleased] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onReleased] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiSliderOnReleased($this->handle, $fn, null);
@@ -104,6 +122,9 @@ class Slider extends Control
 
     /**
      * Sets the slider range.
+     *
+     * @param int $min Minimum value.
+     * @param int $max Maximum value.
      *
      * @see uiSliderSetRange
      */

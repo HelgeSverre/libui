@@ -17,6 +17,8 @@ class Button extends Control
     /**
      * Creates a new button.
      *
+     * @param string $text Label text.
+     *
      * @see uiNewButton
      */
     public function __construct(string $text)
@@ -27,6 +29,8 @@ class Button extends Control
     /**
      * Returns the button label text.
      *
+     * @return string The text of the label.
+     *
      * @see uiButtonText
      */
     public function text(): string
@@ -36,6 +40,8 @@ class Button extends Control
 
     /**
      * Sets the button label text.
+     *
+     * @param string $text Label text.
      *
      * @see uiButtonSetText
      */
@@ -48,6 +54,9 @@ class Button extends Control
     /**
      * Registers a callback for when the button is clicked.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiButtonOnClicked
      */
     public function onClicked(callable $cb): static
@@ -55,8 +64,8 @@ class Button extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onClicked] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onClicked] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiButtonOnClicked($this->handle, $fn, null);

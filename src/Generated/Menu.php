@@ -17,6 +17,8 @@ class Menu extends Control
     /**
      * Creates a new menu.
      *
+     * @param string $name Menu label.
+     *
      * @see uiNewMenu
      */
     public function __construct(string $name)
@@ -26,6 +28,8 @@ class Menu extends Control
 
     /**
      * Appends a generic menu item.
+     *
+     * @param string $name Menu item text.
      *
      * @see uiMenuAppendItem
      */
@@ -37,6 +41,8 @@ class Menu extends Control
     /**
      * Appends a generic menu item with a checkbox.
      *
+     * @param string $name Menu item text.
+     *
      * @see uiMenuAppendCheckItem
      */
     public function appendCheckItem(string $name): \Libui\Generated\MenuItem
@@ -46,6 +52,8 @@ class Menu extends Control
 
     /**
      * Appends a new `Quit` menu item.
+     *
+     * @warning Only one such menu item may exist per application.
      *
      * @see uiMenuAppendQuitItem
      */
@@ -57,6 +65,8 @@ class Menu extends Control
     /**
      * Appends a new `Preferences` menu item.
      *
+     * @warning Only one such menu item may exist per application.
+     *
      * @see uiMenuAppendPreferencesItem
      */
     public function appendPreferencesItem(): \Libui\Generated\MenuItem
@@ -66,6 +76,8 @@ class Menu extends Control
 
     /**
      * Appends a new `About` menu item.
+     *
+     * @warning Only one such menu item may exist per application.
      *
      * @see uiMenuAppendAboutItem
      */

@@ -82,6 +82,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct(string $title, int $width = 640, int $height = 480, bool $hasMenubar = false)`
 - `borderless(): bool` — Returns whether or not the window is borderless.
+- `centered(?int $screenWidth = null, ?int $screenHeight = null): static` — Centre the window on the primary display.
 - `contentSize(CData $width, CData $height): static` — Gets the window content size.
 - `focused(): int` — Returns whether or not the window is focused.
 - `fullscreen(): bool` — Returns whether or not the window is full screen.
@@ -158,8 +159,8 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `__construct()` — Creates a new combo box.
 - `append(string $text): static` — Appends an item to the combo box.
 - `clear(): static` — Deletes all items from the combo box.
-- `delete(int $index): static` — Deletes an item at @p index from the combo box.
-- `insertAt(int $index, string $text): static` — Inserts an item at @p index to the combo box.
+- `delete(int $index): static` — Deletes an item at $index from the combo box.
+- `insertAt(int $index, string $text): static` — Inserts an item at $index to the combo box.
 - `numItems(): int` — Returns the number of items contained within the combo box.
 - `onSelected(callable $cb): static` — Registers a callback for when a combo box item is selected.
 - `selected(): int` — Returns the index of the item selected.
@@ -363,7 +364,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `__construct(bool $padded = false)`
 - `append(Control $child, int $stretchy = 0): static` — Append a child; $stretchy defaults to non-stretching.
 - `appendStretchy(Control $child): static` — Append a child that grows to fill the box's main axis.
-- `delete(int $index): static` — Removes the control at @p index from the box.
+- `delete(int $index): static` — Removes the control at $index from the box.
 - `numChildren(): int` — Returns the number of controls contained within the box.
 - `padded(): bool` — Returns whether or not controls within the box are padded.
 - `setPadded(bool $padded): static` — Sets whether or not controls within the box are padded.
@@ -378,7 +379,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new form.
 - `append(string $label, Control $c, int $stretchy): static` — Appends a control with a label to the form.
-- `delete(int $index): static` — Removes the control at @p index from the form.
+- `delete(int $index): static` — Removes the control at $index from the form.
 - `numChildren(): int` — Returns the number of controls contained within the form.
 - `padded(): bool` — Returns whether or not controls within the form are padded.
 - `setPadded(bool $padded): static` — Sets whether or not controls within the box are padded.
@@ -422,13 +423,13 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new tab container.
 - `append(string $name, Control $c): static` — Appends a control in form of a page/tab with label.
-- `delete(int $index): static` — Removes the control at @p index.
-- `insertAt(string $name, int $index, Control $c): static` — Inserts a control in form of a page/tab with label at @p index.
-- `margined(int $index): int` — Returns whether or not the page/tab at @p index has a margin.
+- `delete(int $index): static` — Removes the control at $index.
+- `insertAt(string $name, int $index, Control $c): static` — Inserts a control in form of a page/tab with label at $index.
+- `margined(int $index): int` — Returns whether or not the page/tab at $index has a margin.
 - `numPages(): int` — Returns the number of pages contained.
 - `onSelected(callable $cb): static` — Registers a callback for when a tab is selected.
 - `selected(): int` — Returns the index of the tab selected.
-- `setMargined(int $index, int $margined): static` — Sets whether or not the page/tab at @p index has a margin.
+- `setMargined(int $index, int $margined): static` — Sets whether or not the page/tab at $index has a margin.
 - `setSelected(int $index): static` — Sets the tab selected.
 
 ## Tables
@@ -640,6 +641,7 @@ A single text attribute (a family, size, weight, colour, …) built via one of t
 - `static italic(TextItalic $italic): Attribute`
 - `static rgb(int $hex, float $a = 1): Attribute` — Colour from a 0xRRGGBB integer (mirrors Brush::rgb).
 - `static size(float $size): Attribute`
+- `static stretch(TextStretch $stretch): Attribute`
 - `static underline(Underline $underline = Underline::Single): Attribute`
 - `static underlineColor(UnderlineColor $color): Attribute`
 - `static weight(TextWeight $weight): Attribute`
@@ -683,6 +685,19 @@ The default font for a TextLayout, wrapping the uiFontDescriptor struct {Family 
 - `setWeight(TextWeight $weight): FontDescriptor`
 - `toCData(): CData`
 
+### `RichText`
+
+`Libui\Text\RichText`
+
+Small facade for building styled text and producing measured TextLayout instances without repeating the AttributedString/FontDescriptor dance.
+
+- `static create(?TextStyle $defaultStyle = null): RichText`
+- `append(string $text, ?TextStyle $style = null): RichText`
+- `height(float $width, DrawTextAlign $align = DrawTextAlign::Left): float`
+- `layout(float $width, DrawTextAlign $align = DrawTextAlign::Left): TextLayout`
+- `measure(float $width, DrawTextAlign $align = DrawTextAlign::Left): array`
+- `string(): AttributedString`
+
 ### `TextLayout`
 
 `Libui\Text\TextLayout`
@@ -698,6 +713,17 @@ A laid-out, ready-to-draw block of attributed text, wrapping uiDrawTextLayout*.
 - `setFont(FontDescriptor $font): TextLayout`
 - `setWidth(float $width): TextLayout`
 - `width(): float`
+
+### `TextStyle`
+
+`Libui\Text\TextStyle`
+
+High-level text style that can produce both a default layout font and span attributes for an AttributedString.
+
+- `__construct(?string $family = null, ?float $size = null, ?TextWeight $weight = null, ?TextItalic $italic = null, ?TextStretch $stretch = null, ?array $color = null, ?array $background = null, ?Underline $underline = null)`
+- `attributes(): array`
+- `font(): FontDescriptor`
+- `with(?string $family = null, ?float $size = null, ?TextWeight $weight = null, ?TextItalic $italic = null, ?TextStretch $stretch = null, ?array $color = null, ?array $background = null, ?Underline $underline = null): TextStyle`
 
 ## Async & utilities
 

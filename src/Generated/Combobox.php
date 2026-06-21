@@ -27,6 +27,8 @@ class Combobox extends Control
     /**
      * Appends an item to the combo box.
      *
+     * @param string $text Item text.
+     *
      * @see uiComboboxAppend
      */
     public function append(string $text): static
@@ -36,7 +38,10 @@ class Combobox extends Control
     }
 
     /**
-     * Inserts an item at @p index to the combo box.
+     * Inserts an item at $index to the combo box.
+     *
+     * @param int $index Index at which to insert the item.
+     * @param string $text Item text.
      *
      * @see uiComboboxInsertAt
      */
@@ -47,7 +52,10 @@ class Combobox extends Control
     }
 
     /**
-     * Deletes an item at @p index from the combo box.
+     * Deletes an item at $index from the combo box.
+     *
+     * @param int $index Index of the item to be deleted.
+     * @note Deleting the index of the item currently selected will move the
      *
      * @see uiComboboxDelete
      */
@@ -71,6 +79,8 @@ class Combobox extends Control
     /**
      * Returns the number of items contained within the combo box.
      *
+     * @return int Number of items.
+     *
      * @see uiComboboxNumItems
      */
     public function numItems(): int
@@ -81,6 +91,8 @@ class Combobox extends Control
     /**
      * Returns the index of the item selected.
      *
+     * @return int Index of the item selected, `-1` on empty selection. [Default `-1`]
+     *
      * @see uiComboboxSelected
      */
     public function selected(): int
@@ -90,6 +102,8 @@ class Combobox extends Control
 
     /**
      * Sets the item selected.
+     *
+     * @param int $index Index of the item to be selected, `-1` to clear selection.
      *
      * @see uiComboboxSetSelected
      */
@@ -102,6 +116,10 @@ class Combobox extends Control
     /**
      * Registers a callback for when a combo box item is selected.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiComboboxSetSelected(),
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiComboboxOnSelected
      */
     public function onSelected(callable $cb): static
@@ -109,8 +127,8 @@ class Combobox extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onSelected] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onSelected] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiComboboxOnSelected($this->handle, $fn, null);

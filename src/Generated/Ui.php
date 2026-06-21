@@ -14,6 +14,10 @@ final class Ui
     /**
      * File chooser dialog window to select a single file.
      *
+     * @param \Libui\Control $parent Parent window.
+     * @note File paths are separated by the underlying OS file path separator.
+     * @return string File path, `NULL` on cancel.
+     *
      * @see uiOpenFile
      */
     public static function openFile(\Libui\Control $parent): string
@@ -23,6 +27,10 @@ final class Ui
 
     /**
      * Folder chooser dialog window to select a single folder.
+     *
+     * @param \Libui\Control $parent Parent window.
+     * @note File paths are separated by the underlying OS file path separator.
+     * @return string Folder path, `NULL` on cancel.
      *
      * @see uiOpenFolder
      */
@@ -34,6 +42,10 @@ final class Ui
     /**
      * Save file dialog window.
      *
+     * @param \Libui\Control $parent Parent window.
+     * @note File paths are separated by the underlying OS file path separator.
+     * @return string File path, `NULL` on cancel.
+     *
      * @see uiSaveFile
      */
     public static function saveFile(\Libui\Control $parent): string
@@ -44,6 +56,10 @@ final class Ui
     /**
      * Message box dialog window.
      *
+     * @param \Libui\Control $parent Parent window.
+     * @param string $title Dialog window title text.
+     * @param string $description Dialog message text.
+     *
      * @see uiMsgBox
      */
     public static function msgBox(\Libui\Control $parent, string $title, string $description): void
@@ -53,6 +69,10 @@ final class Ui
 
     /**
      * Error message box dialog window.
+     *
+     * @param \Libui\Control $parent Parent window.
+     * @param string $title Dialog window title text.
+     * @param string $description Dialog message text.
      *
      * @see uiMsgBoxError
      */

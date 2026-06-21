@@ -27,6 +27,8 @@ class ProgressBar extends Control
     /**
      * Returns the progress bar value.
      *
+     * @return int Progress bar value. `[Default 0]`
+     *
      * @see uiProgressBarValue
      */
     public function value(): int
@@ -36,6 +38,8 @@ class ProgressBar extends Control
 
     /**
      * Sets the progress bar value.
+     *
+     * @param int $n Value to set. Integer in the range of `[-1, 100]`.
      *
      * @see uiProgressBarSetValue
      */

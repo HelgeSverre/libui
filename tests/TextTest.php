@@ -13,7 +13,9 @@ use Libui\Generated\Enum\UnderlineColor;
 use Libui\Text\Attribute;
 use Libui\Text\AttributedString;
 use Libui\Text\FontDescriptor;
+use Libui\Text\RichText;
 use Libui\Text\TextLayout;
+use Libui\Text\TextStyle;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -166,6 +168,16 @@ final class TextTest extends TestCase
     {
         $attr = new Attribute(AttributeType::Stretch, 0, 10, TextStretch::Expanded);
         $this->assertInstanceOf(Attribute::class, $attr);
+    }
+
+    public function testTextStyleBuildsStretchAttribute(): void
+    {
+        $style = new TextStyle(stretch: TextStretch::Expanded);
+
+        $attributes = $style->attributes();
+
+        $this->assertCount(1, $attributes);
+        $this->assertInstanceOf(Attribute::class, $attributes[0]);
     }
 
     public function testAttributeWithFontFamily(): void
@@ -529,5 +541,98 @@ final class TextTest extends TestCase
 
         $this->assertIsFloat($width);
         $this->assertIsFloat($height);
+    }
+
+    // ========================================================================
+    // TEXT STYLE
+    // ========================================================================
+
+    public function testTextStyleEmptyProducesNoAttributes(): void
+    {
+        $this->assertSame([], new TextStyle()->attributes());
+    }
+
+    public function testTextStyleFontFallsBackToDefaults(): void
+    {
+        $font = new TextStyle()->font();
+
+        $this->assertInstanceOf(FontDescriptor::class, $font);
+        $this->assertFalse(\FFI::isNull($font->handle()));
+    }
+
+    public function testTextStyleEmitsAnAttributePerSetField(): void
+    {
+        $style = new TextStyle(
+            family: 'Arial',
+            size: 14.0,
+            weight: TextWeight::Bold,
+            italic: TextItalic::Italic,
+            stretch: TextStretch::Expanded,
+            color: [1.0, 0.0, 0.0],
+            background: [0.0, 1.0, 0.0, 0.5],
+            underline: Underline::Single,
+        );
+
+        $attributes = $style->attributes();
+
+        $this->assertCount(8, $attributes);
+        $this->assertContainsOnlyInstancesOf(Attribute::class, $attributes);
+    }
+
+    public function testTextStyleWithMergesOverridesAndKeepsTheRest(): void
+    {
+        $base = new TextStyle(family: 'Arial', weight: TextWeight::Bold);
+        $derived = $base->with(weight: TextWeight::Normal);
+
+        // family carries over, weight is overridden, original is untouched.
+        $this->assertSame('Arial', $derived->family);
+        $this->assertSame(TextWeight::Normal, $derived->weight);
+        $this->assertSame(TextWeight::Bold, $base->weight);
+    }
+
+    // ========================================================================
+    // RICH TEXT
+    // ========================================================================
+
+    public function testRichTextCreateReturnsInstance(): void
+    {
+        $this->assertInstanceOf(RichText::class, RichText::create());
+    }
+
+    public function testRichTextAppendIsFluentAndGrowsTheString(): void
+    {
+        $rich = RichText::create();
+        $result = $rich->append('Hello', new TextStyle(weight: TextWeight::Bold));
+
+        $this->assertSame($rich, $result);
+        $this->assertSame(5, $rich->string()->length());
+
+        $rich->append(' World');
+        $this->assertSame(11, $rich->string()->length());
+    }
+
+    public function testRichTextLayoutReturnsTextLayout(): void
+    {
+        $layout = RichText::create()->append('Hello')->layout(200.0);
+
+        $this->assertInstanceOf(TextLayout::class, $layout);
+        $layout->free();
+    }
+
+    public function testRichTextMeasureReturnsExtents(): void
+    {
+        $extents = RichText::create()->append('Hello World')->measure(200.0);
+
+        $this->assertCount(2, $extents);
+        $this->assertIsFloat($extents[0]);
+        $this->assertIsFloat($extents[1]);
+    }
+
+    public function testRichTextHeightIsNonNegative(): void
+    {
+        $height = RichText::create()->append('Hello World')->height(200.0);
+
+        $this->assertIsFloat($height);
+        $this->assertGreaterThanOrEqual(0.0, $height);
     }
 }

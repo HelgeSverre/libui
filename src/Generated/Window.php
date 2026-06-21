@@ -17,6 +17,11 @@ class Window extends Control
     /**
      * Creates a new uiWindow.
      *
+     * @param string $title Window title text.
+     * @param int $width Window width.
+     * @param int $height Window height.
+     * @param bool $hasMenubar Whether or not the window should display a menu bar.
+     *
      * @see uiNewWindow
      */
     public function __construct(string $title, int $width, int $height, bool $hasMenubar)
@@ -27,6 +32,8 @@ class Window extends Control
     /**
      * Returns the window title.
      *
+     * @return string The window title text.
+     *
      * @see uiWindowTitle
      */
     public function title(): string
@@ -36,6 +43,9 @@ class Window extends Control
 
     /**
      * Sets the window title.
+     *
+     * @param string $title Window title text.
+     * @note This method is merely a hint and may be ignored on unix platforms.
      *
      * @see uiWindowSetTitle
      */
@@ -48,6 +58,10 @@ class Window extends Control
     /**
      * Gets the window position.
      *
+     * @param \FFI\CData $x Output pointer written by libui.
+     * @param \FFI\CData $y Output pointer written by libui.
+     * @note This method may return inaccurate or dummy values on Unix platforms.
+     *
      * @see uiWindowPosition
      */
     public function position(\FFI\CData $x, \FFI\CData $y): static
@@ -58,6 +72,10 @@ class Window extends Control
 
     /**
      * Moves the window to the specified position.
+     *
+     * @param int $x New x position of the window.
+     * @param int $y New y position of the window.
+     * @note This method is merely a hint and may be ignored on Unix platforms.
      *
      * @see uiWindowSetPosition
      */
@@ -70,6 +88,10 @@ class Window extends Control
     /**
      * Registers a callback for when the window moved.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note Only one callback can be registered at a time.
+     * @note The callback is not triggered when calling uiWindowSetPosition().
+     *
      * @see uiWindowOnPositionChanged
      */
     public function onPositionChanged(callable $cb): static
@@ -77,8 +99,8 @@ class Window extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onPositionChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onPositionChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiWindowOnPositionChanged($this->handle, $fn, null);
@@ -87,6 +109,10 @@ class Window extends Control
 
     /**
      * Gets the window content size.
+     *
+     * @param \FFI\CData $width Output pointer written by libui.
+     * @param \FFI\CData $height Output pointer written by libui.
+     * @note The content size does NOT include window decorations like menus or title bars.
      *
      * @see uiWindowContentSize
      */
@@ -99,6 +125,11 @@ class Window extends Control
     /**
      * Sets the window content size.
      *
+     * @param int $width Window content width to set.
+     * @param int $height Window content height to set.
+     * @note The content size does NOT include window decorations like menus or title bars.
+     * @note This method is merely a hint and may be ignored by the system.
+     *
      * @see uiWindowSetContentSize
      */
     public function setContentSize(int $width, int $height): static
@@ -110,6 +141,8 @@ class Window extends Control
     /**
      * Returns whether or not the window is full screen.
      *
+     * @return bool `TRUE` if full screen, `FALSE` otherwise. [Default: `FALSE`]
+     *
      * @see uiWindowFullscreen
      */
     public function fullscreen(): bool
@@ -119,6 +152,9 @@ class Window extends Control
 
     /**
      * Sets whether or not the window is full screen.
+     *
+     * @param bool $fullscreen `TRUE` to make window full screen, `FALSE` otherwise.
+     * @note This method is merely a hint and may be ignored by the system.
      *
      * @see uiWindowSetFullscreen
      */
@@ -131,6 +167,10 @@ class Window extends Control
     /**
      * Registers a callback for when the window content size is changed.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiWindowSetContentSize().
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiWindowOnContentSizeChanged
      */
     public function onContentSizeChanged(callable $cb): static
@@ -138,8 +178,8 @@ class Window extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onContentSizeChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onContentSizeChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiWindowOnContentSizeChanged($this->handle, $fn, null);
@@ -149,16 +189,19 @@ class Window extends Control
     /**
      * Registers a callback for when the window is to be closed.
      *
+     * @param callable(static): (bool|int) $cb Return false/0 to cancel, true/non-zero to continue.
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiWindowOnClosing
      */
     public function onClosing(callable $cb): static
     {
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
-                $r = $cb($this);
-                return $r === false ? 0 : (\is_int($r) ? $r : 1);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onClosing] {$e->getMessage()}\n");
+                $result = $cb($this);
+                return $result === false ? 0 : (\is_int($result) ? $result : 1);
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onClosing] {$exception->getMessage()}\n");
                 return 0;
             }
         });
@@ -169,6 +212,9 @@ class Window extends Control
     /**
      * Registers a callback for when the window focus changes.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiWindowOnFocusChanged
      */
     public function onFocusChanged(callable $cb): static
@@ -176,8 +222,8 @@ class Window extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onFocusChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onFocusChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiWindowOnFocusChanged($this->handle, $fn, null);
@@ -186,6 +232,8 @@ class Window extends Control
 
     /**
      * Returns whether or not the window is focused.
+     *
+     * @return int `TRUE` if window is focused, `FALSE` otherwise.
      *
      * @see uiWindowFocused
      */
@@ -197,6 +245,8 @@ class Window extends Control
     /**
      * Returns whether or not the window is borderless.
      *
+     * @return bool `TRUE` if window is borderless, `FALSE` otherwise.
+     *
      * @see uiWindowBorderless
      */
     public function borderless(): bool
@@ -206,6 +256,9 @@ class Window extends Control
 
     /**
      * Sets whether or not the window is borderless.
+     *
+     * @param bool $borderless `TRUE` to make window borderless, `FALSE` otherwise.
+     * @note This method is merely a hint and may be ignored by the system.
      *
      * @see uiWindowSetBorderless
      */
@@ -218,6 +271,8 @@ class Window extends Control
     /**
      * Sets the window's child.
      *
+     * @param \Libui\Control $child Control to be made child.
+     *
      * @see uiWindowSetChild
      */
     public function setChild(\Libui\Control $child): static
@@ -229,6 +284,8 @@ class Window extends Control
     /**
      * Returns whether or not the window has a margin.
      *
+     * @return bool `TRUE` if window has a margin, `FALSE` otherwise. [Default: `FALSE`]
+     *
      * @see uiWindowMargined
      */
     public function margined(): bool
@@ -238,6 +295,8 @@ class Window extends Control
 
     /**
      * Sets whether or not the window has a margin.
+     *
+     * @param bool $margined `TRUE` to set a window margin, `FALSE` otherwise.
      *
      * @see uiWindowSetMargined
      */
@@ -250,6 +309,8 @@ class Window extends Control
     /**
      * Returns whether or not the window is user resizeable.
      *
+     * @return bool `TRUE` if window is resizable, `FALSE` otherwise. [Default: `TRUE`]
+     *
      * @see uiWindowResizeable
      */
     public function resizeable(): bool
@@ -259,6 +320,9 @@ class Window extends Control
 
     /**
      * Sets whether or not the window is user resizeable.
+     *
+     * @param bool $resizeable `TRUE` to make window resizable, `FALSE` otherwise.
+     * @note This method is merely a hint and may be ignored by the system.
      *
      * @see uiWindowSetResizeable
      */

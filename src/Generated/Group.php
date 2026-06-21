@@ -17,6 +17,8 @@ class Group extends Control
     /**
      * Creates a new group.
      *
+     * @param string $title Group title text.
+     *
      * @see uiNewGroup
      */
     public function __construct(string $title)
@@ -27,6 +29,8 @@ class Group extends Control
     /**
      * Returns the group title.
      *
+     * @return string The group title text.
+     *
      * @see uiGroupTitle
      */
     public function title(): string
@@ -36,6 +40,8 @@ class Group extends Control
 
     /**
      * Sets the group title.
+     *
+     * @param string $title Group title text.
      *
      * @see uiGroupSetTitle
      */
@@ -48,6 +54,8 @@ class Group extends Control
     /**
      * Sets the group's child.
      *
+     * @param \Libui\Control $c uiControl child instance, or `NULL`.
+     *
      * @see uiGroupSetChild
      */
     public function setChild(\Libui\Control $c): static
@@ -59,6 +67,8 @@ class Group extends Control
     /**
      * Returns whether or not the group has a margin.
      *
+     * @return bool `TRUE` if the group has a margin, `FALSE` otherwise.
+     *
      * @see uiGroupMargined
      */
     public function margined(): bool
@@ -68,6 +78,8 @@ class Group extends Control
 
     /**
      * Sets whether or not the group has a margin.
+     *
+     * @param bool $margined `TRUE` to set a margin, `FALSE` otherwise.
      *
      * @see uiGroupSetMargined
      */

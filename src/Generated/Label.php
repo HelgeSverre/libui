@@ -17,6 +17,8 @@ class Label extends Control
     /**
      * Creates a new label.
      *
+     * @param string $text Label text.
+     *
      * @see uiNewLabel
      */
     public function __construct(string $text)
@@ -27,6 +29,8 @@ class Label extends Control
     /**
      * Returns the label text.
      *
+     * @return string The text of the label.
+     *
      * @see uiLabelText
      */
     public function text(): string
@@ -36,6 +40,8 @@ class Label extends Control
 
     /**
      * Sets the label text.
+     *
+     * @param string $text Label text.
      *
      * @see uiLabelSetText
      */

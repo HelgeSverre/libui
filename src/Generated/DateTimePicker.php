@@ -47,6 +47,8 @@ class DateTimePicker extends Control
     /**
      * Returns date and time stored in the data time picker.
      *
+     * @warning The `struct tm` members `tm_wday` and `tm_yday` are undefined.
+     *
      * @see uiDateTimePickerTime
      */
     public function time(\FFI\CData $time): static
@@ -57,6 +59,9 @@ class DateTimePicker extends Control
 
     /**
      * Sets date and time of the data time picker.
+     *
+     * @param \FFI\CData $time Date and/or time as local time.
+     * @warning The `struct tm` member `tm_isdst` is ignored on windows and should be set to `-1`.
      *
      * @see uiDateTimePickerSetTime
      */
@@ -69,6 +74,10 @@ class DateTimePicker extends Control
     /**
      * Registers a callback for when the date time picker value is changed by the user.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiDateTimePickerSetTime().
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiDateTimePickerOnChanged
      */
     public function onChanged(callable $cb): static
@@ -76,8 +85,8 @@ class DateTimePicker extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiDateTimePickerOnChanged($this->handle, $fn, null);

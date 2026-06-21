@@ -17,6 +17,9 @@ class Spinbox extends Control
     /**
      * Creates a new spinbox.
      *
+     * @param int $min Minimum value.
+     * @param int $max Maximum value.
+     *
      * @see uiNewSpinbox
      */
     public function __construct(int $min, int $max)
@@ -27,6 +30,8 @@ class Spinbox extends Control
     /**
      * Returns the spinbox value.
      *
+     * @return int Spinbox value.
+     *
      * @see uiSpinboxValue
      */
     public function value(): int
@@ -36,6 +41,9 @@ class Spinbox extends Control
 
     /**
      * Sets the spinbox value.
+     *
+     * @param int $value Value to set.
+     * @note Setting a value out of range will clamp to the nearest value in range.
      *
      * @see uiSpinboxSetValue
      */
@@ -48,6 +56,10 @@ class Spinbox extends Control
     /**
      * Registers a callback for when the spinbox value is changed by the user.
      *
+     * @param callable(static): void $cb Receives this widget.
+     * @note The callback is not triggered when calling uiSpinboxSetValue().
+     * @note Only one callback can be registered at a time.
+     *
      * @see uiSpinboxOnChanged
      */
     public function onChanged(callable $cb): static
@@ -55,8 +67,8 @@ class Spinbox extends Control
         $fn = static::keep(function ($sender, $data) use ($cb) {
             try {
                 $cb($this);
-            } catch (\Throwable $e) {
-                \fwrite(\STDERR, "[onChanged] {$e->getMessage()}\n");
+            } catch (\Throwable $exception) {
+                \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
         \Libui\Ffi::get()->uiSpinboxOnChanged($this->handle, $fn, null);

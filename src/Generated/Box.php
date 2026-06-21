@@ -37,6 +37,9 @@ class Box extends Control
     /**
      * Appends a control to the box.
      *
+     * @param \Libui\Control $child Control instance to append.
+     * @param int $stretchy `TRUE` to stretch control, `FALSE` otherwise.
+     *
      * @see uiBoxAppend
      */
     public function append(\Libui\Control $child, int $stretchy): static
@@ -48,6 +51,8 @@ class Box extends Control
     /**
      * Returns the number of controls contained within the box.
      *
+     * @return int Number of children.
+     *
      * @see uiBoxNumChildren
      */
     public function numChildren(): int
@@ -56,7 +61,10 @@ class Box extends Control
     }
 
     /**
-     * Removes the control at @p index from the box.
+     * Removes the control at $index from the box.
+     *
+     * @param int $index Index of control to be removed.
+     * @note The control neither destroyed nor freed.
      *
      * @see uiBoxDelete
      */
@@ -69,6 +77,8 @@ class Box extends Control
     /**
      * Returns whether or not controls within the box are padded.
      *
+     * @return bool `TRUE` if controls are padded, `FALSE` otherwise.
+     *
      * @see uiBoxPadded
      */
     public function padded(): bool
@@ -78,6 +88,8 @@ class Box extends Control
 
     /**
      * Sets whether or not controls within the box are padded.
+     *
+     * @param bool $padded `TRUE` to make controls padded, `FALSE` otherwise.
      *
      * @see uiBoxSetPadded
      */
