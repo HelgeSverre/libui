@@ -707,9 +707,10 @@ always fully qualified. If you `use Libui\Ffi;` don't also import `\FFI`.
 
 - **macOS** (arm64 + x86_64): a universal prebuilt dylib ships in the package —
   nothing to install.
-- **Linux**: needs **GTK 3** at runtime. Build `libui.so` (`composer build-lib`)
-  or point `$LIBUI_LIB` at a system-installed one. GUI tests run headless under
-  `xvfb`.
+- **Linux** (x86_64 + aarch64): a prebuilt `libui.so` ships in the package (the
+  x86_64 one is built on Ubuntu 22.04 for broad glibc compatibility). It just needs
+  **GTK 3** installed at runtime (`apt install libgtk-3-0`); on an incompatible
+  distro, `composer build-lib` or `$LIBUI_LIB`. GUI tests run headless under `xvfb`.
 - **Windows** (x86_64): a prebuilt `libui.dll` (built with MSVC) ships in the
   package under `lib/windows-x86_64/` — nothing to install; works out of the box.
 

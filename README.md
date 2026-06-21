@@ -22,9 +22,9 @@ composer require helgesverre/libui
 ```
 
 Requires **PHP 8.5+** with the **FFI** extension (enabled by default on the CLI).
-On macOS a prebuilt universal `libui` ships inside the package — there's nothing
-else to install. Windows ships a prebuilt `libui.dll` too. Linux needs a `libui`
-shared library for your platform (GTK 3); see [Platform support](#platform-support).
+Prebuilt `libui` binaries ship inside the package for **macOS**, **Linux**
+(x86_64 + aarch64) and **Windows** — there's no compiler or build step. Linux just
+needs **GTK 3** installed at runtime; see [Platform support](#platform-support).
 
 ## Quick start
 
@@ -157,7 +157,7 @@ The loader resolves the right binary for the current OS + architecture from
 | Platform | Status | Notes |
 |---|---|---|
 | **macOS** (arm64 + x86_64) | Prebuilt, ships in the package | Universal `lib/darwin/libui.dylib`; works out of the box. |
-| **Linux** (x86_64 / aarch64) | Build it (prebuilt coming soon) | Needs **GTK 3** at runtime; build `libui.so` (see [Development](#development)) and point `$LIBUI_LIB` at it, or set `$LIBUI_LIB` to a system-installed `libui.so`. |
+| **Linux** (x86_64 / aarch64) | Prebuilt, ships in the package | `lib/linux-*/libui.so` (x86_64 built on Ubuntu 22.04 for broad glibc compatibility). Needs **GTK 3** installed at runtime (`apt install libgtk-3-0`). On an incompatible distro, run `composer build-lib` or point `$LIBUI_LIB` at a system `libui.so`. |
 | **Windows** (x86_64) | Prebuilt, ships in the package | `lib/windows-x86_64/libui.dll` (built with MSVC); works out of the box. |
 
 ## Why not the `ext-ui` from php.net?

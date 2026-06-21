@@ -110,17 +110,14 @@ jobs:
         shell: bash
         run: uname -m
 
-      - name: Build toolchain + GTK 3 (Linux)
+      # All three platforms now test the COMMITTED prebuilt binaries — the exact
+      # artifacts consumers get (lib/darwin/*.dylib, lib/linux-*/*.so,
+      # lib/windows-x86_64/*.dll). Linux still needs the GTK 3 runtime to load its
+      # .so, and xvfb to run headless. The build pipelines themselves are exercised
+      # on demand by build-native.yml.
+      - name: GTK 3 runtime + xvfb (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y meson ninja-build libgtk-3-dev xvfb
-
-      # macOS and Windows test the committed prebuilt binaries (lib/darwin/*.dylib,
-      # lib/windows-x86_64/*.dll) — the exact artifacts consumers get. Only Linux
-      # builds from source (no prebuilt .so is committed). The MSVC build pipeline
-      # for the Windows DLL is exercised separately by build-native.yml.
-      - name: Build libui from source (Linux)
-        if: runner.os == 'Linux'
-        run: bash build-libui.sh
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-0 xvfb
 
       - run: composer install --no-interaction --prefer-dist --no-progress
 
