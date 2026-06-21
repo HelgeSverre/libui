@@ -199,10 +199,23 @@ use Libui\Form;
 
 $form = new Form();
 $form->setPadded(true);
-// append(label, control, stretchy)
-$form->append('Name', $nameEntry, 0);
-$form->append('Bio', $bioEntry, 1); // 1 = this row grows vertically
+$form->append('Name', $nameEntry);
+$form->appendStretchy('Bio', $bioEntry); // this row grows vertically
 ```
+
+**Bulk binding.** Input widgets implement `HasValue` (`value()`/`setValue()`), and
+a `Form` tracks its fields by label, so you can read and write a whole form at once
+instead of wiring each control:
+
+```php
+$form->setValues(['Name' => 'Ada', 'Subscribe' => true, 'Age' => 36]);
+
+$data = $form->values(); // ['Name' => 'Ada', 'Subscribe' => true, 'Age' => 36, …]
+```
+
+`setValues()` ignores unknown labels and non-value controls, so a partial map is
+fine. Each widget keeps its typed accessors (`text()`, `checked()`, `getColor()`, …)
+— `value()`/`setValue()` are just the uniform layer for binding.
 
 ### Tab — paged container
 

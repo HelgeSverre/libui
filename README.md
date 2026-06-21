@@ -114,6 +114,8 @@ see [Development](#development) to run them.
   image columns, row-index click callbacks, and automatic model lifetime.
 - **Images** — `Image::fromPng()` (via GD) or `Image::fromRgba()` for table image
   columns and area drawing.
+- **Form binding** — input widgets implement `HasValue`, and `Form::values()` /
+  `setValues()` read and write a whole form at once, keyed by field label.
 - **App lifecycle** — `App` facade for multi-window apps + an `onShouldQuit()`
   handler, or `Window::run()` for one-call single-window apps.
 - **Async helpers** — the `Loop` class (`defer`/`delay`/`repeat`/`cancel`) over

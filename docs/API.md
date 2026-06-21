@@ -149,7 +149,9 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `onToggled(callable $cb): static` — Registers a callback for when the checkbox is toggled by the user.
 - `setChecked(bool $checked): static` — Sets whether or not the checkbox is checked.
 - `setText(string $text): static` — Sets the checkbox label text.
+- `setValue(mixed $value): static`
 - `text(): string` — Returns the checkbox label text.
+- `value(): bool`
 
 ### `Color`
 
@@ -182,6 +184,8 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `getColor(): Color` — The currently selected colour as a {@see Color}, wrapping the generated output-pointer getter.
 - `onChanged(callable $cb): static` — Registers a callback for when the color is changed.
 - `setColor(Color|float $r, float $g = 0, float $b = 0, float $a = 1): static` — Set the button colour from a {@see Color}, or from raw 0..1 float channels (the generated signature still works).
+- `setValue(mixed $value): static` — Set the colour from a {@see Color} or an `[r,g,b(,a)]` array.
+- `value(): Color` — The selected colour, for generic binding.
 
 ### `Combobox`
 
@@ -200,6 +204,8 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `onSelected(callable $cb): static` — Registers a callback for when a combo box item is selected.
 - `selected(): int` — Returns the index of the item selected.
 - `setSelected(int $index): static` — Sets the item selected.
+- `setValue(mixed $value): static`
+- `value(): int`
 
 ### `DateTimePicker`
 
@@ -244,7 +250,9 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `append(string $text): static` — Appends an item to the editable combo box.
 - `onChanged(callable $cb): static` — Registers a callback for when an editable combo box item is selected or user text changed.
 - `setText(string $text): static` — Sets the editable combo box text.
+- `setValue(mixed $value): static`
 - `text(): string` — Returns the text of the editable combo box. This text is either the text of one of the predefined list items or the t...
+- `value(): string`
 
 ### `Entry`
 
@@ -261,7 +269,9 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `readOnly(): bool` — Returns whether or not the entry's text can be changed.
 - `setReadOnly(bool $readonly): static` — Sets whether or not the entry's text is read only.
 - `setText(string $text): static` — Sets the entry's text.
+- `setValue(mixed $value): static`
 - `text(): string` — Returns the entry's text.
+- `value(): string`
 
 ### `MenuOrderException`
 
@@ -283,6 +293,15 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `font(CData $desc): static` — Returns the selected font.
 - `getFont(): FontDescriptor` — The currently selected font as a typed {@see FontDescriptor}, wrapping the generated output-pointer getter and freeing libui's allocated copy.
 - `onChanged(callable $cb): static` — Registers a callback for when the font is changed.
+
+### `HasValue`
+
+`Libui\HasValue`
+
+An input widget with a single readable/writable value, for generic binding (e.g. {@see Form::values()} / {@see Form::setValues()}).
+
+- `setValue(mixed $value): static`
+- `value(): mixed`
 
 ### `Label`
 
@@ -353,7 +372,9 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `readOnly(): bool` — Returns whether or not the multi line entry's text can be changed.
 - `setReadOnly(bool $readonly): static` — Sets whether or not the multi line entry's text is read only.
 - `setText(string $text): static` — Sets the multi line entry's text.
+- `setValue(mixed $value): static`
 - `text(): string` — Returns the multi line entry's text.
+- `value(): string`
 
 ### `ProgressBar`
 
@@ -380,6 +401,8 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `onSelected(callable $cb): static` — Registers a callback for when radio button is selected.
 - `selected(): int` — Returns the index of the item selected.
 - `setSelected(int $index): static` — Sets the item selected.
+- `setValue(mixed $value): static`
+- `value(): int`
 
 ### `Separator`
 
@@ -406,7 +429,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `onReleased(callable $cb): static` — Registers a callback for when the slider is released from dragging.
 - `setHasToolTip(bool $hasToolTip): static` — Sets whether or not the slider has a tool tip.
 - `setRange(int $min, int $max): static` — Sets the slider range.
-- `setValue(int $value): static` — Sets the slider value.
+- `setValue(mixed $value): static`
 - `value(): int` — Returns the slider value.
 
 ### `Spinbox`
@@ -419,7 +442,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct(int $min, int $max)` — Creates a new spinbox. The initial spinbox value equals the minimum value. In the current implementation $min and $ma...
 - `onChanged(callable $cb): static` — Registers a callback for when the spinbox value is changed by the user.
-- `setValue(int $value): static` — Sets the spinbox value.
+- `setValue(mixed $value): static`
 - `value(): int` — Returns the spinbox value.
 
 ## Containers & layout
@@ -434,7 +457,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `static horizontal(bool $padded = false): static`
 - `__construct(bool $padded = false)`
-- `append(Control $child, int $stretchy = 0): static` — Append a child; $stretchy defaults to non-stretching.
+- `append(Control $child, int|bool $stretchy = false): static` — Append a child; $stretchy (bool, or the raw 0/1 int) defaults to non-stretching.
 - `appendStretchy(Control $child): static` — Append a child that grows to fill the box's main axis.
 - `delete(int $index): static` — Removes the control at $index from the box.
 - `numChildren(): int` — Returns the number of controls contained within the box.
@@ -445,16 +468,19 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 `Libui\Form`
 
-Form widget. Hand-editable — add convenience methods here. Inherits the generated API from Generated\\Form.
+Form widget — labelled rows of controls. Hand-editable. Inherits the generated API from Generated\\Form.
 
 _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new form.
-- `append(string $label, Control $c, int $stretchy): static` — Appends a control with a label to the form. Stretchy items expand to use the remaining space within the container. In...
+- `append(string $label, Control $c, int|bool $stretchy = false): static` — Append a labelled field; $stretchy (bool, or the raw 0/1 int) defaults to off.
+- `appendStretchy(string $label, Control $c): static` — Append a labelled field that grows to fill vertical space.
 - `delete(int $index): static` — Removes the control at $index from the form.
 - `numChildren(): int` — Returns the number of controls contained within the form.
 - `padded(): bool` — Returns whether or not controls within the form are padded. Padding is defined as space between individual controls.
 - `setPadded(bool $padded): static` — Sets whether or not controls within the box are padded. Padding is defined as space between individual controls. The...
+- `setValues(array $values): static` — Set fields from `[label => value]`. Unknown labels and non-value controls are ignored, so a partial map is fine.
+- `values(): array` — Read every {@see HasValue} field as `[label => value]`. Non-value controls (separators, labels, …) are skipped.
 
 ### `Grid`
 

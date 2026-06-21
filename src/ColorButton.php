@@ -8,8 +8,20 @@ namespace Libui;
  * ColorButton widget. Hand-editable — add convenience methods here.
  * Inherits the generated API from Generated\\ColorButton.
  */
-class ColorButton extends Generated\ColorButton
+class ColorButton extends Generated\ColorButton implements HasValue
 {
+    /** The selected colour, for generic binding. */
+    public function value(): Color
+    {
+        return $this->getColor();
+    }
+
+    /** Set the colour from a {@see Color} or an `[r,g,b(,a)]` array. */
+    public function setValue(mixed $value): static
+    {
+        return $this->setColor($value instanceof Color ? $value : Color::from($value));
+    }
+
     /**
      * Set the button colour from a {@see Color}, or from raw 0..1 float channels
      * (the generated signature still works).
