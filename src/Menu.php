@@ -46,4 +46,25 @@ class Menu extends Generated\Menu
         }
         return $item;
     }
+
+    /**
+     * The platform Quit item, as a hand-wrapped {@see MenuItem} so `onClick()` is
+     * available like every other append helper.
+     */
+    public function appendQuitItem(): MenuItem
+    {
+        return MenuItem::fromGenerated(parent::appendQuitItem());
+    }
+
+    /** The platform Preferences item, as a hand-wrapped {@see MenuItem}. */
+    public function appendPreferencesItem(): MenuItem
+    {
+        return MenuItem::fromGenerated(parent::appendPreferencesItem());
+    }
+
+    /** The platform About item, as a hand-wrapped {@see MenuItem}. */
+    public function appendAboutItem(): MenuItem
+    {
+        return MenuItem::fromGenerated(parent::appendAboutItem());
+    }
 }

@@ -118,31 +118,34 @@ final class TableModel
             TableValueType::String->value,
         );
         $this->callbacks['NumRows'] = static fn ($mh, $m) => self::guard($delegate->numRows(...), 0);
-        // libui takes ownership of the returned uiTableValue* and frees it, so
-        // we mint a fresh one per call and hand off the pointer.
-        $this->callbacks['CellValue'] = static fn ($mh, $m, $row, $column) => self::guard(
-            static function () use ($delegate, $ffi, $row, $column) {
-                $type = $delegate->columnType($column);
-                $value = $delegate->cellValue($row, $column);
+        // libui takes ownership of the returned uiTableValue* and frees it, so we
+        // mint a fresh one per call and hand off the pointer. The image fallback
+        // (below) is created on demand and pinned by this closure — itself retained
+        // in $this->callbacks — so it outlives the table.
+        $fallbackImage = null;
+        $this->callbacks['CellValue'] = static function ($mh, $m, $row, $column) use ($delegate, $ffi, &$fallbackImage) {
+            return self::guard(
+                static function () use ($delegate, $ffi, $row, $column, &$fallbackImage) {
+                    $type = $delegate->columnType($column);
+                    $value = $delegate->cellValue($row, $column);
 
-                // libui takes ownership of the returned uiTableValue* and frees it,
-                // so we always mint fresh and never cache. A null return means "no
-                // value" for this cell (e.g. an empty row-background colour).
-                return match ($type) {
-                    TableValueType::Int => $ffi->uiNewTableValueInt((int) $value),
-                    TableValueType::Color => $value instanceof Color
-                        ? $ffi->uiNewTableValueColor($value->r, $value->g, $value->b, $value->a)
-                        : null,
-                    TableValueType::Image => $value instanceof Image && $value->handle() !== null
-                        ? $ffi->uiNewTableValueImage($value->handle())
-                        : null,
-                    // String column: bool is cast to "1"/"" by PHP — checkbox columns
-                    // are Int, so bool-as-text here is the caller's explicit choice.
-                    default => $ffi->uiNewTableValueString((string) $value),
-                };
-            },
-            null,
-        );
+                    // A null return means "no value" for this cell (e.g. an empty
+                    // row-background colour) — fine for Color/String/Int, which libui
+                    // NULL-guards. Image is the exception (see imageValue()).
+                    return match ($type) {
+                        TableValueType::Int => $ffi->uiNewTableValueInt((int) $value),
+                        TableValueType::Color => $value instanceof Color
+                            ? $ffi->uiNewTableValueColor($value->r, $value->g, $value->b, $value->a)
+                            : null,
+                        TableValueType::Image => self::imageValue($ffi, $value, $fallbackImage),
+                        // String column: bool is cast to "1"/"" by PHP — checkbox columns
+                        // are Int, so bool-as-text here is the caller's explicit choice.
+                        default => $ffi->uiNewTableValueString((string) $value),
+                    };
+                },
+                null,
+            );
+        };
         $this->callbacks['SetCellValue'] = static function ($mh, $m, $row, $column, $value) use ($delegate, $ffi): void {
             self::guard(
                 static function () use ($delegate, $ffi, $row, $column, $value): void {
@@ -178,5 +181,26 @@ final class TableModel
             fwrite(STDERR, "[TableModel] handler error: {$e->getMessage()}\n  at {$e->getFile()}:{$e->getLine()}\n");
             return $fallback;
         }
+    }
+
+    /**
+     * Marshal an Image-column cell value into a uiTableValue*.
+     *
+     * libui's image column dereferences the value with NO null guard (unlike the
+     * colour/string/int paths), so returning a C NULL for a missing image would
+     * segfault the process. When a cell yields a non-Image we substitute a shared
+     * 1x1 transparent fallback (lazily created, pinned via $fallback by reference)
+     * and warn, turning a hard crash into a blank cell.
+     */
+    private static function imageValue(\FFI $ffi, mixed $value, ?Image &$fallback): \FFI\CData
+    {
+        if ($value instanceof Image && $value->handle() !== null) {
+            return $ffi->uiNewTableValueImage($value->handle());
+        }
+
+        fwrite(STDERR, "[TableModel] an Image column cell returned a non-Image value; using a blank fallback\n");
+        $fallback ??= Image::fromRgba("\x00\x00\x00\x00", 1, 1);
+
+        return $ffi->uiNewTableValueImage($fallback->handle());
     }
 }

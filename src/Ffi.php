@@ -219,6 +219,7 @@ final class Ffi
         Lifecycle::freeAll(); // free any forgotten TableModels before libui's leak check
         self::get()->uiUninit();
         self::$initialized = false;
+        Window::resetMenuLock(); // a fresh session after uninit() may build menus again
     }
 
     /**

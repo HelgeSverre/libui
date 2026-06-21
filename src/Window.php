@@ -36,12 +36,13 @@ class Window extends Generated\Window
     }
 
     /**
-     * Reset the menu-ordering lock. For tests and rare multi-session apps that
-     * call Ffi::uninit() and start a fresh libui session.
+     * Reset the menu-ordering lock so a fresh libui session (after Ffi::uninit())
+     * may build menus again. Called automatically by Ffi::uninit(); also useful
+     * directly in tests that need to construct a Menu after a Window already exists.
      *
      * @internal
      */
-    public static function resetMenuLockForTesting(): void
+    public static function resetMenuLock(): void
     {
         self::$menusLocked = false;
     }

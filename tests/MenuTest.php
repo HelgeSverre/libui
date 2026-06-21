@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
  * Every test that creates a real libui menu (or a Window then a menu) runs in a
  * separate process: libui finalizes its menu list at first window creation and
  * aborts on any later uiNewMenu, so the shared PHPUnit process (where earlier
- * suites already created Windows) cannot host these. resetMenuLockForTesting()
+ * suites already created Windows) cannot host these. resetMenuLock()
  * keeps the PHP-side ordering checks order-independent; process isolation gives
  * each test a fresh libui session for the C-side menu list.
  */
@@ -28,7 +28,7 @@ final class MenuTest extends LibuiTestCase
 {
     protected function setUp(): void
     {
-        Window::resetMenuLockForTesting();
+        Window::resetMenuLock();
     }
 
     #[RunInSeparateProcess]
@@ -114,6 +114,23 @@ final class MenuTest extends LibuiTestCase
         $item = $menu->appendCheckItem('Toolbar', static fn (MenuItem $i) => null);
 
         $this->assertInstanceOf(MenuItem::class, $item);
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testStandardItemsReturnHandWrappedMenuItemWithOnClick(): void
+    {
+        // Regression: appendQuitItem/About/Preferences must return the hand-written
+        // MenuItem (which has onClick), not Generated\MenuItem — otherwise wiring a
+        // handler on a standard item is a fatal "undefined method onClick". Examples
+        // aren't analysed by PHPStan, so this guards it from the test suite.
+        $menu = new Menu('App');
+
+        // assertInstanceOf is the guard: a regressed Generated\MenuItem (no onClick)
+        // would NOT satisfy the hand-written Libui\MenuItem type.
+        foreach ([$menu->appendQuitItem(), $menu->appendPreferencesItem(), $menu->appendAboutItem()] as $item) {
+            $this->assertInstanceOf(MenuItem::class, $item);
+        }
     }
 
     #[RunInSeparateProcess]
