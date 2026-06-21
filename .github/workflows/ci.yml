@@ -88,27 +88,13 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y meson ninja-build libgtk-3-dev xvfb
 
-      - name: Build toolchain (Windows)
-        if: runner.os == 'Windows'
-        run: pip install meson ninja
-
-      # libui-ng only builds a shared DLL with MSVC (not MinGW), and FFI needs a
-      # shared library — so set up the Visual Studio toolchain for the build below.
-      - name: Set up MSVC (Windows)
-        if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Build libui from source (Linux/Windows)
-        if: runner.os != 'macOS'
-        shell: bash
-        run: |
-          # Git Bash ships a GNU coreutils `link` in /usr/bin that shadows MSVC's
-          # link.exe on PATH and breaks meson's MSVC detection. Remove it (the
-          # runner is ephemeral) so the Visual Studio linker wins.
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            rm -f /usr/bin/link /usr/bin/link.exe || true
-          fi
-          bash build-libui.sh
+      # macOS and Windows test the committed prebuilt binaries (lib/darwin/*.dylib,
+      # lib/windows-x86_64/*.dll) — the exact artifacts consumers get. Only Linux
+      # builds from source (no prebuilt .so is committed). The MSVC build pipeline
+      # for the Windows DLL is exercised separately by build-native.yml.
+      - name: Build libui from source (Linux)
+        if: runner.os == 'Linux'
+        run: bash build-libui.sh
 
       - run: composer install --no-interaction --prefer-dist --no-progress
 
