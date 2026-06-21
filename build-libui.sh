@@ -31,13 +31,27 @@ echo "==> Configuring (shared library, no tests/examples)…"
 # Pass both build dir AND source dir explicitly — on a fresh checkout there is no
 # preconfigured build/ to infer the source from, and the script may run from the
 # repo root (e.g. in CI), not from inside $SRC.
-meson setup "$BUILD" "$SRC" --buildtype=release --default-library=shared \
-  -Dtests=false -Dexamples=false --reconfigure 2>/dev/null \
-  || meson setup "$BUILD" "$SRC" --buildtype=release --default-library=shared \
-       -Dtests=false -Dexamples=false
+MESON_ARGS=(--buildtype=release --default-library=shared -Dtests=false -Dexamples=false)
+
+case "$(uname -s)" in
+  MINGW* | MSYS* | CYGWIN*)
+    # libui-ng only emits a shared DLL with MSVC — MinGW is static-only and meson
+    # errors out. --vsenv makes meson activate and use the Visual Studio (cl.exe)
+    # toolchain (paired with a Developer environment, e.g. ilammy/msvc-dev-cmd in CI).
+    MESON_ARGS+=(--vsenv)
+    ;;
+esac
+
+meson setup "$BUILD" "$SRC" "${MESON_ARGS[@]}" --reconfigure 2>/dev/null \
+  || meson setup "$BUILD" "$SRC" "${MESON_ARGS[@]}"
 
 echo "==> Building…"
-ninja -C "$BUILD"
+case "$(uname -s)" in
+  # meson compile re-activates the VS environment captured by --vsenv; a bare
+  # `ninja` call would not see cl.exe/link.exe.
+  MINGW* | MSYS* | CYGWIN*) meson compile -C "$BUILD" ;;
+  *) ninja -C "$BUILD" ;;
+esac
 
 OUT="$BUILD/meson-out"
 

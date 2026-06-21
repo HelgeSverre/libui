@@ -92,6 +92,12 @@ jobs:
         if: runner.os == 'Windows'
         run: pip install meson ninja
 
+      # libui-ng only builds a shared DLL with MSVC (not MinGW), and FFI needs a
+      # shared library — so set up the Visual Studio toolchain for the build below.
+      - name: Set up MSVC (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Build libui from source (Linux/Windows)
         if: runner.os != 'macOS'
         run: bash build-libui.sh
