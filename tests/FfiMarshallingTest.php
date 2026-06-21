@@ -40,8 +40,10 @@ final class FfiMarshallingTest extends LibuiTestCase
         $root = Ffi::root();
 
         $this->assertIsString($root);
-        // root() returns the directory containing src/, not src/ itself
-        $this->assertStringEndsWith('/php-gui', $root);
+        // root() returns the package root (the directory containing src/), which
+        // is the parent of this tests/ directory — independent of its folder name.
+        $this->assertSame(\dirname(__DIR__), $root);
+        $this->assertDirectoryExists($root . '/src');
         $this->assertFileExists($root . '/composer.json');
     }
 
