@@ -12,12 +12,13 @@ declare(strict_types=1);
  *
  * Not a *Test.php file, so PHPUnit does not collect it as a test.
  *
- *   php tests/table_lifecycle.php <freed|leak|double-free>
+ *   php tests/table_lifecycle.php <freed|leak|double-free|auto>
  */
 
 require __DIR__ . '/../vendor/autoload.php';
 
 use Libui\Ffi;
+use Libui\Lifecycle;
 use Libui\Table;
 use Libui\TableModelDelegate;
 
@@ -101,10 +102,16 @@ switch ($mode) {
         $table->model()->free();
         $table->model()->free(); // idempotent: must not double-free
         break;
+    case 'auto':
+        // No explicit free(): Ffi::uninit() must free via Lifecycle and exit clean.
+        break;
     case 'leak':
-        // Intentionally leave the model unfreed — uiUninit() must abort.
+        // Negative control: the model must actually leak. Auto-registration would
+        // otherwise let Ffi::uninit()'s Lifecycle::freeAll() rescue it, so we
+        // unregister it first — now nothing frees it and uiUninit() must abort.
         // Trap that abort and turn it into a clean non-zero exit so it doesn't
         // escalate to the macOS crash reporter (see silenceLeakTrap()).
+        Lifecycle::unregisterModel($table->model());
         silenceLeakTrap();
         break;
 }

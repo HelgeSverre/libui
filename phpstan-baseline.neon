@@ -337,6 +337,12 @@ parameters:
 			path: src/Ffi.php
 
 		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$ColorModelColumn\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Table.php
+
+		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Model\.$#'
 			identifier: property.notFound
 			count: 1
@@ -361,18 +367,6 @@ parameters:
 			path: src/Table.php
 
 		-
-			message: '#^Method FFI\:\:uiTableAppendButtonColumn\(\) invoked with 3 parameters, 4 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: src/Table.php
-
-		-
-			message: '#^Method FFI\:\:uiTableAppendCheckboxColumn\(\) invoked with 3 parameters, 4 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: src/Table.php
-
-		-
 			message: '#^Method FFI\:\:uiTableAppendCheckboxTextColumn\(\) invoked with 3 parameters, 7 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -381,6 +375,12 @@ parameters:
 		-
 			message: '#^Method FFI\:\:uiTableAppendImageTextColumn\(\) invoked with 3 parameters, 6 required\.$#'
 			identifier: arguments.count
+			count: 1
+			path: src/Table.php
+
+		-
+			message: '#^Property Libui\\Table\:\:\$retainedStructs is never read, only written\.$#'
+			identifier: property.onlyWritten
 			count: 1
 			path: src/Table.php
 

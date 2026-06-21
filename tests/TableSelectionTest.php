@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Libui\Tests;
 
+use Libui\Control;
 use Libui\Generated\Enum\TableSelectionMode;
 use Libui\Table;
 use Libui\TableModelDelegate;
@@ -77,5 +78,47 @@ final class TableSelectionTest extends LibuiTestCase
 
         $table->setSelectedRows([]);
         $this->assertSame([], $table->selectedRows());
+    }
+
+    /**
+     * libui exposes no headless "click a row" API, so we verify the trampoline
+     * structurally: register the handler, then drive the retained C trampoline
+     * with a fabricated (sender, row, data) and assert the user callback saw
+     * (Table, int row). The real row index is the C int the trampoline forwards.
+     */
+    public function testOnRowClickedForwardsRowIndex(): void
+    {
+        $table = $this->makeTable();
+
+        $seen = null;
+        $table->onRowClicked(static function (Table $t, int $row) use (&$seen, $table): void {
+            $seen = [$t === $table, $row];
+        });
+
+        $this->invokeLastTrampoline($table, 3);
+        $this->assertSame([true, 3], $seen);
+    }
+
+    public function testOnRowDoubleClickedForwardsRowIndex(): void
+    {
+        $table = $this->makeTable();
+
+        $seen = null;
+        $table->onRowDoubleClicked(static function (Table $t, int $row) use (&$seen): void {
+            $seen = $row;
+        });
+
+        $this->invokeLastTrampoline($table, 7);
+        $this->assertSame(7, $seen);
+    }
+
+    /** Pull the most-recently retained Control trampoline and call it like libui would. */
+    private function invokeLastTrampoline(Table $table, int $row): void
+    {
+        $prop = new \ReflectionProperty(Control::class, 'callbacks');
+        /** @var list<callable> $callbacks */
+        $callbacks = $prop->getValue();
+        $trampoline = $callbacks[array_key_last($callbacks)];
+        $trampoline($table->handle(), $row, null);
     }
 }

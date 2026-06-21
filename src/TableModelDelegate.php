@@ -34,10 +34,12 @@ abstract class TableModelDelegate
     }
 
     /**
-     * The value to display at a cell. Return a string for String columns and an
-     * int for Int columns (it is marshalled into the matching uiTableValue).
+     * The value to display at a cell. Return a string for String columns, an int
+     * for Int/checkbox/progress columns, a {@see Color} for Color columns, or an
+     * {@see Image} for Image columns (marshalled into the matching uiTableValue).
+     * bool is accepted for checkbox columns and cast to 0/1 via the Int branch.
      */
-    abstract public function cellValue(int $row, int $column): string|int;
+    abstract public function cellValue(int $row, int $column): string|int|bool|Color|Image|null;
 
     /**
      * Persist an edit made in the UI. No-op by default (read-only tables); when

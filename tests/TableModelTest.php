@@ -54,6 +54,34 @@ final class TableModelTest extends TestCase
         );
     }
 
+    public function testForgottenFreeDoesNotAbort(): void
+    {
+        // No explicit free(): Ffi::uninit() must free the model via the Lifecycle
+        // registry and exit cleanly — the footgun is neutralised.
+        $this->assertSame(
+            0,
+            $this->runLifecycle('auto'),
+            'a forgotten free() must be swept up by Lifecycle::freeAll() in uninit()',
+        );
+    }
+
+    public function testLeakDetectorStillLiveWhenUnregistered(): void
+    {
+        // libui's leak-abort for an unfreed uiTableModel lives in darwin/table.m;
+        // the GTK/Windows backends free quietly, so this negative control is macOS-only.
+        if (\PHP_OS_FAMILY !== 'Darwin') {
+            $this->markTestSkipped('uiTableModel leak-abort in uiUninit() is macOS-only.');
+        }
+
+        // The 'leak' runner unregisters the model from Lifecycle so freeAll() can't
+        // rescue it; the detector must still fire, proving the negative control.
+        $this->assertNotSame(
+            0,
+            $this->runLifecycle('leak'),
+            'an unregistered, unfreed model must still abort in uiUninit()',
+        );
+    }
+
     public function testUnfreedModelAbortsInUninit(): void
     {
         // libui's leak-abort for an unfreed uiTableModel lives in darwin/table.m;

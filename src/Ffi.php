@@ -216,6 +216,7 @@ final class Ffi
      */
     public static function uninit(): void
     {
+        Lifecycle::freeAll(); // free any forgotten TableModels before libui's leak check
         self::get()->uiUninit();
         self::$initialized = false;
     }

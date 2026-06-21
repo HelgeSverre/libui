@@ -27,28 +27,87 @@ final class Table extends Control
     /** Kept so the model (and its handler/closures) outlive the table. */
     private TableModel $model;
 
-    public function __construct(TableModel $model)
+    /**
+     * uiTableTextColumnOptionalParams structs retained while libui holds their
+     * pointers. Mirrors how {@see $params} is kept alive as a property.
+     *
+     * @var list<\FFI\CData>
+     */
+    private array $retainedStructs = [];
+
+    /**
+     * @param TableModel $model the data model backing the table
+     * @param int|null $rowBackgroundModelColumn a Color model column to use for
+     *        per-row background, or null for none. Read once by uiNewTable() and
+     *        immutable thereafter — there is no live setter (see setRowBackground).
+     */
+    public function __construct(TableModel $model, ?int $rowBackgroundModelColumn = null)
     {
         $ffi = Ffi::get();
         $this->model = $model;
 
         $this->params = $ffi->new('uiTableParams');
         $this->params->Model = $model->handle();
-        $this->params->RowBackgroundColorModelColumn = self::NO_ROW_BACKGROUND;
+        $this->params->RowBackgroundColorModelColumn = $rowBackgroundModelColumn ?? self::NO_ROW_BACKGROUND;
 
         $this->handle = $ffi->uiNewTable(\FFI::addr($this->params));
     }
 
     /** Convenience: build the model from a delegate and wrap it in a table. */
-    public static function fromDelegate(TableModelDelegate $delegate): self
+    public static function fromDelegate(TableModelDelegate $delegate, ?int $rowBackgroundModelColumn = null): self
     {
-        return new self(new TableModel($delegate));
+        return new self(new TableModel($delegate), $rowBackgroundModelColumn);
     }
 
     /** Convenience: wrap an existing TableModel in a table. */
-    public static function fromModel(TableModel $model): self
+    public static function fromModel(TableModel $model, ?int $rowBackgroundModelColumn = null): self
     {
-        return new self($model);
+        return new self($model, $rowBackgroundModelColumn);
+    }
+
+    /**
+     * Build a read-only table from a list of positional rows.
+     *
+     * @param list<array<string|int>> $rows    row-major scalar cells
+     * @param array<string>            $headers column titles; if empty, one column
+     *        per first-row cell named "Column 1".."Column N"
+     */
+    public static function fromRows(array $rows, array $headers = []): static
+    {
+        if ($headers === []) {
+            $width = $rows === [] ? 0 : \count($rows[0]);
+            $headers = $width === 0
+                ? []
+                : array_map(static fn (int $i) => 'Column ' . ($i + 1), range(0, $width - 1));
+        }
+
+        $delegate = new ArrayTableModelDelegate(array_map('array_values', $rows), array_values($headers));
+        $table = self::fromDelegate($delegate);
+        foreach (array_values($headers) as $i => $name) {
+            $table->appendTextColumn($name, $i);
+        }
+
+        return $table;
+    }
+
+    /**
+     * Build a read-only table from a list of associative rows.
+     *
+     * @param list<array<string,string|int>> $rows
+     * @param array<string>|null $columns column keys to show, in order; defaults
+     *        to array_keys() of the first row. Header = key.
+     */
+    public static function fromAssoc(array $rows, ?array $columns = null): static
+    {
+        $columns ??= $rows === [] ? [] : array_keys($rows[0]);
+        $columns = array_values($columns);
+
+        $positional = array_map(
+            static fn (array $row) => array_map(static fn (string $k) => $row[$k] ?? '', $columns),
+            $rows,
+        );
+
+        return self::fromRows($positional, $columns);
     }
 
     /** The TableModel backing this table. */
@@ -61,16 +120,50 @@ final class Table extends Control
      * Append a read-only text column titled $name that reads from model column
      * $modelColumn (String or Int values are both rendered as text).
      */
-    public function appendTextColumn(string $name, int $modelColumn, ?int $editableModelColumn = null): static
-    {
-        Ffi::get()->uiTableAppendTextColumn(
+    public function appendTextColumn(
+        string $name,
+        int $modelColumn,
+        ?int $editableModelColumn = null,
+        ?int $colorModelColumn = null,
+    ): static {
+        $ffi = Ffi::get();
+
+        $params = null;
+        if ($colorModelColumn !== null) {
+            $struct = $ffi->new('uiTableTextColumnOptionalParams');
+            $struct->ColorModelColumn = $colorModelColumn;
+            $this->keepStruct($struct); // retain so the pointer stays valid for libui
+            $params = \FFI::addr($struct);
+        }
+
+        $ffi->uiTableAppendTextColumn(
             $this->handle,
             $name,
             $modelColumn,
             $editableModelColumn ?? self::NEVER_EDITABLE,
-            null, // optional params (colour) — not used
+            $params,
         );
         return $this;
+    }
+
+    /** Retain an optional-params struct so libui's pointer to it stays valid. */
+    private function keepStruct(\FFI\CData $struct): void
+    {
+        $this->retainedStructs[] = $struct;
+    }
+
+    /**
+     * Point the table at a Color model column for per-row background. This is
+     * NOT a live setter: uiTableParams.RowBackgroundColorModelColumn is read once
+     * by uiNewTable() and cannot change afterward. The method exists only to point
+     * you at the constructor argument, and always throws.
+     */
+    public function setRowBackground(int $colorModelColumn): static
+    {
+        throw new \LogicException(
+            'Row background must be set at construction: new Table($model, rowBackgroundModelColumn: N). '
+            . 'uiTableParams.RowBackgroundColorModelColumn is read once by uiNewTable() and cannot change afterward.',
+        );
     }
 
     /**
@@ -105,12 +198,13 @@ final class Table extends Control
      * Append a checkbox column titled $name that reads from model column
      * $modelColumn. The model should return bool values for this column.
      */
-    public function appendCheckboxColumn(string $name, int $modelColumn): static
+    public function appendCheckboxColumn(string $name, int $modelColumn, ?int $editableModelColumn = null): static
     {
         Ffi::get()->uiTableAppendCheckboxColumn(
             $this->handle,
             $name,
             $modelColumn,
+            $editableModelColumn ?? self::NEVER_EDITABLE,
         );
         return $this;
     }
@@ -146,13 +240,20 @@ final class Table extends Control
     /**
      * Append a button column titled $name that reads from model column
      * $modelColumn.
+     *
+     * libui delivers a button press through the model's
+     * SetCellValue(row, $modelColumn, null) — route click handling through the
+     * delegate's {@see TableModelDelegate::setCellValue()}. The optional
+     * $clickableModelColumn points at a model column gating which rows show an
+     * enabled button (default: always clickable).
      */
-    public function appendButtonColumn(string $name, int $modelColumn): static
+    public function appendButtonColumn(string $name, int $modelColumn, ?int $clickableModelColumn = null): static
     {
         Ffi::get()->uiTableAppendButtonColumn(
             $this->handle,
             $name,
             $modelColumn,
+            $clickableModelColumn ?? self::NEVER_EDITABLE,
         );
         return $this;
     }
@@ -276,12 +377,18 @@ final class Table extends Control
     /**
      * Register a callback for when a row is clicked.
      *
-     * The callback receives the clicked Table instance.
+     * The callback receives the Table instance and the clicked row index:
+     * `fn (Table $t, int $row)`. Old `fn ($t)` callbacks keep working — the
+     * extra argument is simply ignored.
      */
     public function onRowClicked(callable $cb): static
     {
-        $fn = Control::keep(function ($t) use ($cb) {
-            $cb($this);
+        $fn = Control::keep(function ($t, $row) use ($cb) {
+            try {
+                $cb($this, $row);
+            } catch (\Throwable $e) {
+                fwrite(STDERR, "[Table::onRowClicked] {$e->getMessage()}\n");
+            }
         });
         Ffi::get()->uiTableOnRowClicked($this->handle, $fn, null);
         return $this;
@@ -290,12 +397,18 @@ final class Table extends Control
     /**
      * Register a callback for when a row is double-clicked.
      *
-     * The callback receives the clicked Table instance.
+     * The callback receives the Table instance and the clicked row index:
+     * `fn (Table $t, int $row)`. Old `fn ($t)` callbacks keep working — the
+     * extra argument is simply ignored.
      */
     public function onRowDoubleClicked(callable $cb): static
     {
-        $fn = Control::keep(function ($t) use ($cb) {
-            $cb($this);
+        $fn = Control::keep(function ($t, $row) use ($cb) {
+            try {
+                $cb($this, $row);
+            } catch (\Throwable $e) {
+                fwrite(STDERR, "[Table::onRowDoubleClicked] {$e->getMessage()}\n");
+            }
         });
         Ffi::get()->uiTableOnRowDoubleClicked($this->handle, $fn, null);
         return $this;

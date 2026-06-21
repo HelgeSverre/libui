@@ -44,6 +44,7 @@ final class TableModel
         $ffi = Ffi::get();
         $this->handler = $this->makeHandler();
         $this->model = $ffi->uiNewTableModel(\FFI::addr($this->handler));
+        Lifecycle::registerModel($this);
     }
 
     /** The raw uiTableModel* — pass this into a {@see Table}. */
@@ -71,6 +72,11 @@ final class TableModel
      *   Ffi::uninit();
      *
      * Idempotent: a second call is a no-op (freeing twice also aborts libui).
+     *
+     * You no longer have to remember this: every model registers itself with
+     * {@see Lifecycle}, and {@see Ffi::uninit()} frees whatever is still live
+     * before tearing libui down. Calling free() explicitly remains valid (it
+     * frees + de-registers, leaving uninit()'s sweep a no-op).
      */
     public function free(): void
     {
@@ -79,6 +85,7 @@ final class TableModel
         }
         Ffi::get()->uiFreeTableModel($this->model);
         $this->freed = true;
+        Lifecycle::unregisterModel($this);
     }
 
     /** Notify libui that a new row appeared at $index so it can refresh. */
@@ -113,14 +120,29 @@ final class TableModel
         $this->callbacks['NumRows'] = static fn ($mh, $m) => self::guard($delegate->numRows(...), 0);
         // libui takes ownership of the returned uiTableValue* and frees it, so
         // we mint a fresh one per call and hand off the pointer.
-        $this->callbacks['CellValue'] = static fn ($mh, $m, $row, $column) => self::guard(static function () use ($delegate, $ffi, $row, $column) {
-            $type = $delegate->columnType($column);
-            $value = $delegate->cellValue($row, $column);
+        $this->callbacks['CellValue'] = static fn ($mh, $m, $row, $column) => self::guard(
+            static function () use ($delegate, $ffi, $row, $column) {
+                $type = $delegate->columnType($column);
+                $value = $delegate->cellValue($row, $column);
 
-            return $type === TableValueType::Int
-                ? $ffi->uiNewTableValueInt((int) $value)
-                : $ffi->uiNewTableValueString((string) $value);
-        }, null);
+                // libui takes ownership of the returned uiTableValue* and frees it,
+                // so we always mint fresh and never cache. A null return means "no
+                // value" for this cell (e.g. an empty row-background colour).
+                return match ($type) {
+                    TableValueType::Int => $ffi->uiNewTableValueInt((int) $value),
+                    TableValueType::Color => $value instanceof Color
+                        ? $ffi->uiNewTableValueColor($value->r, $value->g, $value->b, $value->a)
+                        : null,
+                    TableValueType::Image => $value instanceof Image && $value->handle() !== null
+                        ? $ffi->uiNewTableValueImage($value->handle())
+                        : null,
+                    // String column: bool is cast to "1"/"" by PHP — checkbox columns
+                    // are Int, so bool-as-text here is the caller's explicit choice.
+                    default => $ffi->uiNewTableValueString((string) $value),
+                };
+            },
+            null,
+        );
         $this->callbacks['SetCellValue'] = static function ($mh, $m, $row, $column, $value) use ($delegate, $ffi): void {
             self::guard(
                 static function () use ($delegate, $ffi, $row, $column, $value): void {
