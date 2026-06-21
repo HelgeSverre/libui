@@ -22,9 +22,21 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 SRC="$ROOT/third_party/libui-ng"
 BUILD="$SRC/build"
 
+# Pin the upstream ref so binaries are reproducible and stay in lock-step with the
+# ui.h the generator parses (override with LIBUI_REF=... for upgrades). Keep this in
+# sync with the generator-drift CI job in .github/workflows/ci.yml.
+LIBUI_REPO="https://github.com/libui-ng/libui-ng.git"
+LIBUI_REF="${LIBUI_REF:-43ba1ef553c8993a43a67f1ce6e35983a2660d8c}"
+
 if [ ! -d "$SRC/.git" ]; then
-  echo "==> Cloning libui-ng…"
-  git clone --depth 1 https://github.com/libui-ng/libui-ng.git "$SRC"
+  echo "==> Cloning libui-ng @ ${LIBUI_REF}…"
+  git clone --filter=blob:none "$LIBUI_REPO" "$SRC"
+  git -C "$SRC" checkout --quiet "$LIBUI_REF"
+elif [ "$(git -C "$SRC" rev-parse HEAD 2>/dev/null)" != "$LIBUI_REF" ]; then
+  # Re-checkout a stale/drifted local clone so it matches the pinned ref.
+  echo "==> Updating libui-ng to ${LIBUI_REF}…"
+  git -C "$SRC" fetch --quiet origin "$LIBUI_REF" || git -C "$SRC" fetch --quiet origin
+  git -C "$SRC" checkout --quiet "$LIBUI_REF"
 fi
 
 echo "==> Configuring (shared library, no tests/examples)…"

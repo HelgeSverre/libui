@@ -52,6 +52,32 @@ jobs:
       - name: Header gate (FFI::cdef accepts the generated header)
         run: composer gate
 
+  # Catch a generate.php / annotations change that wasn't re-run: regenerate from
+  # the pinned ui.h and assert the committed output is identical.
+  generator-drift:
+    name: generator drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: ffi
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      # Only ui.h is needed (the generator parses just that file). Keep this SHA in
+      # sync with LIBUI_REF in build-libui.sh.
+      - name: Fetch pinned ui.h
+        run: |
+          mkdir -p third_party/libui-ng
+          curl -fsSL -o third_party/libui-ng/ui.h \
+            https://raw.githubusercontent.com/libui-ng/libui-ng/43ba1ef553c8993a43a67f1ce6e35983a2660d8c/ui.h
+      - name: Regenerate and assert no drift
+        run: |
+          composer regen
+          git diff --exit-code -- src/Generated src/Native/libui.gen.h \
+            || { echo '::error::Generated files are stale — run `composer regen` and commit the result.'; exit 1; }
+
   # Build libui on each real OS/arch and run the full suite against it. macOS
   # uses the committed universal dylib; Linux/Windows build from source. GUI
   # tests run headless on Linux via xvfb.

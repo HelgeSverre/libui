@@ -73,16 +73,30 @@ final class GeneratorRegressionTest extends LibuiTestCase
         $this->assertIsInt($y->cdata);
     }
 
-    public function testGeneratedClickCallbackIsGuarded(): void
+    public function testEveryGeneratedCallbackSetterIsGuarded(): void
     {
-        // The generated onClicked() must wrap the user callback in try/catch.
-        // We can't synthesise a native click headlessly, so assert the emitted
-        // source guards the callback — the contract the generator promises.
-        $source = file_get_contents(Ffi::root() . '/src/Generated/Button.php');
+        // Every generated on*() that takes a callable hands a closure to C, where a
+        // thrown exception escaping the trampoline is a hard fatal — so the generator
+        // MUST wrap each in try/catch. Assert it for ALL of them, not just Button.
+        $unguarded = [];
 
-        $this->assertNotFalse($source);
-        $this->assertStringContainsString('try {', $source, 'generated callbacks must be wrapped in try/catch');
-        $this->assertStringContainsString('catch (\\Throwable', $source);
+        foreach (glob(Ffi::root() . '/src/Generated/*.php') as $file) {
+            $source = (string) file_get_contents($file);
+            // Capture each `public function onXxx(...) { ... }` method body (the
+            // closing brace is at 4-space indent; closures inside use 8+).
+            preg_match_all('/public function (on\w+)\([^{]*\{(.*?)\n    \}/s', $source, $matches, PREG_SET_ORDER);
+
+            foreach ($matches as [$whole, $name, $body]) {
+                if (! str_contains($whole, 'callable')) {
+                    continue; // only callback setters
+                }
+                if (! str_contains($body, 'try {') || ! str_contains($body, 'catch (\\Throwable')) {
+                    $unguarded[] = basename($file) . "::{$name}()";
+                }
+            }
+        }
+
+        $this->assertSame([], $unguarded, 'these generated callback setters are missing a try/catch guard');
     }
 
     public function testButtonCallbackRegistersWithoutError(): void
