@@ -12,6 +12,13 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <!-- Headless GTK (Linux) prints an AT-SPI accessibility warning to stderr
+             that corrupts PHPUnit's RunInSeparateProcess result serialization
+             (the menu tests need a fresh libui per process). Disable the bridge. -->
+        <env name="NO_AT_BRIDGE" value="1" force="true"/>
+        <env name="GTK_A11Y" value="none" force="true"/>
+    </php>
     <source>
         <include>
             <directory>src</directory>

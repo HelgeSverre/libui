@@ -100,6 +100,11 @@ jobs:
 
       - name: Test suite
         shell: bash
+        # NO_AT_BRIDGE/GTK_A11Y silence the headless-GTK AT-SPI warning so it can't
+        # corrupt PHPUnit's RunInSeparateProcess result serialization (menu tests).
+        env:
+          NO_AT_BRIDGE: '1'
+          GTK_A11Y: none
         run: |
           if [ "$RUNNER_OS" = "Linux" ]; then
             xvfb-run -a composer test
