@@ -46,11 +46,10 @@ function summary(string|false $doc): string
         }
     }
     $text = trim(implode(' ', $lines));
+
     // Resolve inline phpDoc {@see Foo::bar()} cross-references to inline code,
     // since this Markdown is not run through a phpDoc renderer.
-    $text = preg_replace('/\{@see\s+([^}]+)\}/', '`$1`', $text) ?? $text;
-
-    return $text;
+    return preg_replace('/\{@see\s+([^}]+)\}/', '`$1`', $text) ?? $text;
 }
 
 /** Render a parameter list back to a readable PHP-ish signature fragment. */

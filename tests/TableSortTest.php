@@ -39,7 +39,7 @@ final class TableSortTest extends LibuiTestCase
     public function testOnHeaderClickedReturnsSameInstance(): void
     {
         $table = $this->table();
-        $this->assertSame($table, $table->onHeaderClicked(function (Table $t, int $column): void {}));
+        $this->assertSame($table, $table->onHeaderClicked(static function (Table $t, int $column): void {}));
     }
 
     public function testSetSortIndicatorReturnsSameInstance(): void

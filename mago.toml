@@ -48,5 +48,11 @@ halstead = { enabled = false }
 kan-defect = { enabled = false }
 no-else-clause = { enabled = false }
 strict-types = { enabled = false }
+# Hex colour literals (0xFFFFFF, 0xFF byte masks) are the domain's standard form;
+# underscore separators (0xFF_FFFF) would make a colour library *less* readable.
+readable-literal = { enabled = false }
+# Positional literals are idiomatic here: variadic spies, test fixtures, and
+# assertSame(expected, actual) read worse as named arguments.
+literal-named-argument = { enabled = false }
 assertion-style = { style = "this" }
 strict-behavior = { allow-loose-behavior = true }

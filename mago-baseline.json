@@ -25,63 +25,9 @@ message = "Use identity comparison `===` instead of equality comparison `==`."
 count = 1
 
 [[issues]]
-file = "examples/colorpicker.php"
-code = "literal-named-argument"
-message = "Literal argument `1.0` should be passed as a named argument for clarity."
-count = 3
-
-[[issues]]
-file = "examples/colorpicker.php"
-code = "literal-named-argument"
-message = "Literal argument `100` should be passed as a named argument for clarity."
-count = 2
-
-[[issues]]
-file = "examples/colorpicker.php"
-code = "literal-named-argument"
-message = "Literal argument `2.0` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "examples/colorpicker.php"
-code = "literal-named-argument"
-message = "Literal argument `3599` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "examples/colorpicker.php"
-code = "literal-named-argument"
-message = "Literal argument `360.0` should be passed as a named argument for clarity."
-count = 4
-
-[[issues]]
-file = "examples/colorpicker.php"
-code = "literal-named-argument"
-message = "Literal argument `6.0` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
 file = "examples/markdown.php"
 code = "function-name"
 message = "Function name `parseMarkdown` should be in snake case."
-count = 1
-
-[[issues]]
-file = "examples/markdown.php"
-code = "literal-named-argument"
-message = "Literal argument `14.5` should be passed as a named argument for clarity."
-count = 6
-
-[[issues]]
-file = "examples/markdown.php"
-code = "literal-named-argument"
-message = "Literal argument `1` should be passed as a named argument for clarity."
-count = 2
-
-[[issues]]
-file = "examples/markdown.php"
-code = "literal-named-argument"
-message = "Literal argument `2` should be passed as a named argument for clarity."
 count = 1
 
 [[issues]]
@@ -103,9 +49,15 @@ message = "String concatenation with `sprintf` can be simplified."
 count = 1
 
 [[issues]]
-file = "examples/palette.php"
-code = "literal-named-argument"
-message = "Literal argument `0` should be passed as a named argument for clarity."
+file = "src/Draw/Path.php"
+code = "no-multi-assignments"
+message = "Avoid multiple assignments in a single statement."
+count = 5
+
+[[issues]]
+file = "src/Draw/Path.php"
+code = "no-redundant-string-concat"
+message = "String concatenation can be simplified."
 count = 1
 
 [[issues]]
@@ -115,21 +67,9 @@ message = "Nested ternary expressions are confusing due to PHP's operator associ
 count = 1
 
 [[issues]]
-file = "src/Image.php"
-code = "literal-named-argument"
-message = "Literal argument `0` should be passed as a named argument for clarity."
-count = 4
-
-[[issues]]
-file = "src/Image.php"
-code = "literal-named-argument"
-message = "Literal argument `false` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "src/Image.php"
-code = "literal-named-argument"
-message = "Literal argument `true` should be passed as a named argument for clarity."
+file = "src/Form.php"
+code = "prefer-early-continue"
+message = "Consider using early continue pattern to reduce nesting."
 count = 1
 
 [[issues]]
@@ -143,84 +83,6 @@ file = "src/Loop.php"
 code = "no-isset"
 message = "Use of the `isset` construct."
 count = 2
-
-[[issues]]
-file = "src/Utils/Clipboard.php"
-code = "literal-named-argument"
-message = "Literal argument `'r'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "src/Utils/Clipboard.php"
-code = "literal-named-argument"
-message = "Literal argument `'w'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tests/FfiMarshallingTest.php"
-code = "literal-named-argument"
-message = "Literal argument `'libui_test_'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `'libui_img_'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `0` should be passed as a named argument for clarity."
-count = 10
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `10` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `128` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `16` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `1` should be passed as a named argument for clarity."
-count = 4
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `255` should be passed as a named argument for clarity."
-count = 6
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `2` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `64` should be passed as a named argument for clarity."
-count = 2
-
-[[issues]]
-file = "tests/ImageTest.php"
-code = "literal-named-argument"
-message = "Literal argument `true` should be passed as a named argument for clarity."
-count = 1
 
 [[issues]]
 file = "tests/LoopTest.php"
@@ -269,36 +131,6 @@ file = "tools/gen-api-docs.php"
 code = "function-name"
 message = "Function name `typeToString` should be in snake case."
 count = 1
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "literal-named-argument"
-message = "Literal argument `''` should be passed as a named argument for clarity."
-count = 2
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "literal-named-argument"
-message = "Literal argument `'* '` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "literal-named-argument"
-message = "Literal argument `'-'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "literal-named-argument"
-message = '''Literal argument `'\\'` should be passed as a named argument for clarity.'''
-count = 2
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "literal-named-argument"
-message = "Literal argument `true` should be passed as a named argument for clarity."
-count = 3
 
 [[issues]]
 file = "tools/gen-api-docs.php"
@@ -620,120 +452,6 @@ count = 1
 
 [[issues]]
 file = "tools/generate.php"
-code = "literal-named-argument"
-message = 'Literal argument `" \t\n\r\0\x0B\\"` should be passed as a named argument for clarity.'
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = 'Literal argument `"\n\n"` should be passed as a named argument for clarity.'
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `'    '` should be passed as a named argument for clarity."
-count = 6
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `'    public function '` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `'    public static function '` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `' '` should be passed as a named argument for clarity."
-count = 2
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `'$1'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `''` should be passed as a named argument for clarity."
-count = 7
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `'*'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `'/'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `'struct tm { int tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, tm_wday, tm_yday, tm_isdst; };'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `'typedef unsigned int $1; enum'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `'{}'` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `0` should be passed as a named argument for clarity."
-count = 2
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `0o777` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `117` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `2` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `false` should be passed as a named argument for clarity."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "literal-named-argument"
-message = "Literal argument `true` should be passed as a named argument for clarity."
-count = 11
-
-[[issues]]
-file = "tools/generate.php"
 code = "no-isset"
 message = "Use of the `isset` construct."
 count = 8
@@ -749,9 +467,3 @@ file = "tools/generate.php"
 code = "prefer-early-continue"
 message = "Consider using early continue pattern to reduce nesting."
 count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "semantics"
-message = "The pipe operator (`|>`) is not available in your configured PHP version (8.4.0)."
-count = 13
