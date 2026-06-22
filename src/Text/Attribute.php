@@ -40,6 +40,7 @@ final class Attribute
      * - Background: (AttributeType::Background, start, end, float $r, float $g, float $b, float $a)
      * - Underline: (AttributeType::Underline, start, end, Underline $underline)
      * - UnderlineColor: (AttributeType::UnderlineColor, start, end, UnderlineColor $color, [r, g, b, a])
+     * - Features: (AttributeType::Features, start, end, OpenTypeFeatures $features)
      */
     public function __construct(AttributeType $type, int $start, int $end, mixed ...$params)
     {
@@ -93,6 +94,14 @@ final class Attribute
                 $this->attr = $ffi->uiNewUnderlineColorAttribute($color, $r, $g, $b, $a);
                 break;
             case AttributeType::Features:
+                if (! ($params[0] ?? null) instanceof OpenTypeFeatures) {
+                    throw new \InvalidArgumentException(
+                        'AttributeType::Features requires an OpenTypeFeatures instance as the first parameter.',
+                    );
+                }
+                // libui clones the features; the OpenTypeFeatures keeps ownership of its own otf.
+                $this->attr = $ffi->uiNewFeaturesAttribute($params[0]->handle());
+                break;
             default:
                 throw new \InvalidArgumentException("Unsupported attribute type: {$type->name}");
         }

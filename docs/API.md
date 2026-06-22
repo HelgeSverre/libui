@@ -69,7 +69,7 @@ Async event loop integration with libui's native event loop.
 - `static delay(int $milliseconds, callable $callback): int` — Schedule a callback to run once after a delay.
 - `static isRunning(): bool` — Whether the native event loop is currently running.
 - `static repeat(int $milliseconds, callable $callback): int` — Schedule a callback to run repeatedly at a fixed interval.
-- `static run(): void` — Run the event loop until {@see Loop::stop()} is called or all windows close.
+- `static run(): void` — Run the event loop until `Loop::stop()` is called or all windows close.
 - `static stop(): void` — Signal the event loop to quit.
 
 ### `Window`
@@ -114,7 +114,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 `Libui\ArrayTableModelDelegate` — extends `TableModelDelegate`
 
-A ready-made {@see TableModelDelegate} over an in-memory, row-major array.
+A ready-made `TableModelDelegate` over an in-memory, row-major array.
 
 - `__construct(array $rows, array $headers, array $types = [])`
 - `cellValue(int $row, int $column): Color|Image|string|int|bool|null`
@@ -122,6 +122,18 @@ A ready-made {@see TableModelDelegate} over an in-memory, row-major array.
 - `headers(): array`
 - `numColumns(): int`
 - `numRows(): int`
+
+### `Build`
+
+`Libui\Build`
+
+Declarative, fluent constructors for the common container widgets. Layers over the existing public APIs of `Box`, `Form` and `Window` to cut the positional append() boilerplate of an imperative layout.
+
+- `static form(array $fields): Form` — Labelled form built from a `title => control` map, in iteration order.
+- `static hbox(Control|array ...$children): Box` — Padded horizontal box with each child appended in order. A child is either a bare `Control` (non-stretchy) or a `Build::stretchy()` marker. For an unpadded box use `Box::horizontal(false)` directly.
+- `static stretchy(Control $control): array` — Marks a control as stretchy for `Build::vbox()` / `Build::hbox()`. The returned shape is an internal marker consumed by those methods — treat it as opaque.
+- `static vbox(Control|array ...$children): Box` — Padded vertical box with each child appended in order. A child is either a bare `Control` (non-stretchy) or a `Build::stretchy()` marker. Padding is on (the sensible layout default); for an unpadded box use `new Box(false)` directly.
+- `static window(string $title, int $width, int $height, Control $child, bool $margined = true): Window` — New top-level window with its single child set. Margins are on by default.
 
 ### `Button`
 
@@ -181,10 +193,10 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new color button.
 - `color(CData $r, CData $g, CData $bl, CData $a): static` — Returns the color button color.
-- `getColor(): Color` — The currently selected colour as a {@see Color}, wrapping the generated output-pointer getter.
+- `getColor(): Color` — The currently selected colour as a `Color`, wrapping the generated output-pointer getter.
 - `onChanged(callable $cb): static` — Registers a callback for when the color is changed.
-- `setColor(Color|float $r, float $g = 0, float $b = 0, float $a = 1): static` — Set the button colour from a {@see Color}, or from raw 0..1 float channels (the generated signature still works).
-- `setValue(mixed $value): static` — Set the colour from a {@see Color} or an `[r,g,b(,a)]` array.
+- `setColor(Color|float $r, float $g = 0, float $b = 0, float $a = 1): static` — Set the button colour from a `Color`, or from raw 0..1 float channels (the generated signature still works).
+- `setValue(mixed $value): static` — Set the colour from a `Color` or an `[r,g,b(,a)]` array.
 - `value(): Color` — The selected colour, for generic binding.
 
 ### `Combobox`
@@ -291,14 +303,14 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new font button. The default font is determined by the OS defaults.
 - `font(CData $desc): static` — Returns the selected font.
-- `getFont(): FontDescriptor` — The currently selected font as a typed {@see FontDescriptor}, wrapping the generated output-pointer getter and freeing libui's allocated copy.
+- `getFont(): FontDescriptor` — The currently selected font as a typed `FontDescriptor`, wrapping the generated output-pointer getter and freeing libui's allocated copy.
 - `onChanged(callable $cb): static` — Registers a callback for when the font is changed.
 
 ### `HasValue`
 
 `Libui\HasValue`
 
-An input widget with a single readable/writable value, for generic binding (e.g. {@see Form::values()} / {@see Form::setValues()}).
+An input widget with a single readable/writable value, for generic binding (e.g. `Form::values()` / `Form::setValues()`).
 
 - `setValue(mixed $value): static`
 - `value(): mixed`
@@ -319,7 +331,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 `Libui\Lifecycle`
 
-Process-wide registry of native resources that must be released before uiUninit(). Today: uiTableModels — libui's leak checker aborts in uiUninit() if a model is left unfreed, so {@see Ffi::uninit()} drains this registry first.
+Process-wide registry of native resources that must be released before uiUninit(). Today: uiTableModels — libui's leak checker aborts in uiUninit() if a model is left unfreed, so `Ffi::uninit()` drains this registry first.
 
 - `static freeAll(): void` — Free every still-live registered model exactly once.
 - `static registerModel(TableModel $model): void`
@@ -334,11 +346,11 @@ Menu widget. Hand-editable — add convenience methods here. Inherits the genera
 _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct(string $name)`
-- `appendAboutItem(): MenuItem` — The platform About item, as a hand-wrapped {@see MenuItem}.
+- `appendAboutItem(): MenuItem` — The platform About item, as a hand-wrapped `MenuItem`.
 - `appendCheckItem(string $name, ?callable $onClick = null): MenuItem` — Append a check item, optionally wiring a clean fn(MenuItem $item) handler.
 - `appendItem(string $name, ?callable $onClick = null): MenuItem` — Append a clickable item, optionally wiring a clean fn(MenuItem $item) handler.
-- `appendPreferencesItem(): MenuItem` — The platform Preferences item, as a hand-wrapped {@see MenuItem}.
-- `appendQuitItem(): MenuItem` — The platform Quit item, as a hand-wrapped {@see MenuItem} so `onClick()` is available like every other append helper.
+- `appendPreferencesItem(): MenuItem` — The platform Preferences item, as a hand-wrapped `MenuItem`.
+- `appendQuitItem(): MenuItem` — The platform Quit item, as a hand-wrapped `MenuItem` so `onClick()` is available like every other append helper.
 - `appendSeparator(): static` — Appends a new separator.
 
 ### `MenuItem`
@@ -445,6 +457,32 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `setValue(mixed $value): static`
 - `value(): int` — Returns the spinbox value.
 
+### `CallbackSpy`
+
+`Libui\Testing\CallbackSpy`
+
+A callable test double that records every invocation.
+
+- `__construct($inner = null)`
+- `__invoke(mixed ...$args): mixed` — Records the invocation and forwards to the optional delegate.
+- `argsOf(int $index): array` — The argument list captured for a single invocation.
+- `called(): bool` — Whether this spy has been invoked at least once.
+- `calls(): array` — All recorded argument lists, in call order.
+- `count(): int` — Number of times this spy has been invoked.
+- `lastArgs(): array` — The arguments of the most recent invocation.
+- `reset(): void` — Forgets all recorded invocations.
+
+### `Inspect`
+
+`Libui\Testing\Inspect`
+
+Read-only introspection over what libui actually exposes headlessly.
+
+- `static callbacksRegisteredBy(callable $register): int` — Count the event trampolines retained while running $register.
+- `static isEnabled(Control $control): bool` — Whether the control is enabled for user interaction.
+- `static isToplevel(Control $control): bool` — Whether the control is a toplevel widget (e.g. a Window).
+- `static isVisible(Control $control): bool` — Whether the control's own visibility flag is set.
+
 ## Containers & layout
 
 ### `Box`
@@ -480,7 +518,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `padded(): bool` — Returns whether or not controls within the form are padded. Padding is defined as space between individual controls.
 - `setPadded(bool $padded): static` — Sets whether or not controls within the box are padded. Padding is defined as space between individual controls. The...
 - `setValues(array $values): static` — Set fields from `[label => value]`. Unknown labels and non-value controls are ignored, so a partial map is fine.
-- `values(): array` — Read every {@see HasValue} field as `[label => value]`. Non-value controls (separators, labels, …) are skipped.
+- `values(): array` — Read every `HasValue` field as `[label => value]`. Non-value controls (separators, labels, …) are skipped.
 
 ### `Grid`
 
@@ -523,11 +561,13 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct()` — Creates a new tab container.
 - `append(string $name, Control $c): static` — Appends a control in form of a page/tab with label.
+- `appendMargined(string $name, Control $c): static` — Appends a page and marks it margined in one step.
 - `delete(int $index): static` — Removes the control at $index.
 - `insertAt(string $name, int $index, Control $c): static` — Inserts a control in form of a page/tab with label at $index.
 - `margined(int $index): bool` — Returns whether or not the page/tab at $index has a margin.
 - `numPages(): int` — Returns the number of pages contained.
 - `onSelected(callable $cb): static` — Registers a callback for when a tab is selected.
+- `pages(array $named): static` — Appends an ordered map of pages, keyed by their label.
 - `selected(): int` — Returns the index of the tab selected.
 - `setMargined(int $index, bool $margined): static` — Sets whether or not the page/tab at $index has a margin. The margin size is determined by the OS defaults.
 - `setSelected(int $index): static` — Sets the tab selected.
@@ -538,7 +578,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 `Libui\Table` — extends `Control`
 
-A data-grid widget backed by a {@see TableModel}.
+A data-grid widget backed by a `TableModel`.
 
 _Plus the common widget verbs from [`Control`](#control)._
 
@@ -556,27 +596,30 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `appendTextColumn(string $name, int $modelColumn, ?int $editableModelColumn = null, ?int $colorModelColumn = null): static` — Append a read-only text column titled $name that reads from model column $modelColumn (String or Int values are both rendered as text).
 - `headerVisible(): bool` — Whether the column header row is shown.
 - `model(): TableModel` — The TableModel backing this table.
+- `onHeaderClicked(callable $cb): static` — Register a callback for when a column header is clicked.
 - `onRowClicked(callable $cb): static` — Register a callback for when a row is clicked.
 - `onRowDoubleClicked(callable $cb): static` — Register a callback for when a row is double-clicked.
 - `onSelectionChanged(callable $cb): static` — Register a callback for when the table selection changes.
 - `selectedRows(): array` — Get the currently selected rows.
 - `selectionMode(): TableSelectionMode` — Get the current selection mode for the table.
 - `setColumnWidth(int $column, int $width): static` — Set a column's width in pixels.
-- `setHeaderVisible(bool $visible): static`
+- `setHeaderVisible(bool $visible): static` — Show or hide the column header row.
 - `setRowBackground(int $colorModelColumn): static` — Point the table at a Color model column for per-row background. This is NOT a live setter: uiTableParams.RowBackgroundColorModelColumn is read once by uiNewTable() and cannot change afterward. The method exists only to point you at the constructor argument, and always throws.
 - `setSelectedRows(array $rows): static` — Set the selected rows programmatically.
 - `setSelectionMode(TableSelectionMode $mode): static` — Set the selection mode for the table.
+- `setSortIndicator(int $column, SortIndicator $indicator): static` — Set the sort indicator arrow shown on a column's header.
+- `sortIndicator(int $column): SortIndicator` — Get the sort indicator currently shown on a column's header.
 
 ### `TableModel`
 
 `Libui\TableModel`
 
-Bridges a {@see TableModelDelegate} to libui's uiTableModel.
+Bridges a `TableModelDelegate` to libui's uiTableModel.
 
 - `static fromDelegate(TableModelDelegate $delegate): TableModel`
 - `__construct(TableModelDelegate $delegate)`
 - `free(): void` — Release the underlying uiTableModel.
-- `handle(): CData` — The raw uiTableModel* — pass this into a {@see Table}.
+- `handle(): CData` — The raw uiTableModel* — pass this into a `Table`.
 - `rowChanged(int $index): void` — Notify libui that the row at $index changed so it can repaint it.
 - `rowDeleted(int $index): void` — Notify libui that the row at $index was removed.
 - `rowInserted(int $index): void` — Notify libui that a new row appeared at $index so it can refresh.
@@ -585,10 +628,10 @@ Bridges a {@see TableModelDelegate} to libui's uiTableModel.
 
 `Libui\TableModelDelegate`
 
-Drives a {@see TableModel} — implement this to feed a {@see Table} its data.
+Drives a `TableModel` — implement this to feed a `Table` its data.
 
 - `cellEditable(int $row, int $column): ?bool` — Whether a cell is editable. Defaults to null (not editable). Return true for editable cells, false for read-only.
-- `cellValue(int $row, int $column): Color|Image|string|int|bool|null` — The value to display at a cell. Return a string for String columns, an int for Int/checkbox/progress columns, a {@see Color} for Color columns, or an {@see Image} for Image columns (marshalled into the matching uiTableValue). bool is accepted for checkbox columns and cast to 0/1 via the Int branch.
+- `cellValue(int $row, int $column): Color|Image|string|int|bool|null` — The value to display at a cell. Return a string for String columns, an int for Int/checkbox/progress columns, a `Color` for Color columns, or an `Image` for Image columns (marshalled into the matching uiTableValue). bool is accepted for checkbox columns and cast to 0/1 via the Int branch.
 - `cellValueChanged(int $row, int $column): void` — Called after a cell value has been changed. No-op by default.
 - `columnType(int $column): TableValueType` — The value type of a column, deciding how libui renders/marshals it. Defaults to String — override only for Int (or Color) columns.
 - `numColumns(): int` — Total number of columns the model exposes.
@@ -607,7 +650,10 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `static scrolling(AreaDelegate $delegate, int $width, int $height): Area`
 - `__construct(AreaDelegate $delegate, ?int $scrollWidth = null, ?int $scrollHeight = null)`
+- `beginUserWindowMove(): void` — Begin a user-driven move of the window containing this Area.
+- `beginUserWindowResize(WindowResizeEdge $edge): void` — Begin a user-driven resize of the window containing this Area from the given edge.
 - `queueRedrawAll(): void`
+- `scrollTo(float $x, float $y, float $width, float $height): void` — Scroll the Area so the given rectangle is visible.
 - `setSize(int $width, int $height): void`
 
 ### `AreaDelegate`
@@ -617,7 +663,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 Override the methods you need to drive a custom-drawn Area. All default to no-ops so a draw-only delegate just overrides draw().
 
 - `area(): ?Area` — The Area this delegate drives, or null if not yet bound.
-- `bindArea(Area $area): void` — Bind this delegate to its Area. Called by {@see Area::__construct()}; not intended for direct use.
+- `bindArea(Area $area): void` — Bind this delegate to its Area. Called by `Area::__construct()`; not intended for direct use.
 - `dragBroken(): void`
 - `draw(DrawContext $ctx, AreaDrawParams $params): void`
 - `key(AreaKeyEvent $event): bool` — Return true if the key event was handled.
@@ -631,9 +677,9 @@ Override the methods you need to drive a custom-drawn Area. All default to no-op
 
 A paint source for filling/stroking. Build one with a factory, then hand it to DrawContext::fill()/stroke().
 
-- `static color(Color $color): Brush` — Build a solid brush from a {@see Color}.
+- `static color(Color $color): Brush` — Build a solid brush from a `Color`.
 - `static linearGradient(float $x0, float $y0, float $x1, float $y1, array $stops): Brush`
-- `static radialGradient(float $cx, float $cy, float $radius, array $stops): Brush` — Radial gradient centred at ($cx, $cy) out to $radius. Stops are {@see Stop} objects or [pos,r,g,b,a] tuples (or a mix).
+- `static radialGradient(float $cx, float $cy, float $radius, array $stops): Brush` — Radial gradient centred at ($cx, $cy) out to $radius. Stops are `Stop` objects or [pos,r,g,b,a] tuples (or a mix).
 - `static rgb(int $hex, float $a = 1): Brush` — Build a solid brush from a 0xRRGGBB integer.
 - `static solid(float $r, float $g, float $b, float $a = 1): Brush`
 - `toCData(): CData`
@@ -738,11 +784,11 @@ A vector path, built then filled/stroked into a DrawContext.
 
 `Libui\Draw\Stop`
 
-A single gradient colour stop: a position along the gradient (0..1) and a {@see Color}. The typed replacement for hand-built [pos, r, g, b, a] tuples passed to {@see Brush::linearGradient()} / {@see Brush::radialGradient()}.
+A single gradient colour stop: a position along the gradient (0..1) and a `Color`. The typed replacement for hand-built [pos, r, g, b, a] tuples passed to `Brush::linearGradient()` / `Brush::radialGradient()`.
 
 - `static at(float $pos, Color $color): Stop`
 - `__construct(float $pos, Color $color)`
-- `toArray(): array` — The stop as the [pos, r, g, b, a] tuple that {@see Brush::toCData()} already consumes.
+- `toArray(): array` — The stop as the [pos, r, g, b, a] tuple that `Brush::toCData()` already consumes.
 
 ### `StrokeParams`
 
@@ -768,10 +814,10 @@ Stroke styling for DrawContext::stroke().
 A single text attribute (a family, size, weight, colour, …) built via one of the static factories and applied to a range of an AttributedString.
 
 - `static background(float $r, float $g, float $b, float $a = 1): Attribute`
-- `static backgroundFromColor(Color $color): Attribute` — Background colour from a {@see Color}.
+- `static backgroundFromColor(Color $color): Attribute` — Background colour from a `Color`.
 - `static color(float $r, float $g, float $b, float $a = 1): Attribute`
 - `static family(string $family): Attribute`
-- `static fromColor(Color $color): Attribute` — Text colour from a {@see Color}.
+- `static fromColor(Color $color): Attribute` — Text colour from a `Color`.
 - `static italic(TextItalic $italic): Attribute`
 - `static rgb(int $hex, float $a = 1): Attribute` — Colour from a 0xRRGGBB integer (mirrors Brush::rgb).
 - `static size(float $size): Attribute`
@@ -779,7 +825,7 @@ A single text attribute (a family, size, weight, colour, …) built via one of t
 - `static underline(Underline $underline = Underline::Single): Attribute`
 - `static underlineColor(UnderlineColor $color): Attribute`
 - `static weight(TextWeight $weight): Attribute`
-- `__construct(AttributeType $type, int $start, int $end, mixed ...$params)` — Create an attribute with a range. The attribute type and additional parameters vary by type: - Family: (AttributeType::Family, start, end, string $family) - Size: (AttributeType::Size, start, end, float $size) - Weight: (AttributeType::Weight, start, end, TextWeight $weight) - Italic: (AttributeType::Italic, start, end, TextItalic $italic) - Stretch: (AttributeType::Stretch, start, end, TextStretch $stretch) - Color: (AttributeType::Color, start, end, float $r, float $g, float $b, float $a) - Background: (AttributeType::Background, start, end, float $r, float $g, float $b, float $a) - Underline: (AttributeType::Underline, start, end, Underline $underline) - UnderlineColor: (AttributeType::UnderlineColor, start, end, UnderlineColor $color, [r, g, b, a])
+- `__construct(AttributeType $type, int $start, int $end, mixed ...$params)` — Create an attribute with a range. The attribute type and additional parameters vary by type: - Family: (AttributeType::Family, start, end, string $family) - Size: (AttributeType::Size, start, end, float $size) - Weight: (AttributeType::Weight, start, end, TextWeight $weight) - Italic: (AttributeType::Italic, start, end, TextItalic $italic) - Stretch: (AttributeType::Stretch, start, end, TextStretch $stretch) - Color: (AttributeType::Color, start, end, float $r, float $g, float $b, float $a) - Background: (AttributeType::Background, start, end, float $r, float $g, float $b, float $a) - Underline: (AttributeType::Underline, start, end, Underline $underline) - UnderlineColor: (AttributeType::UnderlineColor, start, end, UnderlineColor $color, [r, g, b, a]) - Features: (AttributeType::Features, start, end, OpenTypeFeatures $features)
 - `free(): void`
 - `getEnd(): int`
 - `getStart(): int`
@@ -824,6 +870,18 @@ The default font for a TextLayout, wrapping the uiFontDescriptor struct {Family 
 - `stretch(): TextStretch`
 - `toCData(): CData`
 - `weight(): TextWeight`
+
+### `OpenTypeFeatures`
+
+`Libui\Text\OpenTypeFeatures`
+
+A bag of OpenType feature tags, wrapping uiOpenTypeFeatures*.
+
+- `__construct()`
+- `add(string $tag, int $value): static` — Add (or overwrite) a feature. $tag must be exactly four characters.
+- `free(): void` — Free the native features. Idempotent, and runs automatically on destruction.
+- `get(string $tag): ?int` — Look up a feature's value, or null if the tag is not present. $tag must be exactly four characters.
+- `handle(): CData`
 
 ### `RichText`
 

@@ -30,7 +30,7 @@ The library is split into two layers:
 The full pipeline from a clean checkout, in order:
 
 ```sh
-composer build-lib   # build/refresh lib/libui.dylib from third_party/libui-ng
+composer build-lib   # build/refresh lib/<platform>/libui.* (e.g. lib/darwin/libui.dylib) from third_party/libui-ng
 composer regen       # regenerate src/Native/libui.gen.h + src/Generated/**
 composer gate        # assert FFI::cdef accepts the full generated header
 ```

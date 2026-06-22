@@ -43,12 +43,6 @@ parameters:
 			path: src/Control.php
 
 		-
-			message: '#^Static property Libui\\Control\:\:\$callbacks is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: src/Control.php
-
-		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$tm_hour\.$#'
 			identifier: property.notFound
 			count: 2

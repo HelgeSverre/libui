@@ -1,5 +1,7 @@
 # Libui for PHP - Implementation Improvements
 
+> **SUPERSEDED — point-in-time review from 2026-06.** Item #1 (PHP 8.3 floor) was reverted; the current floor is **PHP 8.5** (`composer.json: "php": ">=8.5"`). Test counts and status here are obsolete. The current roadmap lives in [`docs/superpowers/specs/2026-06-21-improvement-audit.md`](../superpowers/specs/2026-06-21-improvement-audit.md).
+
 This document tracks the implementation status of all improvements identified in the comprehensive review.
 
 ---
@@ -8,7 +10,7 @@ This document tracks the implementation status of all improvements identified in
 
 | # | Improvement | Status | Effort | Impact | Notes |
 |---|-------------|--------|--------|--------|-------|
-| 1 | Drop PHP floor to 8.3 (CI-proven) | ✅ **DONE** | XS | ★★★ | PHP 8.3+ now, CI matrix across 8.3/8.4/8.5 |
+| 1 | Drop PHP floor to 8.3 | ❌ **REVERTED** | — | — | Floor is back to `>=8.5` (composer.json); CI pins PHP 8.5 only (`.github/workflows/ci.yml`) |
 | 2 | Ship prebuilt Linux + Windows binaries | ✅ **DONE** | S | ★★★ | CI workflow in place, error messages improved |
 | 3 | Async event-loop bridge (Revolt/ReactPHP) | ✅ **DONE** | M | ★★★ | Loop class + example, foundation for Revolt |
 | 4 | Complete Table API | ✅ **DONE** | M | ★★ | All column types, selection, callbacks, editing |
@@ -73,9 +75,9 @@ This document tracks the implementation status of all improvements identified in
 
 **New: `src/Loop.php`** - Clean API for async operations:
 ```php
-Loop::defer(fn() => echo "Next tick");
-Loop::delay(1000, fn() => echo "After 1 second");
-Loop::repeat(100, fn() => echo "Every 100ms");
+Loop::defer(function () { echo "Next tick"; });
+Loop::delay(1000, function () { echo "After 1 second"; });
+Loop::repeat(100, function () { echo "Every 100ms"; });
 Loop::cancel($timerId);
 ```
 
@@ -197,4 +199,4 @@ While all 5 strategic improvements are now complete, there's still room for enha
 
 ---
 
-*Last updated: $(date)*
+*Last updated: 2026-06-07*

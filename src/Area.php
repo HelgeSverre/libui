@@ -8,6 +8,7 @@ use Libui\Draw\DrawContext;
 use Libui\Draw\Params\AreaDrawParams;
 use Libui\Draw\Params\AreaKeyEvent;
 use Libui\Draw\Params\AreaMouseEvent;
+use Libui\Generated\Enum\WindowResizeEdge;
 
 /**
  * A custom-drawn surface, driven by an AreaDelegate.
@@ -47,6 +48,29 @@ final class Area extends Control
     public function setSize(int $width, int $height): void
     {
         Ffi::get()->uiAreaSetSize($this->handle, $width, $height);
+    }
+
+    /**
+     * Scroll the Area so the given rectangle is visible.
+     *
+     * Only meaningful on a scrolling Area (one built via {@see Area::scrolling()});
+     * on a non-scrolling Area this is a no-op.
+     */
+    public function scrollTo(float $x, float $y, float $width, float $height): void
+    {
+        Ffi::get()->uiAreaScrollTo($this->handle, $x, $y, $width, $height);
+    }
+
+    /** Begin a user-driven move of the window containing this Area. */
+    public function beginUserWindowMove(): void
+    {
+        Ffi::get()->uiAreaBeginUserWindowMove($this->handle);
+    }
+
+    /** Begin a user-driven resize of the window containing this Area from the given edge. */
+    public function beginUserWindowResize(WindowResizeEdge $edge): void
+    {
+        Ffi::get()->uiAreaBeginUserWindowResize($this->handle, $edge->value);
     }
 
     private function makeHandler(AreaDelegate $delegate): \FFI\CData

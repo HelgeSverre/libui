@@ -70,7 +70,7 @@
     ]
   },
   "scripts-descriptions": {
-    "build-lib": "Build/refresh lib/libui.dylib from libui-ng source",
+    "build-lib": "Build/refresh lib/<platform>/libui.* (e.g. lib/darwin/libui.dylib) from libui-ng source",
     "regen": "Regenerate src/Native/libui.gen.h and src/Generated/* from ui.h",
     "docs:api": "Regenerate docs/API.md from the public API surface (reflection-based)",
     "test": "Run the full PHPUnit test suite",

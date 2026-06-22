@@ -69,6 +69,21 @@ abstract class Control
     }
 
     /**
+     * Returns the trampolines retained via {@see Control::keep()}.
+     *
+     * Exposed solely so the testing harness ({@see \Libui\Testing\Inspect})
+     * can assert that event handlers were registered without running the
+     * event loop. Has no effect on widget behaviour.
+     *
+     * @internal
+     * @return list<callable> The retained callbacks, in registration order
+     */
+    public static function retainedCallbacks(): array
+    {
+        return self::$callbacks;
+    }
+
+    /**
      * Builds an instance around an existing native handle, bypassing the constructor.
      *
      * This is used by factory methods (like DateTimePicker::dateOnly()) to create

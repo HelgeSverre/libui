@@ -1,5 +1,7 @@
 # php-gui (helgesverre/libui) — Prioritized Improvement Report
 
+> **2026-06-22 status update at the bottom of this file** ([jump](#2026-06-22-status-update--new-candidates)): the original A/F/I/G/T/D items below are now **19 done, 1 partial (G3), 28 open**, plus 6 newly-scouted component/abstraction candidates. The items in the body below are kept verbatim as the original audit; consult the addendum for current status.
+
 ## Executive summary
 
 The binding is mature: a generator-plus-hand-sugar architecture, typed widgets, RAII wrappers for most native resources, and a broad test suite. This audit found that the remaining issues cluster into a few honest categories:
@@ -235,3 +237,45 @@ GUIDE Tables (`:487-565`) documents only Int/String column types. The capability
 ## Sequencing note
 
 The Text-subsystem memory items have an ordering constraint: **F4 (TextLayout retains its string) must land with or before F3 (AttributedString destructor)**, and **F2 (drawString leak)** is fixed either by its own `finally` or automatically once F3 lands. Treat F2/F3/F4 as one PR. Everything else is independent.
+
+---
+
+## 2026-06-22 status update & new candidates
+
+Verified against the code and `git log` on 2026-06-22 (docs + roadmap sweep). Status counts: **19 done, 1 partial, 28 open.**
+
+### Done (verified)
+
+`A1` Grid `appendAt`/`place` (`src/Grid.php:20-38`) · `A2` Box/Form bool `stretchy` + Form facade (`src/Box.php:31`, `src/Form.php:17,24`) · `A3` FontButton typed get + FontDescriptor getters/`fromCData` (`src/FontButton.php:22`, `src/Text/FontDescriptor.php:96-130`) · `A4` DateTimePicker ⇄ `DateTimeImmutable` (`src/DateTimePicker.php:17,29,39`) · `A8` `HasValue` value contract (`src/HasValue.php`, `src/Form.php:39,57`) · `G1` multi-line docblock truncation (`src/Generated/Combobox.php:58`) · `D1` GUIDE Windows no longer "experimental" · `D2` broken in-page anchor · `D3` RichText/TextStyle documented · `D4` CONTRIBUTING lists Text+Table · `T1` Table append Image/CheckboxText FFI arity (`src/Table.php:194-201,232-239`) · `T2` `uiWindowFocused`/`uiTabMargined` return bool · `F1` `Table::onSelectionChanged` guarded · `F2/F3/F4/F5` AttributedString lifetime family (`src/Draw/DrawContext.php:150-153`, `src/Text/AttributedString.php`, `src/Text/TextLayout.php`, `src/FontButton.php:29`) · `I1` generator drift detection in CI (`ci.yml:77-79`) · `I2` `build-libui.sh` pinned clone · `I4` AppTest no-op assertions removed.
+
+### Partial
+
+- **G3** — boolean predicate *getters* done (`tools/annotations.php:72-73`), but `Grid::append()` `hexpand`/`vexpand` are still `int` (`src/Generated/Grid.php:42`) and the `generate.php:879` coercion is not generalized to params.
+
+### Open (still outstanding)
+
+`A5` public `Window::getContentSize()`/`getPosition()` (only private `windowSize()` today, `src/Window.php:100`) · `A6` `MenuItem::onClicked` leaks raw `uiWindow*` (`src/Generated/MenuItem.php:51`) · `A7` single-callback add/remove + replace test (no `on()`/unsubscribe in `src/Control.php`) · `A9` `@internal` on generated scalarOut getters · `A10` document Spinbox/Slider int-only · `G2` DateTimePicker factory summaries rotated (no `doc_overrides`) · `G4` strip all `[Default]` fragments (leaks in Slider/Window/Entry/Checkbox/MenuItem/Combobox/ProgressBar) · `G5` out-pointer params opaque · `G6` `@note` before `@return` · `G7` bare `@see uiFunctionName` in Generated docblocks · `G8` "neither destroyed nor freed" grammar typo · `G9` no test asserts docblock content · `D5` GUIDE Tables omits Color columns/bg · `T3` `FfiFunctions` dead duplicate · `T4`/`T5`/`T9` PHPStan baseline noise (iterableValue, alreadyNarrowedType, onlyWritten) · `T6` Brush gradient default `[]` vs 5-tuple · `T7` FFI stub callbacks bare `callable` · `T8` `selectedRows` `@return int[]` → `list<int>` · `F6` retained callback stores never cleared on uninit · `F7` `Image` has no destructor (leaks `uiImage`) · `I3` subprocess test never asserts exit 0 · `I5` DialogsTest never tests empty→null · `I6` PHPStan runs macOS-only · `I7` HeaderGate is string-grep not resolve-check · `I8` enum tests pin PHP to itself not `ui.h` · `I9` no CI guard that committed `lib/` matches a pinned build.
+
+### New component & abstraction candidates (not in the original audit)
+
+> **All six (N1–N6) were implemented on 2026-06-22** and ship green (693 tests, PHPStan clean, gate + format pass). See the table for the delivered surface. As a side effect, N6's `Control::retainedCallbacks()` accessor resolved the `property.onlyWritten` baseline noise on `Control::$callbacks` (partial **F6/T9**).
+>
+> - **N1** — `Table::onHeaderClicked()`, `setSortIndicator()`, `sortIndicator()` (`src/Table.php`; `tests/TableSortTest.php`).
+> - **N2** — `Area::scrollTo()`, `beginUserWindowMove()`, `beginUserWindowResize()` (`src/Area.php`; `tests/AreaScrollTest.php`).
+> - **N3** — `Tab::appendMargined()`, `pages()` (`src/Tab.php`; `tests/TabFacadeTest.php`).
+> - **N4** — `Libui\Text\OpenTypeFeatures` (RAII) + `AttributeType::Features` wired (`src/Text/OpenTypeFeatures.php`, `src/Text/Attribute.php`; `tests/OpenTypeFeaturesTest.php`).
+> - **N5** — `Libui\Build` declarative facade: `vbox`/`hbox`/`form`/`window`/`stretchy` (`src/Build.php`; `tests/BuildTest.php`).
+> - **N6** — `Libui\Testing\CallbackSpy` + `Libui\Testing\Inspect` headless harness (`src/Testing/`; `tests/TestingHarnessTest.php`).
+
+Ranked by impact/effort. All were verified absent from source on 2026-06-22, then implemented the same day.
+
+| # | Candidate | Impact / Effort | Evidence & proposal |
+|---|-----------|-----------------|---------------------|
+| N1 | **Table sortable columns** | medium / S | FFI + `SortIndicator` enum already ship (`stubs/FFI.php:272-275`, `src/Generated/Enum/SortIndicator.php`) but `src/Table.php` wraps neither. Add `onHeaderClicked(callable)` (guarded like `onRowClicked`), `setSortIndicator(int $col, SortIndicator)`, `sortIndicator(int $col)`. `ui.h:3883/3895/3910`. Sortable tables are impossible today despite full backing support. |
+| N2 | **Area scrolling / window-drag ops** | medium / S | `src/Area.php` wraps only `queueRedrawAll`/`setSize`. Add `scrollTo(x,y,w,h)`, `beginUserWindowMove()`, `beginUserWindowResize(WindowResizeEdge)` (`ui.h:2080/2086/2087`). A scrolling Area is constructible (`src/Area.php:31`) yet cannot be scrolled programmatically. |
+| N3 | **Tab convenience facade** | low / S | `src/Tab.php` is an empty subclass; per-page work needs raw-index calls. Add `appendMargined(string $name, Control $c)` and `pages(array $named)`. |
+| N4 | **OpenTypeFeatures + FeaturesAttribute** | low / M | `src/Text/Attribute.php:52-93` wraps every other `uiNew*Attribute` but has no `features` case. Add RAII `src/Text/OpenTypeFeatures.php` (`ui.h:2494-2543`) + `features` case — the only attribute RichText/TextStyle cannot express (ligatures/kerning/stylistic sets). |
+| N5 | **Declarative/builder construction API** | medium / L | Every example builds UI imperatively (e.g. `examples/gallery.php:61-66`). Add an optional fluent/array-tree builder layered over Box/Grid/Form/Window — purely additive, mirrors how RichText layered over AttributedString. |
+| N6 | **GUI testing harness / headless inspection** | medium / L | Tests spawn a real detached process (`tests/AppTest.php:110-190`). Add (a) a way to invoke retained callbacks directly (`Control::$callbacks`) and (b) a widget-tree introspection helper, enabling deterministic in-process tests without `uiMain()`. Synergizes with fixing `I3`. |
+
+**Quick wins to ship first:** N1, N2, N3 — all small, all leveraging already-generated FFI/enum scaffolding.

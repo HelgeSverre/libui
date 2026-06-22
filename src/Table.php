@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Libui;
 
+use Libui\Generated\Enum\SortIndicator;
 use Libui\Generated\Enum\TableSelectionMode;
 
 /**
@@ -282,6 +283,7 @@ final class Table extends Control
         return Ffi::get()->uiTableHeaderVisible($this->handle) !== 0;
     }
 
+    /** Show or hide the column header row. */
     public function setHeaderVisible(bool $visible): static
     {
         Ffi::get()->uiTableHeaderSetVisible($this->handle, (int) $visible);
@@ -436,5 +438,42 @@ final class Table extends Control
         });
         Ffi::get()->uiTableOnRowDoubleClicked($this->handle, $fn, null);
         return $this;
+    }
+
+    /**
+     * Register a callback for when a column header is clicked.
+     *
+     * The callback receives the Table instance and the clicked column index:
+     * `fn (Table $t, int $column)`. Pair it with {@see setSortIndicator()} to
+     * implement sortable columns.
+     */
+    public function onHeaderClicked(callable $cb): static
+    {
+        $fn = Control::keep(function ($t, $column) use ($cb) {
+            try {
+                $cb($this, $column);
+            } catch (\Throwable $e) {
+                fwrite(STDERR, "[Table::onHeaderClicked] {$e->getMessage()}\n");
+            }
+        });
+        Ffi::get()->uiTableHeaderOnClicked($this->handle, $fn, null);
+        return $this;
+    }
+
+    /**
+     * Set the sort indicator arrow shown on a column's header.
+     */
+    public function setSortIndicator(int $column, SortIndicator $indicator): static
+    {
+        Ffi::get()->uiTableHeaderSetSortIndicator($this->handle, $column, $indicator->value);
+        return $this;
+    }
+
+    /**
+     * Get the sort indicator currently shown on a column's header.
+     */
+    public function sortIndicator(int $column): SortIndicator
+    {
+        return SortIndicator::from(Ffi::get()->uiTableHeaderSortIndicator($this->handle, $column));
     }
 }
