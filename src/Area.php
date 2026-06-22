@@ -61,13 +61,27 @@ final class Area extends Control
         Ffi::get()->uiAreaScrollTo($this->handle, $x, $y, $width, $height);
     }
 
-    /** Begin a user-driven move of the window containing this Area. */
+    /**
+     * Begin a user-driven move of the window containing this Area.
+     *
+     * MUST be called only from inside an {@see AreaDelegate::mouse()} handler
+     * while a mouse button is held down (a "down" event). libui's Unix/GTK
+     * backend hard-aborts the process if it is called at any other time, so
+     * never invoke it outside a live mouse-down handler.
+     */
     public function beginUserWindowMove(): void
     {
         Ffi::get()->uiAreaBeginUserWindowMove($this->handle);
     }
 
-    /** Begin a user-driven resize of the window containing this Area from the given edge. */
+    /**
+     * Begin a user-driven resize of the window containing this Area from the
+     * given edge.
+     *
+     * Subject to the same constraint as {@see beginUserWindowMove()}: call it
+     * only from within an {@see AreaDelegate::mouse()} handler during a
+     * mouse-down event, or libui's Unix/GTK backend aborts the process.
+     */
     public function beginUserWindowResize(WindowResizeEdge $edge): void
     {
         Ffi::get()->uiAreaBeginUserWindowResize($this->handle, $edge->value);

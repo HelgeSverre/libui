@@ -30,22 +30,25 @@ final class AreaScrollTest extends LibuiTestCase
         $this->assertFalse(\FFI::isNull($area->handle()));
     }
 
-    public function testBeginUserWindowMoveDoesNotThrow(): void
+    /**
+     * beginUserWindowMove()/beginUserWindowResize() cannot be exercised here:
+     * libui's Unix/GTK backend aborts the process if they are called outside a
+     * live mouse-down handler (../unix/area.c). So we assert the public API
+     * surface via reflection instead of invoking the native calls.
+     */
+    public function testWindowDragMethodsAreDeclaredWithExpectedSignatures(): void
     {
-        $area = $this->makeScrollingArea();
+        $move = new \ReflectionMethod(Area::class, 'beginUserWindowMove');
+        $this->assertTrue($move->isPublic());
+        $this->assertSame(0, $move->getNumberOfParameters());
+        $this->assertSame('void', (string) $move->getReturnType());
 
-        $area->beginUserWindowMove();
-
-        $this->assertFalse(\FFI::isNull($area->handle()));
-    }
-
-    public function testBeginUserWindowResizeDoesNotThrow(): void
-    {
-        $area = $this->makeScrollingArea();
-
-        $area->beginUserWindowResize(WindowResizeEdge::Bottom);
-
-        $this->assertFalse(\FFI::isNull($area->handle()));
+        $resize = new \ReflectionMethod(Area::class, 'beginUserWindowResize');
+        $this->assertTrue($resize->isPublic());
+        $this->assertSame('void', (string) $resize->getReturnType());
+        $edge = $resize->getParameters()[0] ?? null;
+        $this->assertNotNull($edge);
+        $this->assertSame(WindowResizeEdge::class, (string) $edge->getType());
     }
 
     private function makeScrollingArea(): Area
