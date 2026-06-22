@@ -89,6 +89,8 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `dialogs(): Dialogs` — A Dialogs facade bound to this window as the parent.
 - `focused(): bool` — Returns whether or not the window is focused.
 - `fullscreen(): bool` — Returns whether or not the window is full screen.
+- `getContentSize(): array` — The window's current content size, falling back to the constructed size when libui reports a non-positive value (it may on Unix before layout).
+- `getPosition(): array` — The window's current position, measured from the top-left of the screen.
 - `margined(): bool` — Returns whether or not the window has a margin.
 - `onClose(callable $cb): static` — Run cleanup when the window is closed, before the app quits. Unlike the raw onClosing(), you don't manage the loop or return a value.
 - `onClosing(callable $cb): static` — Registers a callback for when the window is to be closed.
@@ -227,9 +229,9 @@ DateTimePicker widget. Hand-editable — add convenience methods here. Inherits 
 
 _Plus the common widget verbs from [`Control`](#control)._
 
-- `static dateOnly(): static` — Creates a new time picker.
-- `static timeOnly(): static` — Creates a new date and time picker.
-- `__construct()` — Creates a new date picker.
+- `static dateOnly(): static` — Creates a new date picker.
+- `static timeOnly(): static` — Creates a new time picker.
+- `__construct()` — Creates a new date and time picker.
 - `getValue(): DateTimeImmutable` — The picked moment as a DateTimeImmutable (local wall-clock fields).
 - `onChanged(callable $cb): static` — Registers a callback for when the date time picker value is changed by the user.
 - `setTime(CData $time): static` — Sets date and time of the data time picker.
@@ -331,10 +333,12 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 `Libui\Lifecycle`
 
-Process-wide registry of native resources that must be released before uiUninit(). Today: uiTableModels — libui's leak checker aborts in uiUninit() if a model is left unfreed, so `Ffi::uninit()` drains this registry first.
+Process-wide registry of native resources that must be released before uiUninit() — libui's leak checker aborts in uiUninit() if a uiTableModel or uiImage is left unfreed, so `Ffi::uninit()` drains this registry first.
 
-- `static freeAll(): void` — Free every still-live registered model exactly once.
+- `static freeAll(): void` — Free every still-live registered resource exactly once.
+- `static registerImage(Image $image): void`
 - `static registerModel(TableModel $model): void`
+- `static unregisterImage(Image $image): void`
 - `static unregisterModel(TableModel $model): void`
 
 ### `Menu`
@@ -513,12 +517,12 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `__construct()` — Creates a new form.
 - `append(string $label, Control $c, int|bool $stretchy = false): static` — Append a labelled field; $stretchy (bool, or the raw 0/1 int) defaults to off.
 - `appendStretchy(string $label, Control $c): static` — Append a labelled field that grows to fill vertical space.
-- `delete(int $index): static` — Removes the control at $index from the form.
+- `delete(int $index): static` — Remove the field at $index, keeping the tracked list in sync.
 - `numChildren(): int` — Returns the number of controls contained within the form.
 - `padded(): bool` — Returns whether or not controls within the form are padded. Padding is defined as space between individual controls.
 - `setPadded(bool $padded): static` — Sets whether or not controls within the box are padded. Padding is defined as space between individual controls. The...
-- `setValues(array $values): static` — Set fields from `[label => value]`. Unknown labels and non-value controls are ignored, so a partial map is fine.
-- `values(): array` — Read every `HasValue` field as `[label => value]`. Non-value controls (separators, labels, …) are skipped.
+- `setValues(array $values): static` — Set fields from `[label => value]`. Unknown labels and non-value controls are ignored, so a partial map is fine. Every field whose label matches a key is updated, so duplicate-label fields all receive the value.
+- `values(): array` — Read every `HasValue` field as `[label => value]`. Non-value controls (separators, labels, …) are skipped. With duplicate labels, the last field with a given label wins (arrays cannot hold duplicate keys).
 
 ### `Grid`
 

@@ -56,3 +56,7 @@ readable-literal = { enabled = false }
 literal-named-argument = { enabled = false }
 assertion-style = { style = "this" }
 strict-behavior = { allow-loose-behavior = true }
+# The generator and codebase use camelCase functions/methods (cleanHeader,
+# harvestDocs, emitMethod, …); accept camelCase rather than flagging it as
+# non-snake_case.
+function-name = { camel = true }

@@ -17,7 +17,7 @@ class Combobox extends Control
     /**
      * Creates a new combo box.
      *
-     * @see uiNewCombobox
+     * libui: uiNewCombobox
      */
     public function __construct()
     {
@@ -29,7 +29,7 @@ class Combobox extends Control
      *
      * @param string $text Item text.
      *
-     * @see uiComboboxAppend
+     * libui: uiComboboxAppend
      */
     public function append(string $text): static
     {
@@ -43,7 +43,7 @@ class Combobox extends Control
      * @param int $index Index at which to insert the item.
      * @param string $text Item text.
      *
-     * @see uiComboboxInsertAt
+     * libui: uiComboboxInsertAt
      */
     public function insertAt(int $index, string $text): static
     {
@@ -57,7 +57,7 @@ class Combobox extends Control
      * @param int $index Index of the item to be deleted.
      * @note Deleting the index of the item currently selected will move the selection to the next item in the combo box or `-1` if no such item exists.
      *
-     * @see uiComboboxDelete
+     * libui: uiComboboxDelete
      */
     public function delete(int $index): static
     {
@@ -68,7 +68,7 @@ class Combobox extends Control
     /**
      * Deletes all items from the combo box.
      *
-     * @see uiComboboxClear
+     * libui: uiComboboxClear
      */
     public function clear(): static
     {
@@ -81,7 +81,7 @@ class Combobox extends Control
      *
      * @return int Number of items.
      *
-     * @see uiComboboxNumItems
+     * libui: uiComboboxNumItems
      */
     public function numItems(): int
     {
@@ -91,9 +91,9 @@ class Combobox extends Control
     /**
      * Returns the index of the item selected.
      *
-     * @return int Index of the item selected, `-1` on empty selection. [Default `-1`]
+     * @return int Index of the item selected, `-1` on empty selection.
      *
-     * @see uiComboboxSelected
+     * libui: uiComboboxSelected
      */
     public function selected(): int
     {
@@ -105,7 +105,7 @@ class Combobox extends Control
      *
      * @param int $index Index of the item to be selected, `-1` to clear selection.
      *
-     * @see uiComboboxSetSelected
+     * libui: uiComboboxSetSelected
      */
     public function setSelected(int $index): static
     {
@@ -119,8 +119,9 @@ class Combobox extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiComboboxSetSelected(), uiComboboxInsertAt(), uiComboboxDelete(), or uiComboboxClear().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiComboboxOnSelected
+     * libui: uiComboboxOnSelected
      */
     public function onSelected(callable $cb): static
     {

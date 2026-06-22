@@ -12,6 +12,7 @@ have PHP 8.5+ with FFI. For *why* the library is built the way it is, read
 - [Application lifecycle](#application-lifecycle)
 - [Widgets](#widgets)
 - [Layout: boxes, grids, forms, tabs](#layout-boxes-grids-forms-tabs)
+- [Declarative layout — the `Build` facade](#declarative-layout--the-build-facade)
 - [Events and callbacks](#events-and-callbacks)
 - [Dialogs](#dialogs)
 - [Menus](#menus)
@@ -22,6 +23,7 @@ have PHP 8.5+ with FFI. For *why* the library is built the way it is, read
 - [Tables (data grids)](#tables-data-grids)
 - [Images](#images)
 - [Clipboard](#clipboard)
+- [Testing your UI headlessly](#testing-your-ui-headlessly)
 - [The raw FFI escape hatch](#the-raw-ffi-escape-hatch)
 - [Gotchas](#gotchas)
 - [Platform notes](#platform-notes)
@@ -176,8 +178,9 @@ $row = Box::horizontal(padded: true)
     ->appendStretchy($right);
 ```
 
-`append($child, $stretchy = 0)` — pass `1` (or use `appendStretchy()`) to let a
-child expand.
+`append(Control $child, bool|int $stretchy = false)` — pass `true` (or use the
+clearer `appendStretchy($child)`) to let a child grow along the main axis. An int
+is accepted too, so legacy `append($child, 1)` still works.
 
 ### Grid — 2D placement
 
@@ -227,6 +230,19 @@ $tab = (new Tab())
     ->append('Advanced', $advancedBox);
 ```
 
+`appendMargined($name, $child)` appends a page *and* turns on its margin in one
+step, and `pages([...])` appends a whole ordered `title => control` map:
+
+```php
+$tab = (new Tab())->pages([
+    'General'  => $generalBox,
+    'Advanced' => $advancedBox,
+]);
+
+$tab->appendMargined('About', $aboutBox); // padded page, no manual setMargined()
+$tab->setSelected(0);                      // select the first page
+```
+
 ### Group — titled frame
 
 ```php
@@ -234,6 +250,46 @@ use Libui\Group;
 
 $group = (new Group('Settings'))->setChild($box);
 ```
+
+---
+
+## Declarative layout — the `Build` facade
+
+`Libui\Build` is a thin, declarative layer over `Box`, `Form` and `Window`: it
+trades the imperative `->append()` chains for nested constructor calls, so the PHP
+reads like the layout tree it builds. It's additive — every widget underneath is
+the same one you'd make by hand.
+
+```php
+use Libui\Build;
+
+$form = Build::form([
+    'Name'  => new Entry(),
+    'Email' => new Entry(),
+]);
+
+$layout = Build::vbox(
+    new Label('Welcome'),
+    $form,
+    Build::stretchy(new MultilineEntry()), // grows to fill the box
+);
+
+$window = Build::window('Demo', 640, 480, $layout);
+$window->run();
+```
+
+The pieces:
+
+- **`Build::vbox(...$children)` / `Build::hbox(...$children)`** — a *padded* box
+  (vertical / horizontal) with each child appended in order. For an unpadded box,
+  drop to `new Box(false)` / `Box::horizontal(false)`.
+- **`Build::stretchy($control)`** — wrap a child to mark it stretchy inside a
+  `vbox`/`hbox` (the equivalent of `appendStretchy()`). Bare controls are
+  non-stretchy. The returned marker is opaque — only `vbox`/`hbox` consume it.
+- **`Build::form(['Title' => $control, …])`** — a padded `Form` built from an
+  ordered `label => control` map.
+- **`Build::window($title, $width, $height, $child, $margined = true)`** — a
+  top-level `Window` with its single child set and margins on by default.
 
 ---
 
@@ -457,6 +513,45 @@ Shape & shortcut sugar (all additive — the primitives above still work):
 - **`AreaDelegate::redraw()`** repaints the bound area without you stashing the
   `Area` reference yourself.
 
+### Scrolling areas
+
+A plain `Area` is sized by its container. For content larger than the viewport,
+build a **scrolling** area with an explicit virtual size — libui then manages the
+scrollbars and only `draw()`s the visible region:
+
+```php
+$area = Area::scrolling($delegate, 2000, 1500); // virtual width × height
+$area->setSize(3000, 2000);                      // resize the scrollable canvas
+$area->scrollTo(0, 800, 400, 300);               // bring a rectangle into view
+```
+
+`setSize()` / `scrollTo()` are no-ops on a non-scrolling area.
+
+### Dragging and resizing the window from an Area
+
+An `Area` can drive a frameless/custom-chrome window: from a mouse-down handler
+you ask libui to take over the OS move/resize loop.
+
+```php
+use Libui\Generated\Enum\WindowResizeEdge;
+
+public function mouse(AreaMouseEvent $e): void
+{
+    if ($e->down === 1) {
+        $this->redraw();                 // (your own state)
+        $area->beginUserWindowMove();    // drag the window
+        // or: $area->beginUserWindowResize(WindowResizeEdge::BottomRight);
+    }
+}
+```
+
+> **Mouse-down only.** `beginUserWindowMove()` / `beginUserWindowResize()` **must**
+> be called only from inside an `AreaDelegate::mouse()` handler while a mouse
+> button is held down (a "down" event). libui's Unix/GTK backend **hard-aborts the
+> process** if either is called at any other time (outside a mouse handler, on a
+> mouse-up, from a timer, etc.). macOS is more forgiving, but write for the strict
+> backend: only ever start a move/resize in direct response to a live mouse-down.
+
 See [`examples/canvas.php`](../examples/canvas.php),
 [`examples/flowfield.php`](../examples/flowfield.php), and
 [`examples/clock.php`](../examples/clock.php).
@@ -517,6 +612,33 @@ $ctx->text($rich->layout(400.0), 10, 10); // or draw it
 
 `TextStyle` is immutable — derive variants with `->with(...)`. `RichText::height()`
 is a shortcut for the measured height (handy for wrapping text in a custom Area).
+
+### OpenType features — ligatures, small caps, …
+
+`Text\OpenTypeFeatures` is a bag of four-character OpenType feature tags (e.g.
+`liga`, `smcp`, `tnum`) mapped to integer values. Build one, then apply it over a
+range with an `AttributeType::Features` attribute:
+
+```php
+use Libui\Text\AttributedString;
+use Libui\Text\Attribute;
+use Libui\Text\OpenTypeFeatures;
+use Libui\Generated\Enum\AttributeType;
+
+$features = (new OpenTypeFeatures())
+    ->add('liga', 1)   // enable standard ligatures
+    ->add('smcp', 1);  // small caps
+
+$value = $features->get('liga'); // 1, or null if the tag isn't present
+
+$string = new AttributedString();
+$string->append('Office', new Attribute(AttributeType::Features, 0, 0, $features));
+```
+
+The tag must be exactly four characters (anything else throws
+`InvalidArgumentException`). libui *clones* the features into the attribute, so the
+`OpenTypeFeatures` keeps ownership of its own native handle — it frees itself on
+destruction, or call `free()` explicitly (idempotent).
 
 ---
 
@@ -588,6 +710,39 @@ $table->onRowClicked(fn (Table $t) => /* … */ null);
 $table->onRowDoubleClicked(fn (Table $t) => /* … */ null);
 ```
 
+### Sortable columns
+
+libui doesn't sort for you — it tells you when a header is clicked and draws the
+arrow you ask it to. You sort the underlying data and reflect the direction with a
+sort indicator:
+
+```php
+use Libui\Generated\Enum\SortIndicator;
+
+$ascending = true;
+
+$table->onHeaderClicked(function (Table $t, int $column) use (&$ascending, $delegate) {
+    $ascending = ! $ascending;
+
+    // clear arrows on every column, then set the active one
+    for ($c = 0; $c < $delegate->numColumns(); $c++) {
+        $t->setSortIndicator($c, SortIndicator::None);
+    }
+    $t->setSortIndicator(
+        $column,
+        $ascending ? SortIndicator::Ascending : SortIndicator::Descending,
+    );
+
+    $delegate->sortByColumn($column, $ascending); // your own data sort + model notify
+});
+
+$current = $table->sortIndicator(0); // SortIndicator::{None,Ascending,Descending}
+```
+
+`onHeaderClicked(fn (Table $t, int $column))` fires with the clicked column index;
+`setSortIndicator($column, $indicator)` and `sortIndicator($column)` get/set the
+arrow. After reordering your rows, notify the model so libui re-reads the cells.
+
 For an editable text column, pass the editable model column and override
 `cellEditable()` + `setCellValue()` in your delegate.
 
@@ -635,6 +790,59 @@ $text = Clipboard::paste();   // null if unavailable
 ```
 
 On Linux it tries Wayland (`wl-copy`), then X11 (`xclip`, `xsel`) in turn.
+
+---
+
+## Testing your UI headlessly
+
+You can't move a real mouse in CI, but you *can* assert that a handler fired and
+inspect a control's flags — without `Ffi::main()`. The `Libui\Testing` namespace
+has two tiny tools for this.
+
+**`CallbackSpy`** is an invokable test double that records every call. Register it
+anywhere a handler is expected; libui (or your test) calls it like any closure, and
+it tallies the arguments:
+
+```php
+use Libui\Testing\CallbackSpy;
+
+$spy = new CallbackSpy();
+$button->onClicked($spy);
+
+$spy(); // simulate a click (a test invokes the spy directly)
+
+$this->assertTrue($spy->called());
+$this->assertSame(1, $spy->count());
+$args = $spy->lastArgs();           // arguments of the most recent call
+$first = $spy->argsOf(0);           // arguments of call #0 (negative = from end)
+
+// Wrap a real handler to record *and* run it:
+$spy = new CallbackSpy(fn (Table $t, int $col) => $t->setSortIndicator($col, $ind));
+```
+
+A `CallbackSpy` never touches FFI or the loop — it only observes calls dispatched
+to it. It can't *trigger* a native event on its own; a test invokes it to simulate
+one.
+
+**`Inspect`** wraps the read-only `uiControl` verbs as intent-revealing assertions,
+plus a delta helper that confirms a registration retained a trampoline:
+
+```php
+use Libui\Testing\Inspect;
+
+$this->assertTrue(Inspect::isVisible($window));
+$this->assertTrue(Inspect::isEnabled($button));
+$this->assertTrue(Inspect::isToplevel($window));
+
+$n = Inspect::callbacksRegisteredBy(fn () => $button->onClicked($spy));
+$this->assertSame(1, $n); // wiring the handler retained one callback
+```
+
+What this **can't** do (libui exposes no C API, so the harness won't fake it):
+enumerate a container's children, map a retained callback back to its widget, read
+rendered geometry, or fire native events. For event assertions, use a
+`CallbackSpy`. Tests live in `tests/` and extend `Libui\Tests\LibuiTestCase`
+(its `setUpBeforeClass()` runs `Ffi::init()`).
 
 ---
 
@@ -693,9 +901,10 @@ It's only valid during the one `draw()` call it's handed to. Don't store it acro
 frames; request a repaint with `Area::queueRedrawAll()` instead.
 
 ### Native resources need freeing
-`Image`, `AttributedString`, `FontDescriptor`, `TextLayout`, and `TableModel` hold
-native memory. Most free themselves on destruction, but for long-running apps that
-churn through many of them, call `free()` explicitly to avoid leaks.
+`Image`, `AttributedString`, `FontDescriptor`, `TextLayout`, `OpenTypeFeatures`,
+and `TableModel` hold native memory. Most free themselves on destruction, but for
+long-running apps that churn through many of them, call `free()` explicitly to
+avoid leaks.
 
 ### `\FFI` vs `Libui\Ffi`
 The class names collide case-insensitively. In library code `\FFI` (the global) is

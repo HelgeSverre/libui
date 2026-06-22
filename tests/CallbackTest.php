@@ -220,46 +220,81 @@ final class CallbackTest extends LibuiTestCase
         $this->assertSame($countBefore, $countAfter);
     }
 
-    public function testCallbackWithExceptionHandlerDoesNotThrow(): void
+    public function testQueueMainCallbackExceptionIsSwallowedByTheGuard(): void
     {
-        $errorMessage = '';
+        // Drive the real event loop (headless, per LifecycleTest): a queued
+        // closure that throws must have its exception caught inside
+        // Ffi::queueMain's C trampoline — an exception escaping into C is a
+        // hard fatal. We assert the throwing closure actually ran AND that
+        // Ffi::main() returned cleanly.
+        $threw = false;
 
-        // Set up a custom error handler to capture the message
-        set_error_handler(static function ($severity, $message) use (&$errorMessage): void {
-            $errorMessage = $message;
+        // The guard reports the caught exception to STDERR; mute that expected
+        // diagnostic so it doesn't pollute the test run.
+        $this->withMutedStderr(static function () use (&$threw): void {
+            Ffi::queueMain(static function () use (&$threw): void {
+                $threw = true;
+                throw new \RuntimeException('boom in queued callback');
+            });
+            Ffi::queueMain(static function (): void {
+                Ffi::quit();
+            });
+            Ffi::main();
         });
 
-        try {
-            Ffi::queueMain(static function (): void {
-                throw new \RuntimeException('Test exception in callback');
-            });
-
-            // The exception should be caught and logged to STDERR, not thrown
-            $this->assertSame('', $errorMessage);
-        } finally {
-            restore_error_handler();
-        }
+        // Reaching this assertion proves the loop unwound cleanly: had the exception
+        // escaped the trampoline, the process would have aborted before this line.
+        $this->assertTrue($threw, 'the throwing queued callback should have run on the loop tick');
     }
 
-    public function testExceptionInFfiCallbackIsHandledGracefully(): void
+    public function testTimerCallbackExceptionIsSwallowedAndStopsTheTimer(): void
     {
-        // This verifies that exceptions in FFI callbacks don't cause hard fatals
-        // The callback should catch the exception and report to STDERR
+        // A throwing timer callback must likewise be caught by the guard, which
+        // additionally stops the timer (returns 0 to C). We assert it fired and
+        // the loop unwound cleanly via a separate quit timer.
+        $fired = false;
 
-        $exceptionThrown = false;
+        $this->withMutedStderr(static function () use (&$fired): void {
+            Ffi::timer(10, static function () use (&$fired): bool {
+                $fired = true;
+                throw new \RuntimeException('boom in timer callback');
+            });
+            // Quit the loop shortly after, independent of the throwing timer.
+            Ffi::timer(40, static function (): bool {
+                Ffi::quit();
+                return false;
+            });
+            Ffi::main();
+        });
 
-        // We can't easily capture STDERR output, but we can verify
-        // that the callback binding itself doesn't throw
+        // Reaching this assertion proves the loop unwound cleanly after the guard
+        // swallowed the exception (otherwise the process would have aborted).
+        $this->assertTrue($fired, 'the throwing timer callback should have fired at least once');
+    }
+
+    /**
+     * Run $body with the guard's expected "[queueMain]/[timer]" diagnostic
+     * swallowed, so the deliberately-thrown exceptions don't pollute the test
+     * output. We attach a stream filter to STDERR that discards everything
+     * written during $body, then always detach it (even if $body throws).
+     *
+     * The guard writes to the literal STDERR constant, which cannot be
+     * reassigned in userland, but a stream filter on it intercepts the writes.
+     */
+    private function withMutedStderr(callable $body): void
+    {
+        if (! in_array('libui.swallow', stream_get_filters(), true)) {
+            stream_filter_register('libui.swallow', SwallowFilter::class);
+        }
+
+        $filter = stream_filter_append(\STDERR, 'libui.swallow', \STREAM_FILTER_WRITE);
 
         try {
-            Ffi::queueMain(static function () use (&$exceptionThrown): void {
-                $exceptionThrown = true;
-                throw new \RuntimeException('Test');
-            });
-
-            $this->assertTrue(true, 'Exception in callback should be caught');
-        } catch (\Throwable $e) {
-            $this->fail('Exception in FFI callback should not propagate: ' . $e->getMessage());
+            $body();
+        } finally {
+            if ($filter !== false) {
+                stream_filter_remove($filter);
+            }
         }
     }
 
@@ -294,5 +329,30 @@ final class CallbackTest extends LibuiTestCase
 
         $this->assertSame($button, $result);
         $this->assertCount(0, $order); // Not triggered yet
+    }
+}
+
+/**
+ * Stream filter that discards everything written through it. Used to swallow
+ * the FFI-callback guard's expected STDERR diagnostics during the
+ * exception-handling tests above.
+ *
+ * @internal
+ */
+final class SwallowFilter extends \php_user_filter
+{
+    /**
+     * @param resource $in
+     * @param resource $out
+     * @param int $consumed
+     */
+    public function filter($in, $out, &$consumed, bool $closing): int
+    {
+        // Drain the input buckets without forwarding them to $out.
+        while ($bucket = stream_bucket_make_writeable($in)) {
+            $consumed += $bucket->datalen;
+        }
+
+        return \PSFS_PASS_ON;
     }
 }

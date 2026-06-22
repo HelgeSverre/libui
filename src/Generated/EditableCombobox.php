@@ -17,7 +17,7 @@ class EditableCombobox extends Control
     /**
      * Creates a new editable combo box.
      *
-     * @see uiNewEditableCombobox
+     * libui: uiNewEditableCombobox
      */
     public function __construct()
     {
@@ -29,7 +29,7 @@ class EditableCombobox extends Control
      *
      * @param string $text Item text.
      *
-     * @see uiEditableComboboxAppend
+     * libui: uiEditableComboboxAppend
      */
     public function append(string $text): static
     {
@@ -42,7 +42,7 @@ class EditableCombobox extends Control
      *
      * @return string The editable combo box text.
      *
-     * @see uiEditableComboboxText
+     * libui: uiEditableComboboxText
      */
     public function text(): string
     {
@@ -54,7 +54,7 @@ class EditableCombobox extends Control
      *
      * @param string $text Text field text.
      *
-     * @see uiEditableComboboxSetText
+     * libui: uiEditableComboboxSetText
      */
     public function setText(string $text): static
     {
@@ -68,8 +68,9 @@ class EditableCombobox extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiEditableComboboxSetText().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiEditableComboboxOnChanged
+     * libui: uiEditableComboboxOnChanged
      */
     public function onChanged(callable $cb): static
     {

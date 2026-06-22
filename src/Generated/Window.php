@@ -22,7 +22,7 @@ class Window extends Control
      * @param int $height Window height.
      * @param bool $hasMenubar Whether or not the window should display a menu bar.
      *
-     * @see uiNewWindow
+     * libui: uiNewWindow
      */
     public function __construct(string $title, int $width, int $height, bool $hasMenubar)
     {
@@ -34,7 +34,7 @@ class Window extends Control
      *
      * @return string The window title text.
      *
-     * @see uiWindowTitle
+     * libui: uiWindowTitle
      */
     public function title(): string
     {
@@ -47,7 +47,7 @@ class Window extends Control
      * @param string $title Window title text.
      * @note This method is merely a hint and may be ignored on unix platforms.
      *
-     * @see uiWindowSetTitle
+     * libui: uiWindowSetTitle
      */
     public function setTitle(string $title): static
     {
@@ -62,7 +62,7 @@ class Window extends Control
      * @param \FFI\CData $y Output pointer written by libui.
      * @note This method may return inaccurate or dummy values on Unix platforms.
      *
-     * @see uiWindowPosition
+     * libui: uiWindowPosition
      */
     public function position(\FFI\CData $x, \FFI\CData $y): static
     {
@@ -77,7 +77,7 @@ class Window extends Control
      * @param int $y New y position of the window.
      * @note This method is merely a hint and may be ignored on Unix platforms.
      *
-     * @see uiWindowSetPosition
+     * libui: uiWindowSetPosition
      */
     public function setPosition(int $x, int $y): static
     {
@@ -91,8 +91,9 @@ class Window extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note Only one callback can be registered at a time.
      * @note The callback is not triggered when calling uiWindowSetPosition().
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiWindowOnPositionChanged
+     * libui: uiWindowOnPositionChanged
      */
     public function onPositionChanged(callable $cb): static
     {
@@ -114,7 +115,7 @@ class Window extends Control
      * @param \FFI\CData $height Output pointer written by libui.
      * @note The content size does NOT include window decorations like menus or title bars.
      *
-     * @see uiWindowContentSize
+     * libui: uiWindowContentSize
      */
     public function contentSize(\FFI\CData $width, \FFI\CData $height): static
     {
@@ -130,7 +131,7 @@ class Window extends Control
      * @note The content size does NOT include window decorations like menus or title bars.
      * @note This method is merely a hint and may be ignored by the system.
      *
-     * @see uiWindowSetContentSize
+     * libui: uiWindowSetContentSize
      */
     public function setContentSize(int $width, int $height): static
     {
@@ -141,9 +142,9 @@ class Window extends Control
     /**
      * Returns whether or not the window is full screen.
      *
-     * @return bool `TRUE` if full screen, `FALSE` otherwise. [Default: `FALSE`]
+     * @return bool `TRUE` if full screen, `FALSE` otherwise.
      *
-     * @see uiWindowFullscreen
+     * libui: uiWindowFullscreen
      */
     public function fullscreen(): bool
     {
@@ -156,7 +157,7 @@ class Window extends Control
      * @param bool $fullscreen `TRUE` to make window full screen, `FALSE` otherwise.
      * @note This method is merely a hint and may be ignored by the system.
      *
-     * @see uiWindowSetFullscreen
+     * libui: uiWindowSetFullscreen
      */
     public function setFullscreen(bool $fullscreen): static
     {
@@ -170,8 +171,9 @@ class Window extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiWindowSetContentSize().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiWindowOnContentSizeChanged
+     * libui: uiWindowOnContentSizeChanged
      */
     public function onContentSizeChanged(callable $cb): static
     {
@@ -191,8 +193,9 @@ class Window extends Control
      *
      * @param callable(static): (bool|int) $cb Return false/0 to cancel, true/non-zero to continue.
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiWindowOnClosing
+     * libui: uiWindowOnClosing
      */
     public function onClosing(callable $cb): static
     {
@@ -214,8 +217,9 @@ class Window extends Control
      *
      * @param callable(static): void $cb Receives this widget.
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiWindowOnFocusChanged
+     * libui: uiWindowOnFocusChanged
      */
     public function onFocusChanged(callable $cb): static
     {
@@ -235,7 +239,7 @@ class Window extends Control
      *
      * @return bool `TRUE` if window is focused, `FALSE` otherwise.
      *
-     * @see uiWindowFocused
+     * libui: uiWindowFocused
      */
     public function focused(): bool
     {
@@ -247,7 +251,7 @@ class Window extends Control
      *
      * @return bool `TRUE` if window is borderless, `FALSE` otherwise.
      *
-     * @see uiWindowBorderless
+     * libui: uiWindowBorderless
      */
     public function borderless(): bool
     {
@@ -260,7 +264,7 @@ class Window extends Control
      * @param bool $borderless `TRUE` to make window borderless, `FALSE` otherwise.
      * @note This method is merely a hint and may be ignored by the system.
      *
-     * @see uiWindowSetBorderless
+     * libui: uiWindowSetBorderless
      */
     public function setBorderless(bool $borderless): static
     {
@@ -273,7 +277,7 @@ class Window extends Control
      *
      * @param \Libui\Control $child Control to be made child.
      *
-     * @see uiWindowSetChild
+     * libui: uiWindowSetChild
      */
     public function setChild(\Libui\Control $child): static
     {
@@ -284,9 +288,9 @@ class Window extends Control
     /**
      * Returns whether or not the window has a margin.
      *
-     * @return bool `TRUE` if window has a margin, `FALSE` otherwise. [Default: `FALSE`]
+     * @return bool `TRUE` if window has a margin, `FALSE` otherwise.
      *
-     * @see uiWindowMargined
+     * libui: uiWindowMargined
      */
     public function margined(): bool
     {
@@ -298,7 +302,7 @@ class Window extends Control
      *
      * @param bool $margined `TRUE` to set a window margin, `FALSE` otherwise.
      *
-     * @see uiWindowSetMargined
+     * libui: uiWindowSetMargined
      */
     public function setMargined(bool $margined): static
     {
@@ -309,9 +313,9 @@ class Window extends Control
     /**
      * Returns whether or not the window is user resizeable.
      *
-     * @return bool `TRUE` if window is resizable, `FALSE` otherwise. [Default: `TRUE`]
+     * @return bool `TRUE` if window is resizable, `FALSE` otherwise.
      *
-     * @see uiWindowResizeable
+     * libui: uiWindowResizeable
      */
     public function resizeable(): bool
     {
@@ -324,7 +328,7 @@ class Window extends Control
      * @param bool $resizeable `TRUE` to make window resizable, `FALSE` otherwise.
      * @note This method is merely a hint and may be ignored by the system.
      *
-     * @see uiWindowSetResizeable
+     * libui: uiWindowSetResizeable
      */
     public function setResizeable(bool $resizeable): static
     {

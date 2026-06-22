@@ -16,7 +16,7 @@ class Window extends Generated\Window
     /** @var (callable():void)|null */
     private $onClose = null;
 
-    /** Content size requested at construction; the fallback for {@see windowSize()}. */
+    /** Content size requested at construction; the fallback for {@see getContentSize()}. */
     private int $width = 640;
 
     private int $height = 480;
@@ -83,7 +83,7 @@ class Window extends Generated\Window
             [$screenWidth, $screenHeight] = $screen;
         }
 
-        [$winWidth, $winHeight] = $this->windowSize();
+        [$winWidth, $winHeight] = $this->getContentSize();
 
         return $this->setPosition(
             (int) \max(0, ($screenWidth - $winWidth) / 2),
@@ -95,9 +95,11 @@ class Window extends Generated\Window
      * The window's current content size, falling back to the constructed size
      * when libui reports a non-positive value (it may on Unix before layout).
      *
+     * The content size excludes window decorations like menus or title bars.
+     *
      * @return array{int, int} [width, height]
      */
-    private function windowSize(): array
+    public function getContentSize(): array
     {
         $out = Ffi::get()->new('int[2]');
         Ffi::get()->uiWindowContentSize($this->handle, \FFI::addr($out[0]), \FFI::addr($out[1]));
@@ -106,6 +108,21 @@ class Window extends Generated\Window
             $out[0] > 0 ? $out[0] : $this->width,
             $out[1] > 0 ? $out[1] : $this->height,
         ];
+    }
+
+    /**
+     * The window's current position, measured from the top-left of the screen.
+     *
+     * @note May return inaccurate or dummy values on Unix platforms.
+     *
+     * @return array{int, int} [x, y]
+     */
+    public function getPosition(): array
+    {
+        $out = Ffi::get()->new('int[2]');
+        Ffi::get()->uiWindowPosition($this->handle, \FFI::addr($out[0]), \FFI::addr($out[1]));
+
+        return [$out[0], $out[1]];
     }
 
     /**

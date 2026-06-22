@@ -69,9 +69,11 @@ final class Table extends Control
     /**
      * Build a read-only table from a list of positional rows.
      *
-     * @param list<array<string|int>> $rows    row-major scalar cells
-     * @param array<string>            $headers column titles; if empty, one column
-     *        per first-row cell named "Column 1".."Column N"
+     * @param list<array<string|int>>       $rows    row-major scalar cells
+     * @param array<int|string|float|bool>  $headers column titles; if empty, one column
+     *        per first-row cell named "Column 1".."Column N". Non-string headers
+     *        (e.g. integer/numeric-string keys from {@see fromAssoc()}) are cast to
+     *        string so they can be used as column names.
      */
     public static function fromRows(array $rows, array $headers = []): static
     {
@@ -82,9 +84,14 @@ final class Table extends Control
                 : array_map(static fn (int $i) => 'Column ' . ($i + 1), range(0, $width - 1));
         }
 
-        $delegate = new ArrayTableModelDelegate(array_map('array_values', $rows), array_values($headers));
+        // Normalise headers to strings once: integer or numeric-string column keys
+        // (e.g. from fromAssoc()) would otherwise reach appendTextColumn(string $name)
+        // as ints and trigger a TypeError.
+        $headers = array_values(array_map(static fn (mixed $h): string => (string) $h, $headers));
+
+        $delegate = new ArrayTableModelDelegate(array_map('array_values', $rows), $headers);
         $table = self::fromDelegate($delegate);
-        foreach (array_values($headers) as $i => $name) {
+        foreach ($headers as $i => $name) {
             $table->appendTextColumn($name, $i);
         }
 
@@ -94,9 +101,12 @@ final class Table extends Control
     /**
      * Build a read-only table from a list of associative rows.
      *
-     * @param list<array<string,string|int>> $rows
-     * @param array<string>|null $columns column keys to show, in order; defaults
-     *        to array_keys() of the first row. Header = key.
+     * Row/column keys may be strings, ints, or numeric strings — non-string
+     * column keys are coerced to column names by {@see fromRows()}.
+     *
+     * @param list<array<array-key, string|int>> $rows
+     * @param array<int|string>|null $columns column keys to show, in order;
+     *        defaults to array_keys() of the first row. Header = key.
      */
     public static function fromAssoc(array $rows, ?array $columns = null): static
     {
@@ -325,7 +335,7 @@ final class Table extends Control
     /**
      * Get the currently selected rows.
      *
-     * @return int[] Array of selected row indices
+     * @return list<int> Array of selected row indices
      */
     public function selectedRows(): array
     {

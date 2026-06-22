@@ -17,7 +17,7 @@ class FontButton extends Control
     /**
      * Creates a new font button. The default font is determined by the OS defaults.
      *
-     * @see uiNewFontButton
+     * libui: uiNewFontButton
      */
     public function __construct()
     {
@@ -29,7 +29,7 @@ class FontButton extends Control
      *
      * @note Make sure to call `uiFreeFontButtonFont()` to free all allocated resources within $desc.
      *
-     * @see uiFontButtonFont
+     * libui: uiFontButtonFont
      */
     public function font(\FFI\CData $desc): static
     {
@@ -42,8 +42,9 @@ class FontButton extends Control
      *
      * @param callable(static): void $cb Receives this widget.
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiFontButtonOnChanged
+     * libui: uiFontButtonOnChanged
      */
     public function onChanged(callable $cb): static
     {

@@ -17,7 +17,7 @@ class ColorButton extends Control
     /**
      * Creates a new color button.
      *
-     * @see uiNewColorButton
+     * libui: uiNewColorButton
      */
     public function __construct()
     {
@@ -32,7 +32,7 @@ class ColorButton extends Control
      * @param \FFI\CData $bl Output pointer written by libui.
      * @param \FFI\CData $a Output pointer written by libui.
      *
-     * @see uiColorButtonColor
+     * libui: uiColorButtonColor
      */
     public function color(\FFI\CData $r, \FFI\CData $g, \FFI\CData $bl, \FFI\CData $a): static
     {
@@ -48,7 +48,7 @@ class ColorButton extends Control
      * @param float $bl Blue. Double in range of [0, 1.0].
      * @param float $a Alpha. Double in range of [0, 1.0].
      *
-     * @see uiColorButtonSetColor
+     * libui: uiColorButtonSetColor
      */
     public function setColor(float $r, float $g, float $bl, float $a): static
     {
@@ -62,8 +62,9 @@ class ColorButton extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiColorButtonSetColor().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiColorButtonOnChanged
+     * libui: uiColorButtonOnChanged
      */
     public function onChanged(callable $cb): static
     {

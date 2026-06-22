@@ -20,7 +20,7 @@ class Slider extends Control
      * @param int $min Minimum value.
      * @param int $max Maximum value.
      *
-     * @see uiNewSlider
+     * libui: uiNewSlider
      */
     public function __construct(int $min, int $max)
     {
@@ -32,7 +32,7 @@ class Slider extends Control
      *
      * @return int Slider value.
      *
-     * @see uiSliderValue
+     * libui: uiSliderValue
      */
     public function value(): int
     {
@@ -44,7 +44,7 @@ class Slider extends Control
      *
      * @param int $value Value to set.
      *
-     * @see uiSliderSetValue
+     * libui: uiSliderSetValue
      */
     public function setValue(int $value): static
     {
@@ -55,9 +55,9 @@ class Slider extends Control
     /**
      * Returns whether or not the slider has a tool tip.
      *
-     * @return bool `TRUE` if a tool tip is present, `FALSE` otherwise. [Default `TRUE`]
+     * @return bool `TRUE` if a tool tip is present, `FALSE` otherwise.
      *
-     * @see uiSliderHasToolTip
+     * libui: uiSliderHasToolTip
      */
     public function hasToolTip(): bool
     {
@@ -69,7 +69,7 @@ class Slider extends Control
      *
      * @param bool $hasToolTip `TRUE` to display a tool tip, `FALSE` to display no tool tip.
      *
-     * @see uiSliderSetHasToolTip
+     * libui: uiSliderSetHasToolTip
      */
     public function setHasToolTip(bool $hasToolTip): static
     {
@@ -83,8 +83,9 @@ class Slider extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiSliderSetValue().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiSliderOnChanged
+     * libui: uiSliderOnChanged
      */
     public function onChanged(callable $cb): static
     {
@@ -104,8 +105,9 @@ class Slider extends Control
      *
      * @param callable(static): void $cb Receives this widget.
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiSliderOnReleased
+     * libui: uiSliderOnReleased
      */
     public function onReleased(callable $cb): static
     {
@@ -126,7 +128,7 @@ class Slider extends Control
      * @param int $min Minimum value.
      * @param int $max Maximum value.
      *
-     * @see uiSliderSetRange
+     * libui: uiSliderSetRange
      */
     public function setRange(int $min, int $max): static
     {

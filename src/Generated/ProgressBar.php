@@ -17,7 +17,7 @@ class ProgressBar extends Control
     /**
      * Creates a new progress bar.
      *
-     * @see uiNewProgressBar
+     * libui: uiNewProgressBar
      */
     public function __construct()
     {
@@ -27,9 +27,9 @@ class ProgressBar extends Control
     /**
      * Returns the progress bar value.
      *
-     * @return int Progress bar value. `[Default 0]`
+     * @return int Progress bar value.
      *
-     * @see uiProgressBarValue
+     * libui: uiProgressBarValue
      */
     public function value(): int
     {
@@ -41,7 +41,7 @@ class ProgressBar extends Control
      *
      * @param int $n Value to set. Integer in the range of `[-1, 100]`.
      *
-     * @see uiProgressBarSetValue
+     * libui: uiProgressBarSetValue
      */
     public function setValue(int $n): static
     {

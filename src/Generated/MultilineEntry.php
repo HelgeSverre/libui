@@ -17,7 +17,7 @@ class MultilineEntry extends Control
     /**
      * Creates a new multi line entry that visually wraps text when lines overflow.
      *
-     * @see uiNewMultilineEntry
+     * libui: uiNewMultilineEntry
      */
     public function __construct()
     {
@@ -27,7 +27,7 @@ class MultilineEntry extends Control
     /**
      * Creates a new multi line entry that scrolls horizontally when lines overflow.
      *
-     * @see uiNewNonWrappingMultilineEntry
+     * libui: uiNewNonWrappingMultilineEntry
      */
     public static function nonWrapping(): static
     {
@@ -39,7 +39,7 @@ class MultilineEntry extends Control
      *
      * @return string The containing text.
      *
-     * @see uiMultilineEntryText
+     * libui: uiMultilineEntryText
      */
     public function text(): string
     {
@@ -51,7 +51,7 @@ class MultilineEntry extends Control
      *
      * @param string $text Single/multi line text.
      *
-     * @see uiMultilineEntrySetText
+     * libui: uiMultilineEntrySetText
      */
     public function setText(string $text): static
     {
@@ -64,7 +64,7 @@ class MultilineEntry extends Control
      *
      * @param string $text Text to append.
      *
-     * @see uiMultilineEntryAppend
+     * libui: uiMultilineEntryAppend
      */
     public function append(string $text): static
     {
@@ -78,8 +78,9 @@ class MultilineEntry extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiMultilineEntrySetText() or uiMultilineEntryAppend().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiMultilineEntryOnChanged
+     * libui: uiMultilineEntryOnChanged
      */
     public function onChanged(callable $cb): static
     {
@@ -97,9 +98,9 @@ class MultilineEntry extends Control
     /**
      * Returns whether or not the multi line entry's text can be changed.
      *
-     * @return bool `TRUE` if read only, `FALSE` otherwise. [Default: `FALSE`]
+     * @return bool `TRUE` if read only, `FALSE` otherwise.
      *
-     * @see uiMultilineEntryReadOnly
+     * libui: uiMultilineEntryReadOnly
      */
     public function readOnly(): bool
     {
@@ -111,7 +112,7 @@ class MultilineEntry extends Control
      *
      * @param bool $readonly `TRUE` to make read only, `FALSE` otherwise.
      *
-     * @see uiMultilineEntrySetReadOnly
+     * libui: uiMultilineEntrySetReadOnly
      */
     public function setReadOnly(bool $readonly): static
     {

@@ -27,6 +27,8 @@ final class Ffi
      * a repeating timer, the should-quit handler). PHP would otherwise GC the
      * closure while libui still holds the pointer, freeing it mid-loop and
      * crashing — so we retain them here for the process lifetime.
+     *
+     * @var list<callable>
      */
     private static array $retained = [];
 
@@ -216,10 +218,16 @@ final class Ffi
      */
     public static function uninit(): void
     {
-        Lifecycle::freeAll(); // free any forgotten TableModels before libui's leak check
+        Lifecycle::freeAll(); // free any forgotten TableModels/Images before libui's leak check
         self::get()->uiUninit();
         self::$initialized = false;
         Window::resetMenuLock(); // a fresh session after uninit() may build menus again
+
+        // The native trampolines libui held pointers to are dead once uiUninit()
+        // has torn the loop down; drop our retainers (and the widget-level ones)
+        // so a fresh init() starts from a clean slate instead of leaking closures.
+        self::$retained = [];
+        Control::clearRetainedCallbacks();
     }
 
     /**

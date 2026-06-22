@@ -19,7 +19,7 @@ class Menu extends Control
      *
      * @param string $name Menu label.
      *
-     * @see uiNewMenu
+     * libui: uiNewMenu
      */
     public function __construct(string $name)
     {
@@ -31,7 +31,7 @@ class Menu extends Control
      *
      * @param string $name Menu item text.
      *
-     * @see uiMenuAppendItem
+     * libui: uiMenuAppendItem
      */
     public function appendItem(string $name): \Libui\Generated\MenuItem
     {
@@ -43,7 +43,7 @@ class Menu extends Control
      *
      * @param string $name Menu item text.
      *
-     * @see uiMenuAppendCheckItem
+     * libui: uiMenuAppendCheckItem
      */
     public function appendCheckItem(string $name): \Libui\Generated\MenuItem
     {
@@ -55,7 +55,7 @@ class Menu extends Control
      *
      * @warning Only one such menu item may exist per application.
      *
-     * @see uiMenuAppendQuitItem
+     * libui: uiMenuAppendQuitItem
      */
     public function appendQuitItem(): \Libui\Generated\MenuItem
     {
@@ -67,7 +67,7 @@ class Menu extends Control
      *
      * @warning Only one such menu item may exist per application.
      *
-     * @see uiMenuAppendPreferencesItem
+     * libui: uiMenuAppendPreferencesItem
      */
     public function appendPreferencesItem(): \Libui\Generated\MenuItem
     {
@@ -79,7 +79,7 @@ class Menu extends Control
      *
      * @warning Only one such menu item may exist per application.
      *
-     * @see uiMenuAppendAboutItem
+     * libui: uiMenuAppendAboutItem
      */
     public function appendAboutItem(): \Libui\Generated\MenuItem
     {
@@ -89,7 +89,7 @@ class Menu extends Control
     /**
      * Appends a new separator.
      *
-     * @see uiMenuAppendSeparator
+     * libui: uiMenuAppendSeparator
      */
     public function appendSeparator(): static
     {

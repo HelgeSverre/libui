@@ -17,7 +17,7 @@ class Box extends Control
     /**
      * Creates a new vertical box. Controls within the box are placed next to each other vertically.
      *
-     * @see uiNewVerticalBox
+     * libui: uiNewVerticalBox
      */
     public function __construct()
     {
@@ -27,7 +27,7 @@ class Box extends Control
     /**
      * Creates a new horizontal box. Controls within the box are placed next to each other horizontally.
      *
-     * @see uiNewHorizontalBox
+     * libui: uiNewHorizontalBox
      */
     public static function horizontal(): static
     {
@@ -40,7 +40,7 @@ class Box extends Control
      * @param \Libui\Control $child Control instance to append.
      * @param int $stretchy `TRUE` to stretch control, `FALSE` otherwise.
      *
-     * @see uiBoxAppend
+     * libui: uiBoxAppend
      */
     public function append(\Libui\Control $child, int $stretchy): static
     {
@@ -53,7 +53,7 @@ class Box extends Control
      *
      * @return int Number of children.
      *
-     * @see uiBoxNumChildren
+     * libui: uiBoxNumChildren
      */
     public function numChildren(): int
     {
@@ -64,9 +64,9 @@ class Box extends Control
      * Removes the control at $index from the box.
      *
      * @param int $index Index of control to be removed.
-     * @note The control neither destroyed nor freed.
+     * @note The control is neither destroyed nor freed.
      *
-     * @see uiBoxDelete
+     * libui: uiBoxDelete
      */
     public function delete(int $index): static
     {
@@ -79,7 +79,7 @@ class Box extends Control
      *
      * @return bool `TRUE` if controls are padded, `FALSE` otherwise.
      *
-     * @see uiBoxPadded
+     * libui: uiBoxPadded
      */
     public function padded(): bool
     {
@@ -91,7 +91,7 @@ class Box extends Control
      *
      * @param bool $padded `TRUE` to make controls padded, `FALSE` otherwise.
      *
-     * @see uiBoxSetPadded
+     * libui: uiBoxSetPadded
      */
     public function setPadded(bool $padded): static
     {

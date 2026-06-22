@@ -20,7 +20,7 @@ class Spinbox extends Control
      * @param int $min Minimum value.
      * @param int $max Maximum value.
      *
-     * @see uiNewSpinbox
+     * libui: uiNewSpinbox
      */
     public function __construct(int $min, int $max)
     {
@@ -32,7 +32,7 @@ class Spinbox extends Control
      *
      * @return int Spinbox value.
      *
-     * @see uiSpinboxValue
+     * libui: uiSpinboxValue
      */
     public function value(): int
     {
@@ -45,7 +45,7 @@ class Spinbox extends Control
      * @param int $value Value to set.
      * @note Setting a value out of range will clamp to the nearest value in range.
      *
-     * @see uiSpinboxSetValue
+     * libui: uiSpinboxSetValue
      */
     public function setValue(int $value): static
     {
@@ -59,8 +59,9 @@ class Spinbox extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiSpinboxSetValue().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiSpinboxOnChanged
+     * libui: uiSpinboxOnChanged
      */
     public function onChanged(callable $cb): static
     {

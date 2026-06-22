@@ -88,6 +88,16 @@ return [
         'uiSaveFile',
     ],
 
+    // Hand-authored summary overrides, merged over the harvested doc summaries.
+    // libui's DateTimePicker constructor comments are rotated in the header (each
+    // sits above the wrong declaration), so the harvested summaries describe the
+    // wrong widget. Pin the correct one per factory. Keyed by C function name.
+    'doc_overrides' => [
+        'uiNewDateTimePicker' => 'Creates a new date and time picker.',
+        'uiNewDatePicker' => 'Creates a new date picker.',
+        'uiNewTimePicker' => 'Creates a new time picker.',
+    ],
+
     // Callback functions with a non-standard trampoline shape (not the usual
     // `void (*f)(uiType *sender, void *data)`). Keyed by C function name.
     //   'int'        => callback returns int (PHP bool/int coerced; default 1)

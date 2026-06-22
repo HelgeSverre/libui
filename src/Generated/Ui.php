@@ -15,10 +15,10 @@ final class Ui
      * File chooser dialog window to select a single file.
      *
      * @param \Libui\Control $parent Parent window.
+     * @return string File path, `NULL` on cancel.
      * @note File paths are separated by the underlying OS file path separator.
-     * @return string File path, `NULL` on cancel. If path is not `NULL`: TODO: clarify string encoding.
      *
-     * @see uiOpenFile
+     * libui: uiOpenFile
      */
     public static function openFile(\Libui\Control $parent): string
     {
@@ -29,10 +29,10 @@ final class Ui
      * Folder chooser dialog window to select a single folder.
      *
      * @param \Libui\Control $parent Parent window.
+     * @return string Folder path, `NULL` on cancel.
      * @note File paths are separated by the underlying OS file path separator.
-     * @return string Folder path, `NULL` on cancel. If path is not `NULL`: TODO: clarify string encoding.
      *
-     * @see uiOpenFolder
+     * libui: uiOpenFolder
      */
     public static function openFolder(\Libui\Control $parent): string
     {
@@ -43,10 +43,10 @@ final class Ui
      * Save file dialog window. The user is asked to confirm overwriting existing files, should the chosen file path already...
      *
      * @param \Libui\Control $parent Parent window.
+     * @return string File path, `NULL` on cancel.
      * @note File paths are separated by the underlying OS file path separator.
-     * @return string File path, `NULL` on cancel. If path is not `NULL`: TODO: clarify string encoding.
      *
-     * @see uiSaveFile
+     * libui: uiSaveFile
      */
     public static function saveFile(\Libui\Control $parent): string
     {
@@ -60,7 +60,7 @@ final class Ui
      * @param string $title Dialog window title text.
      * @param string $description Dialog message text.
      *
-     * @see uiMsgBox
+     * libui: uiMsgBox
      */
     public static function msgBox(\Libui\Control $parent, string $title, string $description): void
     {
@@ -74,7 +74,7 @@ final class Ui
      * @param string $title Dialog window title text.
      * @param string $description Dialog message text.
      *
-     * @see uiMsgBoxError
+     * libui: uiMsgBoxError
      */
     public static function msgBoxError(\Libui\Control $parent, string $title, string $description): void
     {

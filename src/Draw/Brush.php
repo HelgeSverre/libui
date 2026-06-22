@@ -26,7 +26,7 @@ final class Brush
      * factories convert any {@see Stop} objects via normalizeStops() first.
      *
      * @param array<int, array{float,float,float,float,float}> $stops [pos,r,g,b,a]
-     * @param array{float,float,float,float,float}             $gradient [x0,y0,x1,y1,outerRadius]
+     * @param array{float,float,float,float,float}|null        $gradient [x0,y0,x1,y1,outerRadius]
      */
     private function __construct(
         private readonly int $type,
@@ -34,7 +34,7 @@ final class Brush
         private readonly float $g = 0.0,
         private readonly float $b = 0.0,
         private readonly float $a = 1.0,
-        private readonly array $gradient = [],
+        private readonly ?array $gradient = null,
         private readonly array $stops = [],
     ) {}
 
@@ -113,7 +113,7 @@ final class Brush
         $brush->B = $this->b;
         $brush->A = $this->a;
 
-        if ($this->gradient !== []) {
+        if ($this->gradient !== null) {
             [$x0, $y0, $x1, $y1, $outer] = $this->gradient;
             $brush->X0 = $x0;
             $brush->Y0 = $y0;

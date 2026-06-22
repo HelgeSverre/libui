@@ -17,7 +17,7 @@ class MenuItem extends Control
     /**
      * Enables the menu item.
      *
-     * @see uiMenuItemEnable
+     * libui: uiMenuItemEnable
      */
     public function enable(): static
     {
@@ -28,7 +28,7 @@ class MenuItem extends Control
     /**
      * Disables the menu item. Menu item is grayed out and user interaction is not possible.
      *
-     * @see uiMenuItemDisable
+     * libui: uiMenuItemDisable
      */
     public function disable(): static
     {
@@ -41,8 +41,9 @@ class MenuItem extends Control
      *
      * @param callable(static, \FFI\CData): void $cb Receives this menu item and the source uiWindow handle.
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiMenuItemOnClicked
+     * libui: uiMenuItemOnClicked
      */
     public function onClicked(callable $cb): static
     {
@@ -60,9 +61,9 @@ class MenuItem extends Control
     /**
      * Returns whether or not the menu item's checkbox is checked. To be used only with items created via uiMenuAppendCheckI...
      *
-     * @return bool `TRUE` if checked, `FALSE` otherwise. [Default: `FALSE`]
+     * @return bool `TRUE` if checked, `FALSE` otherwise.
      *
-     * @see uiMenuItemChecked
+     * libui: uiMenuItemChecked
      */
     public function checked(): bool
     {
@@ -74,7 +75,7 @@ class MenuItem extends Control
      *
      * @param bool $checked `TRUE` to check menu item checkbox, `FALSE` otherwise.
      *
-     * @see uiMenuItemSetChecked
+     * libui: uiMenuItemSetChecked
      */
     public function setChecked(bool $checked): static
     {

@@ -21,7 +21,7 @@ declare(strict_types=1);
  * @phpstan-type ParsedFunction array{name: string, ret: string, params: list<ParsedParam>}
  * @phpstan-type Classification array{kind: string, name?: string, scalarOut?: bool}
  * @phpstan-type ConstructorConfig array{primary?: string|null, factories?: array<string, string>}
- * @phpstan-type GeneratorAnnotations array{skip_types: list<string>, constructors: array<string, ConstructorConfig>, bool_funcs: list<string>, flag_enums: list<string>, facade_funcs: list<string>, deviating_callbacks: array<string, string>}
+ * @phpstan-type GeneratorAnnotations array{skip_types: list<string>, constructors: array<string, ConstructorConfig>, bool_funcs: list<string>, flag_enums: list<string>, facade_funcs: list<string>, doc_overrides: array<string, string>, deviating_callbacks: array<string, string>}
  * @phpstan-type GeneratorContext array{enums: array<string, array<string, int>>, types: list<string>, generatedTypes: list<string>, functions: array<string, ParsedFunction>, annotations: GeneratorAnnotations, docs: array<string, DocData>}
  */
 
@@ -125,6 +125,25 @@ function harvestDocs(string $rawHeader): array
         if (docHasSignal($doc)) {
             $docs[$name] = $doc;
         }
+    }
+
+    return $docs;
+}
+
+/**
+ * Overlay hand-authored summaries onto harvested docs. Used where the header's
+ * comments are wrong (e.g. rotated DateTimePicker constructor summaries).
+ *
+ * @param array<string, DocData> $docs
+ * @param array<string, string> $overrides uiName => summary
+ * @return array<string, DocData>
+ */
+function applyDocOverrides(array $docs, array $overrides): array
+{
+    foreach ($overrides as $name => $summary) {
+        $doc = $docs[$name] ?? emptyDoc();
+        $doc['summary'] = sanitizeSummary($summary);
+        $docs[$name] = $doc;
     }
 
     return $docs;
@@ -356,9 +375,16 @@ function sanitizeDocText(string $text): string
         $text,
     );
     $text = preg_replace('/#(ui[A-Za-z0-9_]+)/', '$1', $text);
-    // libui leaves some defaults unfilled as `[Default: `TODO`]` — drop the
-    // placeholder, but keep real documented defaults like `[Default: `FALSE`]`.
-    $text = preg_replace('/\s*\[Default:?\s*`?TODO`?\]/i', '', $text);
+    // libui leaves `[Default: ...]` fragments dangling in prose (both unfilled
+    // `TODO` placeholders and documented values like `FALSE`); none of them read
+    // well inline, so strip the whole bracketed fragment.
+    $text = preg_replace('/\s*`?\[Default:?[^\]]*\]`?/i', '', $text);
+    // Some descriptions trail off into a literal `TODO:` placeholder clause that
+    // dangles off an unfinished sentence (e.g. "...: TODO: clarify ..."). Drop the
+    // whole trailing clause back to the last completed sentence boundary.
+    $text = preg_replace('/\s*[^.!?]*\bTODO:.*$/i', '', $text);
+    // Normalise a recurring grammar typo in libui's notes.
+    $text = str_replace('control neither destroyed nor freed', 'control is neither destroyed nor freed', $text);
     // Strip libui's recurring string-ownership boilerplate wherever it appears —
     // multi-line continuation lines append it to otherwise-useful descriptions.
     $text = preg_replace(
@@ -391,6 +417,31 @@ function sanitizeDocText(string $text): string
 }
 
 /**
+ * Reorder docblock tags into [params, return, notes/warnings]. Callers append
+ * @return after @note for convenience; PHPDoc convention puts @return first.
+ *
+ * @param list<string> $tags
+ * @return list<string>
+ */
+function orderDocTags(array $tags): array
+{
+    $params = [];
+    $returns = [];
+    $rest = [];
+    foreach ($tags as $tag) {
+        if (str_starts_with($tag, '@param')) {
+            $params[] = $tag;
+        } elseif (str_starts_with($tag, '@return')) {
+            $returns[] = $tag;
+        } else {
+            $rest[] = $tag;
+        }
+    }
+
+    return [...$params, ...$returns, ...$rest];
+}
+
+/**
  * Render a method/function docblock.
  *
  * @param array<string, array{summary: string, params: array<string, string>, return: string, notes: list<string>, warnings: list<string>}> $docs
@@ -401,24 +452,29 @@ function docBlock(string $uiName, array $docs, string $indent, array $extraTags 
     $doc = $docs[$uiName] ?? emptyDoc();
     $summary = $doc['summary'];
     if ($summary === '' && $extraTags === []) {
-        return "{$indent}/** @see {$uiName} */\n";
+        return "{$indent}/** libui: {$uiName} */\n";
     }
+
+    // Emit tags in the canonical order [params, return, notes/warnings]; callers
+    // assemble them notes-last, so reorder here rather than at every call site.
+    $orderedTags = orderDocTags($extraTags);
 
     $lines = ["{$indent}/**"];
     if ($summary !== '') {
         $lines[] = "{$indent} * {$summary}";
     }
-    if ($summary !== '' && $extraTags !== []) {
+    if ($summary !== '' && $orderedTags !== []) {
         $lines[] = "{$indent} *";
     }
-    foreach ($extraTags as $tag) {
+    foreach ($orderedTags as $tag) {
         if ($tag === '') {
             continue;
         }
         $lines[] = "{$indent} * {$tag}";
     }
     $lines[] = "{$indent} *";
-    $lines[] = "{$indent} * @see {$uiName}";
+    // Bare `@see uiFn` resolves to no PHP symbol, so emit a prose label instead.
+    $lines[] = "{$indent} * libui: {$uiName}";
     $lines[] = "{$indent} */";
 
     return implode("\n", $lines) . "\n";
@@ -605,6 +661,11 @@ function classify(string $type, array $enums, array $types): array
         if ($base === 'double') {
             return ['kind' => 'double'];
         }
+        // A scalar C `char` binds to a one-character PHP string under FFI, not an
+        // int (this is what bit OpenTypeFeaturesAdd/Get).
+        if ($base === 'char') {
+            return ['kind' => 'char'];
+        }
         if (isset($enums[$base])) {
             return ['kind' => 'enum', 'name' => $base];
         }
@@ -632,7 +693,7 @@ function phpTypeForParam(array $classification): string
 {
     return match ($classification['kind']) {
         'double' => 'float',
-        'string_borrow', 'string_owned' => 'string',
+        'char', 'string_borrow', 'string_owned' => 'string',
         'enum' => '\\Libui\\Generated\\Enum\\' . enumClassName($classification['name']),
         'control', 'widget' => '\\Libui\\Control',
         'cdata' => '\\FFI\\CData',
@@ -672,7 +733,7 @@ function phpTypeForReturn(array $classification, array $generatedTypes): string
     return match ($classification['kind']) {
         'void' => 'void',
         'double' => 'float',
-        'string_borrow', 'string_owned' => 'string',
+        'char', 'string_borrow', 'string_owned' => 'string',
         'enum' => '\\Libui\\Generated\\Enum\\' . enumClassName($classification['name']),
         'widget' => in_array($classification['name'], $generatedTypes, true)
             ? '\\Libui\\Generated\\' . stripUiPrefix($classification['name'])
@@ -700,6 +761,7 @@ function ffiTypeForParam(array $param, array $enums): string
         'void' => 'void',
         'double' => 'float',
         'enum', 'int' => 'int',
+        'char' => 'string',
         'string_borrow', 'string_owned' => 'string|\\FFI\\CData',
         default => '?\\FFI\\CData',
     };
@@ -906,7 +968,8 @@ function emitMethod(array $function, string $type, array $context): ?string
     if (str_starts_with($methodSuffix, 'On') && $hasCallback) {
         $deviation = $annotations['deviating_callbacks'][$name] ?? null;
         $body = eventHandlerBody($method, $deviation);
-        $docTags = array_merge(callbackDocTags($deviation), noteDocTags($name, $docs));
+        $replaceNote = '@note Registering a second handler supersedes the first at the C level; ' . 'the prior trampoline stays retained for the lifetime of this object.';
+        $docTags = array_merge(callbackDocTags($deviation), noteDocTags($name, $docs), [$replaceNote]);
 
         return (
             docBlock($name, $docs, '    ', $docTags)
@@ -1563,6 +1626,7 @@ function main(array $annotations): void
     $parsedFunctions = parseFunctions($cleaned);
     $parsedEnums = parseEnums($cleaned);
     $parsedDocs = harvestDocs($rawHeader);
+    $parsedDocs = applyDocOverrides($parsedDocs, $annotations['doc_overrides']);
 
     $excludedTypes = $annotations['skip_types'];
     $generatedTypes = $parsedTypes |> (fn (array $types): array => array_diff($types, $excludedTypes)) |> array_values(...);

@@ -14,8 +14,15 @@ final class Image
 {
     private ?\FFI\CData $handle;
 
+    /** Whether {@see free()} has already released the image (guards double-free). */
+    private bool $freed = false;
+
     /**
      * Creates a new empty image with the specified dimensions.
+     *
+     * The image registers itself with the {@see Lifecycle} registry so a
+     * forgotten free() does not leak a uiImage into uiUninit() — libui's leak
+     * checker aborts the process on a live uiImage at shutdown.
      *
      * @param float $width The width of the image in pixels
      * @param float $height The height of the image in pixels
@@ -23,6 +30,7 @@ final class Image
     public function __construct(float $width, float $height)
     {
         $this->handle = Ffi::get()->uiNewImage($width, $height);
+        Lifecycle::registerImage($this);
     }
 
     /**
@@ -35,13 +43,23 @@ final class Image
 
     /**
      * Frees the image and releases its resources.
+     *
+     * Idempotent: a second call is a no-op (freeing a uiImage twice would abort
+     * libui), and the image de-registers from the {@see Lifecycle} registry so
+     * uninit()'s sweep skips it. The registry calls this for any image still
+     * live at uninit().
      */
     public function free(): void
     {
+        if ($this->freed) {
+            return;
+        }
+        $this->freed = true;
         if (isset($this->handle) && ! \FFI::isNull($this->handle)) {
             Ffi::get()->uiFreeImage($this->handle);
             $this->handle = null;
         }
+        Lifecycle::unregisterImage($this);
     }
 
     /**

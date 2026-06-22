@@ -188,6 +188,50 @@ final class DrawTest extends TestCase
         $this->assertInstanceOf(Brush::class, $brush);
     }
 
+    public function testBrushLinearGradientMarshalsGeometryAndStops(): void
+    {
+        // Hold the Brush: toCData() retains the struct + stops array on the
+        // instance, so the returned pointer is only valid while the Brush lives.
+        $brush = Brush::linearGradient(1.0, 2.0, 3.0, 4.0, [
+            [0.0, 1.0, 0.0, 0.0, 1.0],
+            [1.0, 0.0, 0.0, 1.0, 1.0],
+        ]);
+        $cdata = $brush->toCData();
+
+        $this->assertSame(DrawBrushType::LinearGradient->value, $cdata->Type);
+        $this->assertEqualsWithDelta(1.0, $cdata->X0, 1e-9);
+        $this->assertEqualsWithDelta(2.0, $cdata->Y0, 1e-9);
+        $this->assertEqualsWithDelta(3.0, $cdata->X1, 1e-9);
+        $this->assertEqualsWithDelta(4.0, $cdata->Y1, 1e-9);
+        $this->assertSame(2, $cdata->NumStops);
+        $this->assertFalse(\FFI::isNull($cdata->Stops));
+    }
+
+    public function testBrushRadialGradientMarshalsOuterRadius(): void
+    {
+        $brush = Brush::radialGradient(5.0, 6.0, 7.0, [
+            [0.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 0.0, 0.0, 0.0, 1.0],
+        ]);
+        $cdata = $brush->toCData();
+
+        $this->assertSame(DrawBrushType::RadialGradient->value, $cdata->Type);
+        $this->assertEqualsWithDelta(7.0, $cdata->OuterRadius, 1e-9);
+        $this->assertSame(2, $cdata->NumStops);
+    }
+
+    public function testBrushSolidHasNoGradientStops(): void
+    {
+        // A solid brush passes no gradient (null default) and no stops; toCData()
+        // must skip the gradient/stops marshalling entirely.
+        $brush = Brush::solid(1.0, 0.5, 0.25, 1.0);
+        $cdata = $brush->toCData();
+
+        $this->assertSame(DrawBrushType::Solid->value, $cdata->Type);
+        $this->assertSame(0, $cdata->NumStops);
+        $this->assertTrue(\FFI::isNull($cdata->Stops));
+    }
+
     public function testBrushToCData(): void
     {
         $brush = Brush::solid(1.0, 0.5, 0.25, 1.0);

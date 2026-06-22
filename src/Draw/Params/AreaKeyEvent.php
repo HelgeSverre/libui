@@ -18,7 +18,8 @@ final class AreaKeyEvent
     public static function fromCData(\FFI\CData $e): self
     {
         return new self(
-            (int) $e->Key,
+            // C `char Key` binds to a one-char PHP string in FFI; (int) cast is always 0.
+            $e->Key === '' ? 0 : \ord($e->Key),
             $e->ExtKey,
             $e->Modifier,
             $e->Modifiers,

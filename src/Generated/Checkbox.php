@@ -19,7 +19,7 @@ class Checkbox extends Control
      *
      * @param string $text Label text.
      *
-     * @see uiNewCheckbox
+     * libui: uiNewCheckbox
      */
     public function __construct(string $text)
     {
@@ -31,7 +31,7 @@ class Checkbox extends Control
      *
      * @return string The text of the label.
      *
-     * @see uiCheckboxText
+     * libui: uiCheckboxText
      */
     public function text(): string
     {
@@ -43,7 +43,7 @@ class Checkbox extends Control
      *
      * @param string $text Label text.
      *
-     * @see uiCheckboxSetText
+     * libui: uiCheckboxSetText
      */
     public function setText(string $text): static
     {
@@ -57,8 +57,9 @@ class Checkbox extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiCheckboxSetChecked().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiCheckboxOnToggled
+     * libui: uiCheckboxOnToggled
      */
     public function onToggled(callable $cb): static
     {
@@ -76,9 +77,9 @@ class Checkbox extends Control
     /**
      * Returns whether or the checkbox is checked.
      *
-     * @return bool `TRUE` if checked, `FALSE` otherwise. [Default: `FALSE`]
+     * @return bool `TRUE` if checked, `FALSE` otherwise.
      *
-     * @see uiCheckboxChecked
+     * libui: uiCheckboxChecked
      */
     public function checked(): bool
     {
@@ -90,7 +91,7 @@ class Checkbox extends Control
      *
      * @param bool $checked `TRUE` to check box, `FALSE` otherwise.
      *
-     * @see uiCheckboxSetChecked
+     * libui: uiCheckboxSetChecked
      */
     public function setChecked(bool $checked): static
     {

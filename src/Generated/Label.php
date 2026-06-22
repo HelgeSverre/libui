@@ -19,7 +19,7 @@ class Label extends Control
      *
      * @param string $text Label text.
      *
-     * @see uiNewLabel
+     * libui: uiNewLabel
      */
     public function __construct(string $text)
     {
@@ -31,7 +31,7 @@ class Label extends Control
      *
      * @return string The text of the label.
      *
-     * @see uiLabelText
+     * libui: uiLabelText
      */
     public function text(): string
     {
@@ -43,7 +43,7 @@ class Label extends Control
      *
      * @param string $text Label text.
      *
-     * @see uiLabelSetText
+     * libui: uiLabelSetText
      */
     public function setText(string $text): static
     {

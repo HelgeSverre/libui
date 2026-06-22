@@ -10,13 +10,19 @@ namespace Libui;
  */
 class Form extends Generated\Form
 {
-    /** @var array<string, Control> Appended fields, label => control, in order. */
+    /**
+     * Appended fields as an ordered list of [label, control] pairs, mirroring
+     * the children libui holds. A list (not a label-keyed map) so duplicate
+     * labels stay distinct and indices line up with delete(int).
+     *
+     * @var list<array{string, Control}>
+     */
     private array $fields = [];
 
     /** Append a labelled field; $stretchy (bool, or the raw 0/1 int) defaults to off. */
     public function append(string $label, Control $c, bool|int $stretchy = false): static
     {
-        $this->fields[$label] = $c;
+        $this->fields[] = [$label, $c];
         return parent::append($label, $c, (int) $stretchy);
     }
 
@@ -26,16 +32,27 @@ class Form extends Generated\Form
         return $this->append($label, $c, true);
     }
 
+    /** Remove the field at $index, keeping the tracked list in sync. */
+    public function delete(int $index): static
+    {
+        if ($index >= 0 && $index < \count($this->fields)) {
+            \array_splice($this->fields, $index, 1);
+        }
+
+        return parent::delete($index);
+    }
+
     /**
      * Read every {@see HasValue} field as `[label => value]`. Non-value controls
-     * (separators, labels, …) are skipped.
+     * (separators, labels, …) are skipped. With duplicate labels, the last
+     * field with a given label wins (arrays cannot hold duplicate keys).
      *
      * @return array<string, mixed>
      */
     public function values(): array
     {
         $out = [];
-        foreach ($this->fields as $label => $control) {
+        foreach ($this->fields as [$label, $control]) {
             if ($control instanceof HasValue) {
                 $out[$label] = $control->value();
             }
@@ -46,16 +63,16 @@ class Form extends Generated\Form
 
     /**
      * Set fields from `[label => value]`. Unknown labels and non-value controls
-     * are ignored, so a partial map is fine.
+     * are ignored, so a partial map is fine. Every field whose label matches a
+     * key is updated, so duplicate-label fields all receive the value.
      *
      * @param array<string, mixed> $values
      */
     public function setValues(array $values): static
     {
-        foreach ($values as $label => $value) {
-            $control = $this->fields[$label] ?? null;
-            if ($control instanceof HasValue) {
-                $control->setValue($value);
+        foreach ($this->fields as [$label, $control]) {
+            if ($control instanceof HasValue && \array_key_exists($label, $values)) {
+                $control->setValue($values[$label]);
             }
         }
 

@@ -17,7 +17,7 @@ class Grid extends Control
     /**
      * Creates a new grid.
      *
-     * @see uiNewGrid
+     * libui: uiNewGrid
      */
     public function __construct()
     {
@@ -37,7 +37,7 @@ class Grid extends Control
      * @param int $vexpand `TRUE` to expand reserved area vertically, `FALSE` otherwise.
      * @param \Libui\Generated\Enum\Align $valign Vertical alignment of the control within the reserved space.
      *
-     * @see uiGridAppend
+     * libui: uiGridAppend
      */
     public function append(\Libui\Control $c, int $left, int $top, int $xspan, int $yspan, int $hexpand, \Libui\Generated\Enum\Align $halign, int $vexpand, \Libui\Generated\Enum\Align $valign): static
     {
@@ -58,7 +58,7 @@ class Grid extends Control
      * @param int $vexpand `TRUE` to expand reserved area vertically, `FALSE` otherwise.
      * @param \Libui\Generated\Enum\Align $valign Vertical alignment of the control within the reserved space.
      *
-     * @see uiGridInsertAt
+     * libui: uiGridInsertAt
      */
     public function insertAt(\Libui\Control $c, \Libui\Control $existing, \Libui\Generated\Enum\At $at, int $xspan, int $yspan, int $hexpand, \Libui\Generated\Enum\Align $halign, int $vexpand, \Libui\Generated\Enum\Align $valign): static
     {
@@ -71,7 +71,7 @@ class Grid extends Control
      *
      * @return bool `TRUE` if controls are padded, `FALSE` otherwise.
      *
-     * @see uiGridPadded
+     * libui: uiGridPadded
      */
     public function padded(): bool
     {
@@ -83,7 +83,7 @@ class Grid extends Control
      *
      * @param bool $padded `TRUE` to make controls padded, `FALSE` otherwise.
      *
-     * @see uiGridSetPadded
+     * libui: uiGridSetPadded
      */
     public function setPadded(bool $padded): static
     {

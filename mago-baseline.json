@@ -1,33 +1,9 @@
 variant = "loose"
 
 [[issues]]
-file = "examples/async_http.php"
-code = "function-name"
-message = "Function name `simulateHttpRequest` should be in snake case."
-count = 1
-
-[[issues]]
-file = "examples/colorpicker.php"
-code = "function-name"
-message = "Function name `rgbToHsl` should be in snake case."
-count = 1
-
-[[issues]]
-file = "examples/colorpicker.php"
-code = "function-name"
-message = "Function name `rgbToOklch` should be in snake case."
-count = 1
-
-[[issues]]
 file = "examples/colorpicker.php"
 code = "identity-comparison"
 message = "Use identity comparison `===` instead of equality comparison `==`."
-count = 1
-
-[[issues]]
-file = "examples/markdown.php"
-code = "function-name"
-message = "Function name `parseMarkdown` should be in snake case."
 count = 1
 
 [[issues]]
@@ -70,7 +46,7 @@ count = 1
 file = "src/Form.php"
 code = "prefer-early-continue"
 message = "Consider using early continue pattern to reduce nesting."
-count = 1
+count = 2
 
 [[issues]]
 file = "src/Image.php"
@@ -85,6 +61,18 @@ message = "Use of the `isset` construct."
 count = 2
 
 [[issues]]
+file = "tests/CallbackTest.php"
+code = "no-assign-in-condition"
+message = "Avoid assignments in conditions."
+count = 1
+
+[[issues]]
+file = "tests/CallbackTest.php"
+code = "single-class-per-file"
+message = "File contains multiple class-like definitions; found class `SwallowFilter` but class `CallbackTest` is already defined in this file."
+count = 1
+
+[[issues]]
 file = "tests/LoopTest.php"
 code = "no-redundant-use"
 message = "Unused import: `Ffi`."
@@ -97,42 +85,6 @@ message = "Use first-class callable syntax `...` instead of a arrow function."
 count = 6
 
 [[issues]]
-file = "tests/table_lifecycle.php"
-code = "function-name"
-message = "Function name `silenceLeakTrap` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "function-name"
-message = "Function name `fqcnFromPath` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "function-name"
-message = "Function name `renderDefault` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "function-name"
-message = "Function name `renderParams` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "function-name"
-message = "Function name `shortType` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/gen-api-docs.php"
-code = "function-name"
-message = "Function name `typeToString` should be in snake case."
-count = 1
-
-[[issues]]
 file = "tools/gen-api-docs.php"
 code = "no-nested-ternary"
 message = "Nested ternary expressions are confusing due to PHP's operator associativity rules."
@@ -140,321 +92,15 @@ count = 1
 
 [[issues]]
 file = "tools/generate.php"
-code = "function-name"
-message = "Function name `buildConstructorMaps` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `callbackDocTags` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `cleanHeader` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `docBlock` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `docFromBlock` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `docFromLineComments` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `docHasSignal` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `dropNoiseLines` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitAllEnums` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitAllWidgets` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitEnum` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitFacade` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitFfiContracts` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitFfiFunctionsInterface` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitFfiStub` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitFlags` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitMethod` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emitWidget` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `emptyDoc` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `enumClassName` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `enumDocBlock` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `evaluateEnumExpression` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `eventHandlerBody` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `extractDoc` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `ffiMethodLines` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `ffiTypeForParam` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `ffiTypeForReturn` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `harvestDocs` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `isReservedWord` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `longestCommonPrefix` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `marshalArg` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `methodParamDoc` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `methodReturnDoc` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `noteDocTags` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `parseEnums` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `parseFunctions` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `parseParameters` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `partitionFunctions` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `phpDocType` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `phpTypeForParam` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `phpTypeForReturn` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `prependGenerationNotice` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `printReport` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `readInput` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `removeDirectory` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `returnStatement` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `sanitizeDocText` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `sanitizeSummary` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `shouldDropLine` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `stripUiPrefix` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `typeList` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
-code = "function-name"
-message = "Function name `writeFile` should be in snake case."
-count = 1
-
-[[issues]]
-file = "tools/generate.php"
 code = "no-isset"
 message = "Use of the `isset` construct."
 count = 8
+
+[[issues]]
+file = "tools/generate.php"
+code = "no-redundant-string-concat"
+message = "String concatenation can be simplified."
+count = 1
 
 [[issues]]
 file = "tools/generate.php"

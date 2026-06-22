@@ -31,12 +31,28 @@ final class HeaderGateTest extends LibuiTestCase
     #[DataProvider('representativeSymbols')]
     public function testHeaderDeclaresSymbol(string $symbol): void
     {
-        $header = file_get_contents(Ffi::root() . '/src/Native/libui.gen.h');
-
+        // Fast pre-filter: the declaration must at least appear in the header.
+        $header = (string) file_get_contents(Ffi::root() . '/src/Native/libui.gen.h');
         $this->assertStringContainsString(
             $symbol . '(',
             $header,
             "{$symbol} should be declared in the generated header",
+        );
+
+        // The real gate: resolve the symbol against the live FFI handle. A
+        // declaration that FFI parsed but couldn't bind to the shared library
+        // throws \FFI\Exception on access (FFI never returns false for a
+        // missing symbol) — so a clean access proves the function is callable.
+        try {
+            $bound = Ffi::get()->{$symbol};
+        } catch (\FFI\Exception $e) {
+            $this->fail("{$symbol} is declared but not bound in the live FFI handle: {$e->getMessage()}");
+        }
+
+        $this->assertInstanceOf(
+            \FFI\CData::class,
+            $bound,
+            "{$symbol} should resolve to a callable C function on the FFI handle",
         );
     }
 

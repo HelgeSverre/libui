@@ -17,7 +17,7 @@ class RadioButtons extends Control
     /**
      * Creates a new radio buttons instance.
      *
-     * @see uiNewRadioButtons
+     * libui: uiNewRadioButtons
      */
     public function __construct()
     {
@@ -29,7 +29,7 @@ class RadioButtons extends Control
      *
      * @param string $text Radio button text.
      *
-     * @see uiRadioButtonsAppend
+     * libui: uiRadioButtonsAppend
      */
     public function append(string $text): static
     {
@@ -42,7 +42,7 @@ class RadioButtons extends Control
      *
      * @return int Index of the item selected, `-1` on empty selection.
      *
-     * @see uiRadioButtonsSelected
+     * libui: uiRadioButtonsSelected
      */
     public function selected(): int
     {
@@ -54,7 +54,7 @@ class RadioButtons extends Control
      *
      * @param int $index Index of the item to be selected, `-1` to clear selection.
      *
-     * @see uiRadioButtonsSetSelected
+     * libui: uiRadioButtonsSetSelected
      */
     public function setSelected(int $index): static
     {
@@ -68,8 +68,9 @@ class RadioButtons extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiRadioButtonsSetSelected().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiRadioButtonsOnSelected
+     * libui: uiRadioButtonsOnSelected
      */
     public function onSelected(callable $cb): static
     {

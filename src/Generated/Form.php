@@ -17,7 +17,7 @@ class Form extends Control
     /**
      * Creates a new form.
      *
-     * @see uiNewForm
+     * libui: uiNewForm
      */
     public function __construct()
     {
@@ -31,7 +31,7 @@ class Form extends Control
      * @param \Libui\Control $c Control to append.
      * @param int $stretchy `TRUE` to stretch control, `FALSE` otherwise.
      *
-     * @see uiFormAppend
+     * libui: uiFormAppend
      */
     public function append(string $label, \Libui\Control $c, int $stretchy): static
     {
@@ -42,7 +42,7 @@ class Form extends Control
     /**
      * Returns the number of controls contained within the form.
      *
-     * @see uiFormNumChildren
+     * libui: uiFormNumChildren
      */
     public function numChildren(): int
     {
@@ -55,7 +55,7 @@ class Form extends Control
      * @param int $index Index of the control to be removed.
      * @note The control is neither destroyed nor freed.
      *
-     * @see uiFormDelete
+     * libui: uiFormDelete
      */
     public function delete(int $index): static
     {
@@ -68,7 +68,7 @@ class Form extends Control
      *
      * @return bool `TRUE` if controls are padded, `FALSE` otherwise.
      *
-     * @see uiFormPadded
+     * libui: uiFormPadded
      */
     public function padded(): bool
     {
@@ -80,7 +80,7 @@ class Form extends Control
      *
      * @param bool $padded `TRUE` to make controls padded, `FALSE` otherwise.
      *
-     * @see uiFormSetPadded
+     * libui: uiFormSetPadded
      */
     public function setPadded(bool $padded): static
     {

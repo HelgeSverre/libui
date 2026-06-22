@@ -104,16 +104,18 @@ final class AppTest extends LibuiTestCase
     }
 
     /**
-     * Test the full lifecycle in a subprocess to avoid blocking the test process.
-     * This verifies that App::run() properly initializes, runs, and uninitializes.
+     * Drive the full App lifecycle in a child process so the blocking event
+     * loop never freezes the test runner.
+     *
+     * The child builds a window, queues a timer that destroys the window and
+     * quits (destroying before quit avoids libui's leak-check abort during
+     * uiUninit), runs App::run() to completion, prints a sentinel, and exits 0.
+     * We assert on the real outcome: a clean exit code AND a stderr with no
+     * abort/leak diagnostic — not merely that the child "started".
      */
     public function testAppFullLifecycleInSubprocess(): void
     {
-        if (\PHP_OS_FAMILY === 'Windows') {
-            $this->markTestSkipped('Backgrounding (`&`) and the /tmp flag-file handshake are POSIX-only.');
-        }
-
-        // Create a temporary script that runs the app
+        // proc_open with pipes is available on every supported platform.
         $autoloadPath = __DIR__ . '/../vendor/autoload.php';
         $script = <<<PHP
             <?php
@@ -122,7 +124,6 @@ final class AppTest extends LibuiTestCase
             use Libui\App;
             use Libui\Button;
             use Libui\Ffi;
-            use Libui\Loop;
             use Libui\Window;
 
             Ffi::init();
@@ -131,25 +132,21 @@ final class AppTest extends LibuiTestCase
             \$window = new Window('Test', 100, 100, false);
             \$button = new Button('Quit');
 
-            \$button->onClicked(function () use (\$window): void {
-                Ffi::quit();
-            });
-
             \$window->setChild(\$button);
             \$app->window(\$window);
 
-            // Set a flag that we've started
-            file_put_contents('/tmp/libui_app_test_started', '1');
-
-            // Auto-quit after a short delay so the test doesn't hang
-            Loop::delay(500, function() use (\$app): void {
+            // Headless: nobody clicks the button, so a timer drives the quit.
+            // Destroy the window first so uiUninit()'s leak check stays clean,
+            // then ask the loop to return.
+            Ffi::timer(50, function () use (\$window): bool {
+                \$window->destroy();
                 Ffi::quit();
+                return false; // one-shot
             });
 
-            \$app->run();
+            \$app->run(); // initialises, runs the loop, then uninits
 
-            // Set a flag that we've completed
-            file_put_contents('/tmp/libui_app_test_completed', '1');
+            fwrite(STDOUT, "LIBUI_LIFECYCLE_OK\\n");
             exit(0);
             PHP;
 
@@ -157,35 +154,43 @@ final class AppTest extends LibuiTestCase
         file_put_contents($scriptPath, $script);
 
         try {
-            // Clean up any previous flags
-            @unlink('/tmp/libui_app_test_started');
-            @unlink('/tmp/libui_app_test_completed');
+            $descriptors = [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ];
 
-            // Run the script in a subprocess
-            $cmd = escapeshellarg(\PHP_BINARY) . ' ' . escapeshellarg($scriptPath) . ' >/dev/null 2>&1 &';
+            $cmd = escapeshellarg(\PHP_BINARY) . ' ' . escapeshellarg($scriptPath);
+            $process = proc_open($cmd, $descriptors, $pipes);
 
-            // Start the process (we'll poll for the flag)
-            exec($cmd);
+            $this->assertIsResource($process, 'the child PHP process should launch');
 
-            // Wait for the app to start (up to 2 seconds)
-            $started = false;
-            for ($i = 0; $i < 20; $i++) {
-                if (file_exists('/tmp/libui_app_test_started')) {
-                    $started = true;
-                    break;
-                }
-                usleep(100_000); // 100ms
-            }
+            fclose($pipes[0]);
+            $stdout = (string) stream_get_contents($pipes[1]);
+            $stderr = (string) stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
 
-            $this->assertTrue($started, 'App should start and create the started flag');
+            $exitCode = proc_close($process);
 
-            // Now send a quit signal by creating a fake click event
-            // For now, we'll just verify it started
+            $this->assertSame(
+                0,
+                $exitCode,
+                "App lifecycle child should exit 0. stderr was:\n{$stderr}",
+            );
+            $this->assertStringContainsString(
+                'LIBUI_LIFECYCLE_OK',
+                $stdout,
+                'the child should run App::run() to completion and print its sentinel',
+            );
+            // libui aborts (and GTK warns) on leaks/misuse; none of those must appear.
+            $this->assertDoesNotMatchRegularExpression(
+                '/abort|leak|Assertion|Fatal error|uncaught/i',
+                $stderr,
+                "child stderr should be free of abort/leak/fatal diagnostics. stderr was:\n{$stderr}",
+            );
         } finally {
-            // Clean up
             @unlink($scriptPath);
-            @unlink('/tmp/libui_app_test_started');
-            @unlink('/tmp/libui_app_test_completed');
         }
     }
 

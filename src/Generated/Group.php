@@ -19,7 +19,7 @@ class Group extends Control
      *
      * @param string $title Group title text.
      *
-     * @see uiNewGroup
+     * libui: uiNewGroup
      */
     public function __construct(string $title)
     {
@@ -31,7 +31,7 @@ class Group extends Control
      *
      * @return string The group title text.
      *
-     * @see uiGroupTitle
+     * libui: uiGroupTitle
      */
     public function title(): string
     {
@@ -43,7 +43,7 @@ class Group extends Control
      *
      * @param string $title Group title text.
      *
-     * @see uiGroupSetTitle
+     * libui: uiGroupSetTitle
      */
     public function setTitle(string $title): static
     {
@@ -56,7 +56,7 @@ class Group extends Control
      *
      * @param \Libui\Control $c uiControl child instance, or `NULL`.
      *
-     * @see uiGroupSetChild
+     * libui: uiGroupSetChild
      */
     public function setChild(\Libui\Control $c): static
     {
@@ -69,7 +69,7 @@ class Group extends Control
      *
      * @return bool `TRUE` if the group has a margin, `FALSE` otherwise.
      *
-     * @see uiGroupMargined
+     * libui: uiGroupMargined
      */
     public function margined(): bool
     {
@@ -81,7 +81,7 @@ class Group extends Control
      *
      * @param bool $margined `TRUE` to set a margin, `FALSE` otherwise.
      *
-     * @see uiGroupSetMargined
+     * libui: uiGroupSetMargined
      */
     public function setMargined(bool $margined): static
     {

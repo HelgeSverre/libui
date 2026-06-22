@@ -19,7 +19,7 @@ class Button extends Control
      *
      * @param string $text Label text.
      *
-     * @see uiNewButton
+     * libui: uiNewButton
      */
     public function __construct(string $text)
     {
@@ -31,7 +31,7 @@ class Button extends Control
      *
      * @return string The text of the label.
      *
-     * @see uiButtonText
+     * libui: uiButtonText
      */
     public function text(): string
     {
@@ -43,7 +43,7 @@ class Button extends Control
      *
      * @param string $text Label text.
      *
-     * @see uiButtonSetText
+     * libui: uiButtonSetText
      */
     public function setText(string $text): static
     {
@@ -56,8 +56,9 @@ class Button extends Control
      *
      * @param callable(static): void $cb Receives this widget.
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiButtonOnClicked
+     * libui: uiButtonOnClicked
      */
     public function onClicked(callable $cb): static
     {

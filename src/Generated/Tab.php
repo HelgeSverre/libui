@@ -17,7 +17,7 @@ class Tab extends Control
     /**
      * Creates a new tab container.
      *
-     * @see uiNewTab
+     * libui: uiNewTab
      */
     public function __construct()
     {
@@ -29,7 +29,7 @@ class Tab extends Control
      *
      * @return int Index of the tab selected
      *
-     * @see uiTabSelected
+     * libui: uiTabSelected
      */
     public function selected(): int
     {
@@ -42,7 +42,7 @@ class Tab extends Control
      * @param int $index Index of the tab to be selected
      * @note The $index must be in the range [0, uiTabNumPages(t) - 1]. If out of bounds, the selection is not changed.
      *
-     * @see uiTabSetSelected
+     * libui: uiTabSetSelected
      */
     public function setSelected(int $index): static
     {
@@ -56,8 +56,9 @@ class Tab extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiTabSetSelected(),
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiTabOnSelected
+     * libui: uiTabOnSelected
      */
     public function onSelected(callable $cb): static
     {
@@ -78,7 +79,7 @@ class Tab extends Control
      * @param string $name Label text.
      * @param \Libui\Control $c Control to append.
      *
-     * @see uiTabAppend
+     * libui: uiTabAppend
      */
     public function append(string $name, \Libui\Control $c): static
     {
@@ -93,7 +94,7 @@ class Tab extends Control
      * @param int $index Index at which to insert the control.
      * @param \Libui\Control $c Control to insert.
      *
-     * @see uiTabInsertAt
+     * libui: uiTabInsertAt
      */
     public function insertAt(string $name, int $index, \Libui\Control $c): static
     {
@@ -107,7 +108,7 @@ class Tab extends Control
      * @param int $index Index of the control to be removed.
      * @note The control is neither destroyed nor freed.
      *
-     * @see uiTabDelete
+     * libui: uiTabDelete
      */
     public function delete(int $index): static
     {
@@ -120,7 +121,7 @@ class Tab extends Control
      *
      * @return int Number of pages.
      *
-     * @see uiTabNumPages
+     * libui: uiTabNumPages
      */
     public function numPages(): int
     {
@@ -133,7 +134,7 @@ class Tab extends Control
      * @param int $index Index to check if it has a margin.
      * @return bool `TRUE` if the tab has a margin, `FALSE` otherwise.
      *
-     * @see uiTabMargined
+     * libui: uiTabMargined
      */
     public function margined(int $index): bool
     {
@@ -146,7 +147,7 @@ class Tab extends Control
      * @param int $index Index of the tab/page to un/set margin for.
      * @param bool $margined `TRUE` to set a margin for tab at $index, `FALSE` otherwise.
      *
-     * @see uiTabSetMargined
+     * libui: uiTabSetMargined
      */
     public function setMargined(int $index, bool $margined): static
     {

@@ -17,7 +17,7 @@ class Entry extends Control
     /**
      * Creates a new entry.
      *
-     * @see uiNewEntry
+     * libui: uiNewEntry
      */
     public function __construct()
     {
@@ -27,7 +27,7 @@ class Entry extends Control
     /**
      * Creates a new entry suitable for sensitive inputs like passwords. The entered text is NOT readable by the user but ma...
      *
-     * @see uiNewPasswordEntry
+     * libui: uiNewPasswordEntry
      */
     public static function password(): static
     {
@@ -37,7 +37,7 @@ class Entry extends Control
     /**
      * Creates a new entry suitable for search. Some systems will deliberately delay the uiEntryOnChanged() callback for a m...
      *
-     * @see uiNewSearchEntry
+     * libui: uiNewSearchEntry
      */
     public static function search(): static
     {
@@ -49,7 +49,7 @@ class Entry extends Control
      *
      * @return string The text of the entry.
      *
-     * @see uiEntryText
+     * libui: uiEntryText
      */
     public function text(): string
     {
@@ -61,7 +61,7 @@ class Entry extends Control
      *
      * @param string $text Entry text.
      *
-     * @see uiEntrySetText
+     * libui: uiEntrySetText
      */
     public function setText(string $text): static
     {
@@ -74,8 +74,9 @@ class Entry extends Control
      *
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiEntrySetText().
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiEntryOnChanged
+     * libui: uiEntryOnChanged
      */
     public function onChanged(callable $cb): static
     {
@@ -93,9 +94,9 @@ class Entry extends Control
     /**
      * Returns whether or not the entry's text can be changed.
      *
-     * @return bool `TRUE` if read only, `FALSE` otherwise. [Default: `FALSE`]
+     * @return bool `TRUE` if read only, `FALSE` otherwise.
      *
-     * @see uiEntryReadOnly
+     * libui: uiEntryReadOnly
      */
     public function readOnly(): bool
     {
@@ -107,7 +108,7 @@ class Entry extends Control
      *
      * @param bool $readonly `TRUE` to make read only, `FALSE` otherwise.
      *
-     * @see uiEntrySetReadOnly
+     * libui: uiEntrySetReadOnly
      */
     public function setReadOnly(bool $readonly): static
     {

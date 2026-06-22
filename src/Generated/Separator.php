@@ -17,7 +17,7 @@ class Separator extends Control
     /**
      * Creates a new horizontal separator to separate controls being stacked vertically.
      *
-     * @see uiNewHorizontalSeparator
+     * libui: uiNewHorizontalSeparator
      */
     public function __construct()
     {
@@ -27,7 +27,7 @@ class Separator extends Control
     /**
      * Creates a new vertical separator to separate controls being stacked horizontally.
      *
-     * @see uiNewVerticalSeparator
+     * libui: uiNewVerticalSeparator
      */
     public static function vertical(): static
     {

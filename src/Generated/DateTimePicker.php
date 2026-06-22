@@ -15,9 +15,9 @@ use Libui\Control;
 class DateTimePicker extends Control
 {
     /**
-     * Creates a new date picker.
+     * Creates a new date and time picker.
      *
-     * @see uiNewDateTimePicker
+     * libui: uiNewDateTimePicker
      */
     public function __construct()
     {
@@ -25,9 +25,9 @@ class DateTimePicker extends Control
     }
 
     /**
-     * Creates a new time picker.
+     * Creates a new date picker.
      *
-     * @see uiNewDatePicker
+     * libui: uiNewDatePicker
      */
     public static function dateOnly(): static
     {
@@ -35,9 +35,9 @@ class DateTimePicker extends Control
     }
 
     /**
-     * Creates a new date and time picker.
+     * Creates a new time picker.
      *
-     * @see uiNewTimePicker
+     * libui: uiNewTimePicker
      */
     public static function timeOnly(): static
     {
@@ -49,7 +49,7 @@ class DateTimePicker extends Control
      *
      * @warning The `struct tm` members `tm_wday` and `tm_yday` are undefined.
      *
-     * @see uiDateTimePickerTime
+     * libui: uiDateTimePickerTime
      */
     public function time(\FFI\CData $time): static
     {
@@ -63,7 +63,7 @@ class DateTimePicker extends Control
      * @param \FFI\CData $time Date and/or time as local time.
      * @warning The `struct tm` member `tm_isdst` is ignored on windows and should be set to `-1`.
      *
-     * @see uiDateTimePickerSetTime
+     * libui: uiDateTimePickerSetTime
      */
     public function setTime(\FFI\CData $time): static
     {
@@ -77,8 +77,9 @@ class DateTimePicker extends Control
      * @param callable(static): void $cb Receives this widget.
      * @note The callback is not triggered when calling uiDateTimePickerSetTime().
      * @note Only one callback can be registered at a time.
+     * @note Registering a second handler supersedes the first at the C level; the prior trampoline stays retained for the lifetime of this object.
      *
-     * @see uiDateTimePickerOnChanged
+     * libui: uiDateTimePickerOnChanged
      */
     public function onChanged(callable $cb): static
     {

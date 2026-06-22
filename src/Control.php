@@ -22,6 +22,8 @@ abstract class Control
      * collected while libui still holds the pointer — freeing the trampoline
      * mid-event-loop and crashing. Storing them statically keeps them alive
      * even after the owning widget object is gone.
+     *
+     * @var list<callable>
      */
     private static array $callbacks = [];
 
@@ -81,6 +83,20 @@ abstract class Control
     public static function retainedCallbacks(): array
     {
         return self::$callbacks;
+    }
+
+    /**
+     * Drops every retained widget callback trampoline.
+     *
+     * Called by {@see Ffi::uninit()} once libui's loop is torn down: the native
+     * pointers into these closures are dead, so holding them only leaks. A fresh
+     * {@see Ffi::init()} then starts from an empty store.
+     *
+     * @internal
+     */
+    public static function clearRetainedCallbacks(): void
+    {
+        self::$callbacks = [];
     }
 
     /**

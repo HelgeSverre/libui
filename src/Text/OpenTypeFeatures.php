@@ -35,9 +35,7 @@ final class OpenTypeFeatures
         }
 
         // PHP's FFI binds a C `char` parameter to a one-character PHP string,
-        // not an int — pass the raw bytes. The generated stub types these
-        // params as int, hence the ignore.
-        // @phpstan-ignore-next-line
+        // not an int — pass the raw bytes.
         Ffi::get()->uiOpenTypeFeaturesAdd($this->otf, $tag[0], $tag[1], $tag[2], $tag[3], $value);
 
         return $this;
@@ -55,8 +53,7 @@ final class OpenTypeFeatures
 
         $ffi = Ffi::get();
         $out = $ffi->new('uint32_t');
-        // char params bind to one-character strings (see add()); the stub types them as int.
-        // @phpstan-ignore-next-line
+        // char params bind to one-character PHP strings (see add()).
         $present = $ffi->uiOpenTypeFeaturesGet($this->otf, $tag[0], $tag[1], $tag[2], $tag[3], \FFI::addr($out));
 
         // @phpstan-ignore-next-line  scalar FFI\CData value access (uint32_t out-param)
