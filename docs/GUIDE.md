@@ -459,6 +459,7 @@ For anything libui doesn't have a widget for — charts, canvases, custom contro
 ```php
 use Libui\Area;
 use Libui\AreaDelegate;
+use Libui\Color;
 use Libui\Draw\DrawContext;
 use Libui\Draw\Brush;
 use Libui\Draw\Path;
@@ -476,7 +477,7 @@ $delegate = new class extends AreaDelegate {
         );
 
         // A one-line text helper (no AttributedString dance needed):
-        $ctx->drawString('Hello', new FontDescriptor('Helvetica', 24.0), [1.0, 1.0, 1.0], 20, 20);
+        $ctx->drawString('Hello', new FontDescriptor('Helvetica', 24.0), Color::white(), 20, 20);
     }
 
     public function mouse(AreaMouseEvent $e): void
@@ -583,7 +584,9 @@ $ctx->text($layout, 10, 10);
 ```
 
 `Attribute` has static builders: `color()`, `rgb(0xRRGGBB)`, `background()`,
-`weight()`, `italic()`, `size()`, `family()`, `underline()`, `underlineColor()`.
+`weight()`, `italic()`, `stretch()`, `size()`, `family()`, `underline()`,
+`underlineColor()`. The colour builders also take a typed `Color` via
+`fromColor()` / `backgroundFromColor()`.
 
 `AttributedString`, `FontDescriptor`, `TextLayout` and `Attribute` hold native
 memory; they free themselves on destruction, but you can call `free()` explicitly.
@@ -746,7 +749,8 @@ arrow. After reordering your rows, notify the model so libui re-reads the cells.
 For an editable text column, pass the editable model column and override
 `cellEditable()` + `setCellValue()` in your delegate.
 
-> ### Model lifetime is handled for you
+### Model lifetime is handled for you
+
 > libui **aborts the process** if a `TableModel` is leaked past `uiUninit()` (its
 > leak checker) — or freed while its `Table` is still alive. You no longer have to
 > manage this: every `TableModel` registers itself, and `Ffi::uninit()` frees any

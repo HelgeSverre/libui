@@ -164,7 +164,9 @@ freed with `uiFreeText` (`Ffi::ownedString`); a **borrowed** `const char *`
 return → copied, not freed (`Ffi::borrowedString`); an enum param/return → the
 generated PHP enum (`->value` / `::from()`); a cross-type `uiX *child`
 parameter → a typed `Control`, upcast at the call site via
-`Ffi::control($child->handle())`; bool-ish `int`s → `bool`.
+`Ffi::control($child->handle())`; a scalar C `char` (no pointer) → a
+one-character `string` (PHP's FFI binds it as a 1-char string, not an int — this
+is what `Text\OpenTypeFeatures` relies on); bool-ish `int`s → `bool`.
 
 Setters and `void` functions are emitted as **fluent** (returning `$this`), which
 is why `(new Box())->setPadded(true)->append(...)` chains.
@@ -208,6 +210,11 @@ gets wrong, the fix usually belongs here, not in generated output.
   `has($mask, $flag)` helper.
 - **`facade_funcs`** — the free functions exposed on `Generated\Ui` (`uiMsgBox`,
   `uiMsgBoxError`, `uiOpenFile`, `uiOpenFolder`, `uiSaveFile`).
+- **`doc_overrides`** — hand-authored summaries merged over the harvested docs for
+  the few symbols whose header comment is wrong. libui's DateTimePicker constructor
+  comments are rotated (each sits above the wrong declaration), so
+  `uiNewDateTimePicker`/`uiNewDatePicker`/`uiNewTimePicker` get their correct
+  one-line summary pinned here (applied by `applyDocOverrides()`).
 - **`deviating_callbacks`** — the two events whose trampoline isn't the usual
   `void (*)(sender, data)`:
   - `uiWindowOnClosing` → callback returns `int`; the trampoline coerces a PHP
@@ -289,7 +296,10 @@ and returns a safe fallback instead of throwing.
 **Generated (never edit — rewritten every `composer regen`):**
 
 - `src/Native/libui.gen.h`
-- `src/Generated/**` — widget classes, enums, flags, the `Ui` facade
+- `src/Generated/**` — widget classes, enums, flags, the `Ui` facade, and
+  `FfiFunctions.php` (the `@method` contract for all 299 functions)
+- `stubs/FFI.php` — the PHPStan stub for the dynamic `\FFI` methods; rewritten on
+  every regen even though it lives outside `src/Generated/`
 
 **Hand-written (the generator never clobbers these):**
 
@@ -305,7 +315,7 @@ and returns a safe fallback instead of throwing.
 **The regen pipeline** (from a clean checkout, in order):
 
 ```sh
-composer build-lib   # build/refresh lib/libui.* from third_party/libui-ng (needs meson + ninja)
+composer build-lib   # build/refresh lib/<platform>/libui.* (e.g. lib/darwin/libui.dylib) from third_party/libui-ng (needs meson + ninja)
 composer regen       # ui.h -> src/Native/libui.gen.h + src/Generated/**
 composer test        # the full PHPUnit suite
 composer gate        # PHPUnit @group gate — FFI::cdef accepts the header  (the pivot)

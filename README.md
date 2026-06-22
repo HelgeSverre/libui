@@ -68,7 +68,8 @@ App::new()
 
 Every widget is a typed class with fluent setters and IDE autocompletion
 (`$slider->setValue(50)`, `$entry->text()`, `$button->onClicked(...)`), so you
-can discover the API as you type.
+can discover the API as you type. Prefer a single declarative expression?
+`Libui\Build` (`vbox`/`hbox`/`form`/`window`) composes the same layout in one call.
 
 ## What you can build
 
@@ -106,18 +107,29 @@ see [Development](#development) to run them.
 - **Custom 2D drawing** — vector `Path`s (with `line`/`circle`/`arc`/`roundedRect`
   sugar), solid/gradient `Brush`es with typed `Stop`s, a fluent `StrokeParams`
   builder, affine `Matrix`, clipping, and `DrawContext` fill/stroke shape helpers.
+  `Area`s also support `scrollTo()` and `beginUserWindowMove()`/`beginUserWindowResize()`
+  for scrollable canvases and borderless window dragging.
 - **Attributed text** — `AttributedString` with per-range colour/weight/italic/
   underline attributes, a `FontDescriptor`, and a drawable `TextLayout`; plus a
-  `RichText` builder + `TextStyle` value object for one-call styled text.
+  `RichText` builder + `TextStyle` value object for one-call styled text. OpenType
+  features (ligatures, small-caps, …) are exposed via `Text\OpenTypeFeatures` and a
+  `Features` attribute.
 - **Data-grid table** — `Table::fromRows()` / `fromAssoc()` for static data (no
   delegate), or a `TableModelDelegate` for dynamic data; checkbox/progress/button/
-  image columns, row-index click callbacks, and automatic model lifetime.
+  image columns, row-index click callbacks, **sortable headers**
+  (`onHeaderClicked()` + `setSortIndicator()`), and automatic model lifetime.
 - **Images** — `Image::fromPng()` (via GD) or `Image::fromRgba()` for table image
   columns and area drawing.
 - **Form binding** — input widgets implement `HasValue`, and `Form::values()` /
   `setValues()` read and write a whole form at once, keyed by field label.
 - **App lifecycle** — `App` facade for multi-window apps + an `onShouldQuit()`
-  handler, or `Window::run()` for one-call single-window apps.
+  handler, or `Window::run()` for one-call single-window apps. Windows also expose
+  `getContentSize()` and `getPosition()`.
+- **Declarative layout** — a `Build` facade (`Build::vbox()`, `hbox()`, `form()`,
+  `window()`, `stretchy()`) composes a whole layout in one expression when you
+  prefer that over chained setters.
+- **Testable** — a `Testing\CallbackSpy` and `Testing\Inspect` harness let you
+  assert on widget state and callback invocations without spinning up the event loop.
 - **Async helpers** — the `Loop` class (`defer`/`delay`/`repeat`/`cancel`) over
   libui's native event loop, plus raw `queueMain()`, `timer()`, `onShouldQuit()`.
 - **Clipboard** — `Utils\Clipboard` cross-platform copy/paste (best-effort,

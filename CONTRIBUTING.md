@@ -105,7 +105,9 @@ The generator maps ~98% of libui mechanically from the naming convention. The
 remaining irregular cases live in **`tools/annotations.php`** — a hand-maintained
 table covering: types to skip (`uiControl`, `uiArea`, `uiTable`), multi-constructor
 types and their factory methods (e.g. `Box::horizontal()`, `Entry::password()`),
-`int`-as-`bool` functions, bit-flag enums, the dialog facade function list, and
-callbacks with a non-standard trampoline shape (`uiWindowOnClosing`,
-`uiMenuItemOnClicked`). If you are wrapping a libui feature the generator gets
-wrong, the fix usually belongs there — not in the generated output.
+`int`-as-`bool` functions, bit-flag enums, the dialog facade function list,
+doc-summary overrides for symbols whose header comment is wrong (e.g. the rotated
+DateTimePicker constructor comments), and callbacks with a non-standard trampoline
+shape (`uiWindowOnClosing`, `uiMenuItemOnClicked`). If you are wrapping a libui
+feature the generator gets wrong, the fix usually belongs there — not in the
+generated output.
