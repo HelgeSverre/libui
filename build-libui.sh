@@ -39,6 +39,32 @@ elif [ "$(git -C "$SRC" rev-parse HEAD 2>/dev/null)" != "$LIBUI_REF" ]; then
   git -C "$SRC" checkout --quiet "$LIBUI_REF"
 fi
 
+# Apply our local source patches to the pinned libui-ng checkout. Currently this
+# carries the Windows color-emoji fix (Segoe UI Emoji rendered monochrome instead
+# of in color) — see patches/README.md and helgesverre/libui#1 / libui-ng#344.
+# These are kept as patches pending upstream merge. The step is idempotent: a patch
+# already present in the working tree is skipped (apply --reverse --check succeeds),
+# and a patch that fails to apply cleanly aborts the build loudly so a LIBUI_REF
+# bump can't silently drop the fix.
+PATCH_DIR="$ROOT/patches"
+if [ -d "$PATCH_DIR" ]; then
+  shopt -s nullglob
+  for patch in "$PATCH_DIR"/*.patch; do
+    if git -C "$SRC" apply --reverse --check "$patch" >/dev/null 2>&1; then
+      echo "==> Patch already applied: ${patch#"$ROOT"/}"
+    elif git -C "$SRC" apply --check "$patch" >/dev/null 2>&1; then
+      echo "==> Applying patch: ${patch#"$ROOT"/}"
+      git -C "$SRC" apply "$patch"
+    else
+      echo "!! Patch does not apply cleanly to libui-ng @ ${LIBUI_REF}:" >&2
+      echo "   ${patch#"$ROOT"/}" >&2
+      echo "   Re-validate/regenerate it against the pinned LIBUI_REF." >&2
+      exit 1
+    fi
+  done
+  shopt -u nullglob
+fi
+
 echo "==> Configuring (shared library, no tests/examples)…"
 # Pass both build dir AND source dir explicitly — on a fresh checkout there is no
 # preconfigured build/ to infer the source from, and the script may run from the
