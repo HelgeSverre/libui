@@ -51,6 +51,8 @@ return [
         'uiWindowSetBorderless',
         'uiWindowResizeable',
         'uiWindowSetResizeable',
+        'uiWindowShadow',
+        'uiWindowSetShadow',
         'uiBoxPadded',
         'uiBoxSetPadded',
         'uiCheckboxChecked',

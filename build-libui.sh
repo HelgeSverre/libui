@@ -25,8 +25,11 @@ BUILD="$SRC/build"
 # Pin the upstream ref so binaries are reproducible and stay in lock-step with the
 # ui.h the generator parses (override with LIBUI_REF=... for upgrades). Keep this in
 # sync with the generator-drift CI job in .github/workflows/ci.yml.
-LIBUI_REPO="https://github.com/libui-ng/libui-ng.git"
-LIBUI_REF="${LIBUI_REF:-43ba1ef553c8993a43a67f1ce6e35983a2660d8c}"
+# Our maintained fork (color-emoji + triaged bugfixes + custom-chrome windows
+# baked in). The patches/ dir is now upstreamed into the fork, so the patch-apply
+# step below is a no-op against it.
+LIBUI_REPO="https://github.com/HelgeSverre/libui-ng.git"
+LIBUI_REF="${LIBUI_REF:-bc14dce14d7dda503bc2dfad3946a65b444b0db4}"
 
 if [ ! -d "$SRC/.git" ]; then
   echo "==> Cloning libui-ng @ ${LIBUI_REF}…"

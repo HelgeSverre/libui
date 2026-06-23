@@ -115,4 +115,30 @@ class Entry extends Control
         \Libui\Ffi::get()->uiEntrySetReadOnly($this->handle, (int) $readonly);
         return $this;
     }
+
+    /**
+     * Returns the entry's placeholder.
+     *
+     * @return string The placeholder text of the entry.
+     *
+     * libui: uiEntryPlaceholder
+     */
+    public function placeholder(): string
+    {
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEntryPlaceholder($this->handle));
+    }
+
+    /**
+     * Sets text to be displayed in the entry when it is empty.
+     *
+     * @param string $text Placeholder text.
+     * @warning Read only entries do not display the placeholder text on Windows.
+     *
+     * libui: uiEntrySetPlaceholder
+     */
+    public function setPlaceholder(string $text): static
+    {
+        \Libui\Ffi::get()->uiEntrySetPlaceholder($this->handle, $text);
+        return $this;
+    }
 }

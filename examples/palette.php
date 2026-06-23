@@ -27,6 +27,7 @@ use Libui\Draw\Path;
 use Libui\Ffi;
 use Libui\Generated\Enum\ExtKey;
 use Libui\Generated\Enum\TextWeight;
+use Libui\Generated\Enum\WindowCornerStyle;
 use Libui\Text\FontDescriptor;
 use Libui\Window;
 
@@ -175,7 +176,11 @@ Ffi::init();
 $area = new Area($palette);
 $palette->area = $area;
 
-new Window('Command palette', 660, 420)
+// Custom chrome: a borderless, rounded, shadowed window you can drag by its body.
+$window = new Window('Command palette', 660, 420);
+$window
     ->setBorderless(true)
-    ->setChild(new Box()->appendStretchy($area))
-    ->run();
+    ->setCornerStyle(WindowCornerStyle::Rounded)
+    ->setChild(new Box()->appendStretchy($area));
+$window->setTitlebar($area); // drag the palette body to move the window
+$window->run();

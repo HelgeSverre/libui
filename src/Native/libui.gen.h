@@ -125,6 +125,26 @@ int uiWindowResizeable(uiWindow *w);
 
 void uiWindowSetResizeable(uiWindow *w, int resizeable);
 
+int uiWindowKeepAbove(const uiWindow *w);
+
+void uiWindowSetKeepAbove(uiWindow *w, int keepAbove);
+
+typedef unsigned int uiWindowCornerStyle; enum {
+	uiWindowCornerStyleNone,        
+	uiWindowCornerStyleRounded,     
+	uiWindowCornerStyleRoundedSmall 
+};
+
+void uiWindowSetTitlebar(uiWindow *w, uiControl *titlebar);
+
+uiWindowCornerStyle uiWindowGetCornerStyle(uiWindow *w);
+
+void uiWindowSetCornerStyle(uiWindow *w, uiWindowCornerStyle style);
+
+int uiWindowShadow(uiWindow *w);
+
+void uiWindowSetShadow(uiWindow *w, int shadow);
+
 uiWindow *uiNewWindow(const char *title, int width, int height, int hasMenubar);
 
 typedef struct uiButton uiButton;
@@ -181,6 +201,10 @@ void uiEntryOnChanged(uiEntry *e,
 int uiEntryReadOnly(uiEntry *e);
 
 void uiEntrySetReadOnly(uiEntry *e, int readonly);
+
+char *uiEntryPlaceholder(uiEntry *e);
+
+void uiEntrySetPlaceholder(uiEntry *e, const char *text);
 
 uiEntry *uiNewEntry(void);
 
@@ -309,6 +333,10 @@ void uiEditableComboboxSetText(uiEditableCombobox *c, const char *text);
 
 void uiEditableComboboxOnChanged(uiEditableCombobox *c,
 	void (*f)(uiEditableCombobox *sender, void *senderData), void *data);
+
+char *uiEditableComboboxPlaceholder(uiEditableCombobox *c);
+
+void uiEditableComboboxSetPlaceholder(uiEditableCombobox *c, const char *text);
 
 uiEditableCombobox *uiNewEditableCombobox(void);
 

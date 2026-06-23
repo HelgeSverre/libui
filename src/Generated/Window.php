@@ -335,4 +335,94 @@ class Window extends Control
         \Libui\Ffi::get()->uiWindowSetResizeable($this->handle, (int) $resizeable);
         return $this;
     }
+
+    /**
+     * Returns whether or not the window is kept in front of other windows.
+     *
+     * @return int `TRUE` if window is kept in front, `FALSE` otherwise.
+     *
+     * libui: uiWindowKeepAbove
+     */
+    public function keepAbove(): int
+    {
+        return \Libui\Ffi::get()->uiWindowKeepAbove($this->handle);
+    }
+
+    /**
+     * Sets whether or not the window is kept in front of other windows.
+     *
+     * @param int $keepAbove `TRUE` to keep window in front of others, `FALSE` otherwise.
+     * @note This method is merely a hint and may be ignored by the system.
+     *
+     * libui: uiWindowSetKeepAbove
+     */
+    public function setKeepAbove(int $keepAbove): static
+    {
+        \Libui\Ffi::get()->uiWindowSetKeepAbove($this->handle, $keepAbove);
+        return $this;
+    }
+
+    /**
+     * Designates a child control as the window's draggable titlebar. Intended for borderless (custom-chrome) windows: press...
+     *
+     * @param \Libui\Control $titlebar A child control to use as the drag handle, or `NULL`.
+     *
+     * libui: uiWindowSetTitlebar
+     */
+    public function setTitlebar(\Libui\Control $titlebar): static
+    {
+        \Libui\Ffi::get()->uiWindowSetTitlebar($this->handle, \Libui\Ffi::control($titlebar->handle()));
+        return $this;
+    }
+
+    /**
+     * Returns the window's corner style.
+     *
+     * @return \Libui\Generated\Enum\WindowCornerStyle the current uiWindowCornerStyle.
+     *
+     * libui: uiWindowGetCornerStyle
+     */
+    public function getCornerStyle(): \Libui\Generated\Enum\WindowCornerStyle
+    {
+        return \Libui\Generated\Enum\WindowCornerStyle::from(\Libui\Ffi::get()->uiWindowGetCornerStyle($this->handle));
+    }
+
+    /**
+     * Sets the window's corner style. Most relevant for borderless windows. On Windows this maps to the DWM corner preferen...
+     *
+     * @param \Libui\Generated\Enum\WindowCornerStyle $style a uiWindowCornerStyle.
+     * @note Best-effort; may be ignored where the platform/compositor cannot honor it.
+     *
+     * libui: uiWindowSetCornerStyle
+     */
+    public function setCornerStyle(\Libui\Generated\Enum\WindowCornerStyle $style): static
+    {
+        \Libui\Ffi::get()->uiWindowSetCornerStyle($this->handle, $style->value);
+        return $this;
+    }
+
+    /**
+     * Returns whether the window casts a drop shadow.
+     *
+     * @return bool `TRUE` if the window has a shadow.
+     *
+     * libui: uiWindowShadow
+     */
+    public function shadow(): bool
+    {
+        return \Libui\Ffi::get()->uiWindowShadow($this->handle) !== 0;
+    }
+
+    /**
+     * Sets whether the window casts a drop shadow. Useful to restore the shadow a borderless window otherwise loses.
+     *
+     * @param bool $shadow `TRUE` to cast a shadow, `FALSE` otherwise.
+     *
+     * libui: uiWindowSetShadow
+     */
+    public function setShadow(bool $shadow): static
+    {
+        \Libui\Ffi::get()->uiWindowSetShadow($this->handle, (int) $shadow);
+        return $this;
+    }
 }
