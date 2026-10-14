@@ -1,0 +1,19 @@
+diff --git a/common/attrlist.c b/common/attrlist.c
+index 0ca4b95e..0ed7f39d 100644
+--- a/common/attrlist.c
++++ b/common/attrlist.c
+@@ -341,6 +341,14 @@ void uiprivAttrListInsertAttribute(uiprivAttrList *alist, uiAttribute *val, size
+ 		// TODO will this reduce fragmentation if we first add from 0 to 2 and then from 2 to 4? or do we have to do that separately?
+ 		if (uiprivAttributeEqual(before->val, val)) {
+ 			attrGrow(alist, before, start, end);
++			// We grew the existing equal-valued span instead of inserting val,
++			// so val is never retained (that only happens on the insert path
++			// below) and never stored. Without freeing it here it leaks: it is
++			// still user-owned (refcount 0). Applying two value-identical
++			// attributes over adjacent/overlapping ranges is common (e.g. the
++			// same size/colour on consecutive text spans), so this leaked one
++			// uiAttribute per span. See php-gui issue #4 (leaked uiAttribute).
++			uiFreeAttribute(val);
+ 			return;
+ 		}
+ 		// okay the values are different; we need to split apart

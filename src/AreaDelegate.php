@@ -8,6 +8,7 @@ use Libui\Draw\DrawContext;
 use Libui\Draw\Params\AreaDrawParams;
 use Libui\Draw\Params\AreaKeyEvent;
 use Libui\Draw\Params\AreaMouseEvent;
+use Libui\Draw\Params\AreaScrollEvent;
 
 /**
  * Override the methods you need to drive a custom-drawn Area. All default to
@@ -20,6 +21,9 @@ abstract class AreaDelegate
     public function draw(DrawContext $ctx, AreaDrawParams $params): void {}
 
     public function mouse(AreaMouseEvent $event): void {}
+
+    /** Mouse-wheel / trackpad scroll over the Area. */
+    public function scroll(AreaScrollEvent $event): void {}
 
     public function mouseCrossed(bool $left): void {}
 

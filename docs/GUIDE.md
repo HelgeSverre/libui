@@ -557,6 +557,44 @@ See [`examples/canvas.php`](../examples/canvas.php),
 [`examples/flowfield.php`](../examples/flowfield.php), and
 [`examples/clock.php`](../examples/clock.php).
 
+## Custom-chrome windows
+
+For Raycast/Spotlight-style windows — borderless, but with an app-defined
+titlebar, rounded corners, and a drop shadow — combine `setBorderless(true)` with
+the chrome API:
+
+```php
+use Libui\Generated\Enum\WindowCornerStyle;
+
+$bar = (new Box())->append(new Label('My App'))->append($closeButton);
+
+$window = new Window('My App', 720, 480);
+$window
+    ->setBorderless(true)
+    ->setCornerStyle(WindowCornerStyle::Rounded)   // None | Rounded | RoundedSmall
+    ->setChild($content);
+$window->setTitlebar($bar);   // drag this control to move the window
+$window->setShadow(true);     // on by default for borderless windows
+```
+
+- **`setTitlebar(Control)`** marks a child as the drag handle — dragging its empty
+  areas moves the window, while buttons/entries inside it keep working. (On macOS
+  the whole window background drags; Windows/GTK honor the specific control.)
+- **`setCornerStyle(WindowCornerStyle)`** rounds the window. The enum is a preset
+  (`None`/`Rounded`/`RoundedSmall`) so it behaves consistently everywhere — Windows
+  only exposes presets via DWM.
+- **`setShadow(bool)`** restores the drop shadow a borderless window would lose.
+
+**Cross-platform support (best-effort, R9 — the window always works regardless):**
+
+| | Windows | macOS | Linux/GTK |
+|---|---|---|---|
+| Rounded corners | Windows 11 (square on Win10) | yes | compositor-dependent |
+| Shadow | yes (DWM) | yes | compositor-dependent |
+| Titlebar drag / resize | yes | yes | X11 yes; Wayland limited |
+
+[`examples/palette.php`](../examples/palette.php) is built on this API.
+
 ---
 
 ## Attributed text

@@ -1,8 +1,8 @@
 name: Release
 
 # Publish a GitHub release when a version tag is pushed. Packagist picks up the
-# new version from the tag via its webhook; the prebuilt libraries already live
-# in the repo (lib/<platform>/), so there are no build artifacts to attach.
+# new version from the tag via its webhook. Attach the packaged libraries that
+# CI tested, including the signed and notarized macOS library.
 
 on:
   push:
@@ -30,8 +30,28 @@ jobs:
             *-*) prerelease="--prerelease" ;;
           esac
 
+          awk -v version="${GITHUB_REF_NAME#v}" '
+            index($0, "## [" version "]") == 1 { active=1; next }
+            active && /^## / { exit }
+            active && /^\[[0-9]/ { exit }
+            active { print }
+          ' CHANGELOG.md > release-notes.md
+          test -s release-notes.md
+          previous_tag="$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^")"
+          printf '\n**Full changelog:** https://github.com/%s/compare/%s...%s\n' \
+            "$GITHUB_REPOSITORY" "$previous_tag" "$GITHUB_REF_NAME" >> release-notes.md
+
+          cp lib/darwin/libui.dylib libui-darwin-universal.dylib
+          cp lib/linux-x86_64/libui.so libui-linux-x86_64.so
+          cp lib/linux-aarch64/libui.so libui-linux-aarch64.so
+          cp lib/windows-x86_64/libui.dll libui-windows-x86_64.dll
+          shasum -a 256 libui-darwin-universal.dylib libui-linux-x86_64.so \
+            libui-linux-aarch64.so libui-windows-x86_64.dll > SHA256SUMS
+
           gh release create "${GITHUB_REF_NAME}" \
+            libui-darwin-universal.dylib libui-linux-x86_64.so \
+            libui-linux-aarch64.so libui-windows-x86_64.dll SHA256SUMS \
             --title "${GITHUB_REF_NAME}" \
-            --generate-notes \
+            --notes-file release-notes.md \
             --verify-tag \
             ${prerelease}

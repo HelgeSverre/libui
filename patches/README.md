@@ -1,10 +1,9 @@
 # libui-ng source patches
 
-Local patches applied on top of the pinned upstream `libui-ng` checkout
-(`LIBUI_REF` in [`../build-libui.sh`](../build-libui.sh)) during the native build.
-They are kept here, rather than forked into `third_party/libui-ng`, so the vendored
-clone stays at a clean upstream ref and each fix is reviewable in isolation pending
-an upstream merge.
+These diffs mirror fixes in our maintained [libui-ng fork](https://github.com/HelgeSverre/libui-ng),
+pinned by `LIBUI_REF` in [`../build-libui.sh`](../build-libui.sh). The build checks
+each patch and skips fixes already present in the pinned source. The standalone
+diffs keep each change reviewable and detect a revision bump that drops a fix.
 
 ## How they're applied
 
@@ -45,6 +44,56 @@ git -C third_party/libui-ng diff -- windows/drawtext.cpp > patches/windows-color
 - **Upstream issue:** [helgesverre/libui#1](https://github.com/helgesverre/libui/issues/1)
   == [libui-ng#344](https://github.com/libui-ng/libui-ng/issues/344). Remove this patch
   once the fix lands upstream and `LIBUI_REF` is bumped past it.
+- **Scope:** custom-drawn `uiArea` text. Native entry controls are covered by
+  `windows-entry-color.patch` below.
+
+### `windows-entry-color.patch`
+
+- **What:** Renders color emoji in native Windows `uiEntry` and
+  `uiMultilineEntry` controls ([issue #2](https://github.com/HelgeSverre/libui/issues/2)).
+- **Fix:** Retain the system EDIT control for input, selection, scrolling,
+  clipboard, and accessibility. After its normal paint, draw only color-font
+  clusters with DirectWrite at EDIT's own character positions. Preserve the
+  native image and clipping region; ordinary text is unchanged. Selected
+  clusters retain native selection painting, masked fields never expose their
+  underlying glyphs, and active IME composition uses the system painter.
+- **Compatibility:** Uses the same COLR/CPAL color-font API as the Area renderer.
+  If that API or a suitable render target is unavailable, native painting remains.
+- **Verification:** `scripts/windows-entry-color-test.cpp` captures actual
+  visible controls. It fails the color checks with the old DLL and passes all
+  14 checks with the patched DLL, including selection, scrolling, masking
+  enabled after construction, and change callbacks. CI runs it against the
+  committed Windows DLL.
+
+### `darwin-accessible-drag.patch`
+
+- **What:** Allows complete accessibility-generated mouse event sequences to
+  move a window through libui's existing manual tracker. Hardware mouse drags
+  retain AppKit's native drag operation and Spaces support.
+- **Verification:** The palette opened centered, moved by `(100, 60)` points
+  after a header drag, accepted typing after the move, and exited cleanly.
+
+### `common-attribute-leak.patch`
+
+- **What:** Stops `uiAttribute` objects from leaking when the same attribute value
+  is applied over adjacent/overlapping ranges of a `uiAttributedString`.
+- **Why:** In `uiprivAttrListInsertAttribute` (`common/attrlist.c`), when the
+  attribute being inserted is value-equal to an adjacent existing span, libui
+  grows the existing span (`attrGrow`) and returns **without** retaining or
+  storing the passed-in attribute — and without freeing it. That attribute stays
+  user-owned (`refcount 0`) and is orphaned, so libui's leak checker reports it at
+  `uiUninit` (`darwin/alloc.m:47` "Some data was leaked … uiAttribute"). Applying
+  identical size/colour/weight to consecutive text spans is common (e.g. the
+  `markdown` example's `inline()` helper), so this leaked one attribute per span.
+- **Fix:** Call `uiFreeAttribute(val)` in that equal-value branch before returning.
+  `val` is never retained on this path, so freeing it is safe (no double-free); the
+  normal insert path is unchanged. Complements the binding-side
+  `AttributedString::__destruct` fix (commit `e0d13ff`), which already frees applied
+  attributes via `uiFreeAttributedString` — this covers the *orphaned* ones, which
+  the PHP layer cannot reach.
+- **Upstream issue:** php-gui issue #4 (leaked `uiAttribute` on close). A PHP-only
+  fix isn't possible: the binding cannot tell whether libui retained the attribute
+  (normal path) or orphaned it (equal path), so the free must live in libui itself.
 
 ## Maintenance
 

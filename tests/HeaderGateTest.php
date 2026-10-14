@@ -28,6 +28,16 @@ final class HeaderGateTest extends LibuiTestCase
         $this->assertInstanceOf(\FFI::class, Ffi::get());
     }
 
+    public function testBrokenDownTimeMatchesThePlatformAbi(): void
+    {
+        // Supported platforms are 64-bit. The Windows CRT has nine ints;
+        // macOS/glibc append an aligned long and a timezone-string pointer.
+        $this->assertSame(
+            PHP_OS_FAMILY === 'Windows' ? 36 : 56,
+            \FFI::sizeof(Ffi::get()->new('struct tm')),
+        );
+    }
+
     #[DataProvider('representativeSymbols')]
     public function testHeaderDeclaresSymbol(string $symbol): void
     {

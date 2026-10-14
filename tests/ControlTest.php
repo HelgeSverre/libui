@@ -105,7 +105,19 @@ final class ControlTest extends LibuiTestCase
         $button = new Button('Test');
         $button->destroy();
 
-        $this->assertTrue(true, 'destroy() should complete without throwing');
+        $this->assertTrue($button->isDestroyed(), 'destroy() should mark the control destroyed');
+    }
+
+    public function testDestroyIsIdempotent(): void
+    {
+        $button = new Button('Test');
+
+        $button->destroy();
+        // A second destroy() must be a no-op, not a second uiControlDestroy() on
+        // an already-freed pointer (which crashes the process).
+        $button->destroy();
+
+        $this->assertTrue($button->isDestroyed());
     }
 
     public function testCallbackRetentionBindsWithoutError(): void

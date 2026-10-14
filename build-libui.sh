@@ -25,8 +25,11 @@ BUILD="$SRC/build"
 # Pin the upstream ref so binaries are reproducible and stay in lock-step with the
 # ui.h the generator parses (override with LIBUI_REF=... for upgrades). Keep this in
 # sync with the generator-drift CI job in .github/workflows/ci.yml.
-LIBUI_REPO="https://github.com/libui-ng/libui-ng.git"
-LIBUI_REF="${LIBUI_REF:-43ba1ef553c8993a43a67f1ce6e35983a2660d8c}"
+# Our maintained fork (drawn and native-entry color emoji, custom-chrome
+# windows, scrolling events, and the uiAttribute leak fix baked in). The patches/ dir is now upstreamed into the
+# fork, so the patch-apply step below is a no-op against it.
+LIBUI_REPO="https://github.com/HelgeSverre/libui-ng.git"
+LIBUI_REF="${LIBUI_REF:-3880d58fe91b8118700878ac9e010cffbc0aedd6}"
 
 if [ ! -d "$SRC/.git" ]; then
   echo "==> Cloning libui-ng @ ${LIBUI_REF}…"
@@ -130,4 +133,28 @@ fi
 
 mkdir -p "$(dirname "$DEST")"
 cp "$ARTIFACT" "$DEST"
+
+# On macOS, re-sign the vendored dylib with a Developer ID Application identity
+# (hardened runtime + secure timestamp) when one is available, so it can be
+# notarized (see scripts/notarize-macos.sh). Without this the artifact is only
+# adhoc/linker-signed, and macOS Gatekeeper refuses to load it from a quarantined
+# (downloaded) copy: "library load disallowed by system policy" (php-gui issue #3).
+# Override the identity with MACOS_SIGN_IDENTITY=...; set MACOS_SIGN_IDENTITY=-
+# to force adhoc. Auto-detects the first "Developer ID Application" cert otherwise.
+if [ "$(uname -s)" = "Darwin" ]; then
+  SIGN_ID="${MACOS_SIGN_IDENTITY:-}"
+  if [ -z "$SIGN_ID" ]; then
+    SIGN_ID="$(security find-identity -v -p codesigning 2>/dev/null \
+      | grep -m1 'Developer ID Application' | sed -E 's/.*"(.*)"/\1/')" || true
+  fi
+  if [ -n "$SIGN_ID" ] && [ "$SIGN_ID" != "-" ]; then
+    echo "==> Signing ${DEST#"$ROOT"/} with: $SIGN_ID"
+    codesign --force --timestamp --options runtime --sign "$SIGN_ID" "$DEST"
+    codesign --verify --strict --verbose=2 "$DEST"
+  else
+    echo "==> No Developer ID identity; leaving adhoc signature (not notarizable)." >&2
+    echo "   Set MACOS_SIGN_IDENTITY='Developer ID Application: …' to enable notarization." >&2
+  fi
+fi
+
 echo "==> Done: ${DEST#"$ROOT"/}"

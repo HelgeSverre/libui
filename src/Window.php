@@ -171,6 +171,28 @@ class Window extends Generated\Window
     }
 
     /**
+     * Track destruction when libui accepts the closing callback. This keeps
+     * destroy() safe in afterClose cleanup even when the OS closed the window.
+     *
+     * @param callable(static): (bool|int) $cb
+     */
+    public function onClosing(callable $cb): static
+    {
+        return parent::onClosing(function () use ($cb) {
+            $result = $cb($this);
+            // A callback may explicitly destroy the window; libui must then
+            // avoid destroying the same native pointer a second time.
+            if ($this->isDestroyed()) {
+                return false;
+            }
+            if ($result !== false && $result !== 0) {
+                $this->markDestroyed();
+            }
+            return $result;
+        });
+    }
+
+    /**
      * Run cleanup when the window is closed, before the app quits. Unlike the raw
      * onClosing(), you don't manage the loop or return a value.
      */
@@ -196,10 +218,14 @@ class Window extends Generated\Window
     {
         Ffi::init();
 
-        $this->onClosing(function () {
+        // Set when the loop ends via this window's own close handler: libui then
+        // destroys the window for us (onClosing returning true -> uiControlDestroy).
+        $closedViaHandler = false;
+        $this->onClosing(function () use (&$closedViaHandler) {
             if ($this->onClose !== null) {
                 ($this->onClose)();
             }
+            $closedViaHandler = true;
             Ffi::quit();
             return true;
         });
@@ -208,6 +234,15 @@ class Window extends Generated\Window
 
         try {
             Ffi::main();
+
+            // If the loop ended any other way (Ffi::quit() from a key/menu handler,
+            // or a borderless window with no close button), the control tree is
+            // still alive — destroy it before uiUninit(), or libui aborts the
+            // process reporting leaked controls. Destroying the window frees its
+            // child box and area too.
+            if (! $closedViaHandler) {
+                $this->destroy();
+            }
 
             if ($afterClose !== null) {
                 $afterClose();

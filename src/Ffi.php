@@ -139,7 +139,20 @@ final class Ffi
                 throw new \RuntimeException("libui library missing at {$lib} (run: composer build-lib).");
             }
 
-            self::$ffi = \FFI::cdef(file_get_contents($header), $lib);
+            $declarations = file_get_contents($header);
+            // The portable header declares the nine standard struct-tm fields.
+            // POSIX platforms append timezone fields; native getters copy the
+            // whole struct, so omitting them would overwrite FFI-owned memory.
+            // Windows uses the nine-field CRT layout.
+            if (\PHP_OS_FAMILY !== 'Windows') {
+                $declarations = str_replace(
+                    'struct tm { int tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, tm_wday, tm_yday, tm_isdst; };',
+                    'struct tm { int tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, tm_wday, tm_yday, tm_isdst; long tm_gmtoff; const char *tm_zone; };',
+                    $declarations,
+                );
+            }
+
+            self::$ffi = \FFI::cdef($declarations, $lib);
         }
 
         return self::$ffi;

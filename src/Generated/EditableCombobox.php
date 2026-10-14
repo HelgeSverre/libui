@@ -84,4 +84,29 @@ class EditableCombobox extends Control
         \Libui\Ffi::get()->uiEditableComboboxOnChanged($this->handle, $fn, null);
         return $this;
     }
+
+    /**
+     * Returns the editable combo box's placeholder.
+     *
+     * @return string The placeholder text of the combo box.
+     *
+     * libui: uiEditableComboboxPlaceholder
+     */
+    public function placeholder(): string
+    {
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEditableComboboxPlaceholder($this->handle));
+    }
+
+    /**
+     * Sets text to be displayed in the editable combo box when it is empty.
+     *
+     * @param string $text Placeholder text.
+     *
+     * libui: uiEditableComboboxSetPlaceholder
+     */
+    public function setPlaceholder(string $text): static
+    {
+        \Libui\Ffi::get()->uiEditableComboboxSetPlaceholder($this->handle, $text);
+        return $this;
+    }
 }

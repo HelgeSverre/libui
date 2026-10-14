@@ -90,10 +90,12 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `focused(): bool` — Returns whether or not the window is focused.
 - `fullscreen(): bool` — Returns whether or not the window is full screen.
 - `getContentSize(): array` — The window's current content size, falling back to the constructed size when libui reports a non-positive value (it may on Unix before layout).
+- `getCornerStyle(): WindowCornerStyle` — Returns the window's corner style.
 - `getPosition(): array` — The window's current position, measured from the top-left of the screen.
+- `keepAbove(): int` — Returns whether or not the window is kept in front of other windows.
 - `margined(): bool` — Returns whether or not the window has a margin.
 - `onClose(callable $cb): static` — Run cleanup when the window is closed, before the app quits. Unlike the raw onClosing(), you don't manage the loop or return a value.
-- `onClosing(callable $cb): static` — Registers a callback for when the window is to be closed.
+- `onClosing(callable $cb): static` — Track destruction when libui accepts the closing callback. This keeps destroy() safe in afterClose cleanup even when the OS closed the window.
 - `onContentSizeChanged(callable $cb): static` — Registers a callback for when the window content size is changed.
 - `onFocusChanged(callable $cb): static` — Registers a callback for when the window focus changes.
 - `onPositionChanged(callable $cb): static` — Registers a callback for when the window moved.
@@ -103,11 +105,16 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `setBorderless(bool $borderless): static` — Sets whether or not the window is borderless.
 - `setChild(Control $child): static` — Sets the window's child.
 - `setContentSize(int $width, int $height): static` — Sets the window content size.
+- `setCornerStyle(WindowCornerStyle $style): static` — Sets the window's corner style. Most relevant for borderless windows. On Windows this maps to the DWM corner preferen...
 - `setFullscreen(bool $fullscreen): static` — Sets whether or not the window is full screen.
+- `setKeepAbove(int $keepAbove): static` — Sets whether or not the window is kept in front of other windows.
 - `setMargined(bool $margined): static` — Sets whether or not the window has a margin. The margin size is determined by the OS defaults.
 - `setPosition(int $x, int $y): static` — Moves the window to the specified position. Coordinates are measured from the top left corner of the screen.
 - `setResizeable(bool $resizeable): static` — Sets whether or not the window is user resizeable.
+- `setShadow(bool $shadow): static` — Sets whether the window casts a drop shadow. Useful to restore the shadow a borderless window otherwise loses.
 - `setTitle(string $title): static` — Sets the window title.
+- `setTitlebar(Control $titlebar): static` — Designates a child control as the window's draggable titlebar. Intended for borderless (custom-chrome) windows: press...
+- `shadow(): bool` — Returns whether the window casts a drop shadow.
 - `title(): string` — Returns the window title.
 
 ## Widgets
@@ -263,6 +270,8 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `__construct()` — Creates a new editable combo box.
 - `append(string $text): static` — Appends an item to the editable combo box.
 - `onChanged(callable $cb): static` — Registers a callback for when an editable combo box item is selected or user text changed.
+- `placeholder(): string` — Returns the editable combo box's placeholder.
+- `setPlaceholder(string $text): static` — Sets text to be displayed in the editable combo box when it is empty.
 - `setText(string $text): static` — Sets the editable combo box text.
 - `setValue(mixed $value): static`
 - `text(): string` — Returns the text of the editable combo box. This text is either the text of one of the predefined list items or the t...
@@ -280,7 +289,9 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `static search(): static` — Creates a new entry suitable for search. Some systems will deliberately delay the uiEntryOnChanged() callback for a m...
 - `__construct()` — Creates a new entry.
 - `onChanged(callable $cb): static` — Registers a callback for when the user changes the entry's text.
+- `placeholder(): string` — Returns the entry's placeholder.
 - `readOnly(): bool` — Returns whether or not the entry's text can be changed.
+- `setPlaceholder(string $text): static` — Sets text to be displayed in the entry when it is empty.
 - `setReadOnly(bool $readonly): static` — Sets whether or not the entry's text is read only.
 - `setText(string $text): static` — Sets the entry's text.
 - `setValue(mixed $value): static`
@@ -674,6 +685,7 @@ Override the methods you need to drive a custom-drawn Area. All default to no-op
 - `mouse(AreaMouseEvent $event): void`
 - `mouseCrossed(bool $left): void`
 - `redraw(): void` — Queue a full repaint of the bound Area. No-op if the delegate has not been bound to an Area yet. Subclasses call $this->redraw() from event handlers instead of storing an Area and calling queueRedrawAll().
+- `scroll(AreaScrollEvent $event): void` — Mouse-wheel / trackpad scroll over the Area.
 
 ### `Brush`
 
@@ -758,6 +770,15 @@ A PHP view of uiAreaMouseEvent.
 
 - `static fromCData(CData $e): AreaMouseEvent`
 - `__construct(float $x, float $y, float $areaWidth, float $areaHeight, int $down, int $up, int $count, int $modifiers, int $held)`
+
+### `AreaScrollEvent`
+
+`Libui\Draw\Params\AreaScrollEvent`
+
+A PHP view of uiAreaMouseScrollEvent.
+
+- `static fromCData(CData $e): AreaScrollEvent`
+- `__construct(float $x, float $y, float $areaWidth, float $areaHeight, float $deltaX, float $deltaY, int $modifiers)`
 
 ### `Path`
 
@@ -985,6 +1006,7 @@ GENERATED facade for libui free functions (dialogs, etc.). DO NOT EDIT.
 - **`UiForEach`** — ForEachContinue, Stop
 - **`Underline`** — None, Single, Double, Suggestion
 - **`UnderlineColor`** — Custom, Spelling, Grammar, Auxiliary
+- **`WindowCornerStyle`** — None, Rounded, RoundedSmall
 - **`WindowResizeEdge`** — Left, Top, Right, Bottom, TopLeft, TopRight, BottomLeft, BottomRight
 - **`Modifiers`** — flags/constants
 
