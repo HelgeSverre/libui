@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 final class TableModelTest extends TestCase
 {
     /** Run the lifecycle runner in $mode and return its exit code. */
-    private function runLifecycle(string $mode): int
+    private function runModelLifecycleProbe(string $mode): int
     {
         // PHP_BINARY must be escaped too — e.g. Herd's path has spaces
         // ("…/Application Support/Herd/bin/php85"), which the shell would split.
@@ -41,7 +41,7 @@ final class TableModelTest extends TestCase
     {
         $this->assertSame(
             0,
-            $this->runLifecycle('freed'),
+            $this->runModelLifecycleProbe('freed'),
             'TableModel::free() should release the model so uiUninit() exits cleanly',
         );
     }
@@ -50,7 +50,7 @@ final class TableModelTest extends TestCase
     {
         $this->assertSame(
             0,
-            $this->runLifecycle('double-free'),
+            $this->runModelLifecycleProbe('double-free'),
             'calling free() twice must be a no-op, not a double-free abort',
         );
     }
@@ -61,7 +61,7 @@ final class TableModelTest extends TestCase
         // registry and exit cleanly — the footgun is neutralised.
         $this->assertSame(
             0,
-            $this->runLifecycle('auto'),
+            $this->runModelLifecycleProbe('auto'),
             'a forgotten free() must be swept up by Lifecycle::freeAll() in uninit()',
         );
     }
@@ -78,7 +78,7 @@ final class TableModelTest extends TestCase
         // rescue it; the detector must still fire, proving the negative control.
         $this->assertNotSame(
             0,
-            $this->runLifecycle('leak'),
+            $this->runModelLifecycleProbe('leak'),
             'an unregistered, unfreed model must still abort in uiUninit()',
         );
     }
@@ -95,7 +95,7 @@ final class TableModelTest extends TestCase
         // otherwise the passing cases above would prove nothing.
         $this->assertNotSame(
             0,
-            $this->runLifecycle('leak'),
+            $this->runModelLifecycleProbe('leak'),
             'an unfreed model must still abort in uiUninit() (leak detector is live)',
         );
     }

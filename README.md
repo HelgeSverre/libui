@@ -10,6 +10,8 @@
 ![PHP](https://img.shields.io/badge/php-8.5%2B-777bb3)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+See the [changelog](CHANGELOG.md) for release notes.
+
 <p align="center">
   <img src="docs/flowfield.png" width="49%" alt="Generative flow field">
   <img src="docs/markdown.png" width="49%" alt="Markdown editor with live preview">
@@ -27,7 +29,7 @@ Prebuilt `libui` binaries ship inside the package for **macOS**, **Linux**
 needs **GTK 3** installed at runtime; see [Platform support](#platform-support).
 
 > **macOS Gatekeeper:** the bundled binary is signed with a Developer ID and
-> notarized, so they load normally. If you build the dylib yourself or grab one
+> notarized, so it loads normally. If you build the dylib yourself or grab one
 > from an unsigned source, macOS may block it with
 > *"library load disallowed by system policy."* Clear the download quarantine with:
 >

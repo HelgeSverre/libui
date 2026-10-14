@@ -1,6 +1,7 @@
 name: Release Build
 
-# Build libui binaries for Linux and Windows and attach to GitHub releases
+# Optional manual rebuild of Linux and Windows assets for an existing release.
+# Tag releases publish the verified packaged libraries through release.yml.
 #
 # NOTE: macOS darwin libui.dylib is prebuilt and committed in the repo.
 # This workflow only builds Linux and Windows artifacts.
@@ -11,9 +12,6 @@ on:
       tag:
         description: 'Tag to build (e.g., v1.0.0)'
         required: true
-  push:
-    tags:
-      - 'v*'
 
 permissions:
   contents: write
@@ -21,11 +19,12 @@ permissions:
 jobs:
   build-linux-x86_64:
     name: Build Linux x86_64
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag }}
 
       - name: Install build dependencies
         run: sudo apt-get update && sudo apt-get install -y meson ninja-build libgtk-3-dev
@@ -54,6 +53,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag }}
 
       - name: Install build dependencies
         run: sudo apt-get update && sudo apt-get install -y meson ninja-build libgtk-3-dev
@@ -80,6 +80,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag }}
 
       - name: Install Python and pip
         uses: actions/setup-python@v5
@@ -121,6 +122,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag }}
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4

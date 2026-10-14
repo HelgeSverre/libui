@@ -95,7 +95,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `keepAbove(): int` — Returns whether or not the window is kept in front of other windows.
 - `margined(): bool` — Returns whether or not the window has a margin.
 - `onClose(callable $cb): static` — Run cleanup when the window is closed, before the app quits. Unlike the raw onClosing(), you don't manage the loop or return a value.
-- `onClosing(callable $cb): static` — Registers a callback for when the window is to be closed.
+- `onClosing(callable $cb): static` — Track destruction when libui accepts the closing callback. This keeps destroy() safe in afterClose cleanup even when the OS closed the window.
 - `onContentSizeChanged(callable $cb): static` — Registers a callback for when the window content size is changed.
 - `onFocusChanged(callable $cb): static` — Registers a callback for when the window focus changes.
 - `onPositionChanged(callable $cb): static` — Registers a callback for when the window moved.
@@ -685,6 +685,7 @@ Override the methods you need to drive a custom-drawn Area. All default to no-op
 - `mouse(AreaMouseEvent $event): void`
 - `mouseCrossed(bool $left): void`
 - `redraw(): void` — Queue a full repaint of the bound Area. No-op if the delegate has not been bound to an Area yet. Subclasses call $this->redraw() from event handlers instead of storing an Area and calling queueRedrawAll().
+- `scroll(AreaScrollEvent $event): void` — Mouse-wheel / trackpad scroll over the Area.
 
 ### `Brush`
 
@@ -769,6 +770,15 @@ A PHP view of uiAreaMouseEvent.
 
 - `static fromCData(CData $e): AreaMouseEvent`
 - `__construct(float $x, float $y, float $areaWidth, float $areaHeight, int $down, int $up, int $count, int $modifiers, int $held)`
+
+### `AreaScrollEvent`
+
+`Libui\Draw\Params\AreaScrollEvent`
+
+A PHP view of uiAreaMouseScrollEvent.
+
+- `static fromCData(CData $e): AreaScrollEvent`
+- `__construct(float $x, float $y, float $areaWidth, float $areaHeight, float $deltaX, float $deltaY, int $modifiers)`
 
 ### `Path`
 

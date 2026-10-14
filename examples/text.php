@@ -58,7 +58,7 @@ $delegate = new class extends AreaDelegate {
         $string->appendUnattributed(' and ');
         $string->append('this one is underlined.', Attribute::underline(), Attribute::color(0.55, 0.10, 0.60));
         $string->appendUnattributed(
-            "\n\nThe rest wraps as ordinary body text " . 'across the full width of the drawing area, demonstrating ' . 'the default font and left alignment.',
+            "\n\nThe rest wraps as ordinary body text across the full width of the drawing area, demonstrating the default font and left alignment.",
         );
 
         $font = new FontDescriptor('Georgia', 18.0);
