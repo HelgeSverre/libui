@@ -29,7 +29,7 @@ BUILD="$SRC/build"
 # windows, scrolling events, and the uiAttribute leak fix baked in). The patches/ dir is now upstreamed into the
 # fork, so the patch-apply step below is a no-op against it.
 LIBUI_REPO="https://github.com/HelgeSverre/libui-ng.git"
-LIBUI_REF="${LIBUI_REF:-3880d58fe91b8118700878ac9e010cffbc0aedd6}"
+LIBUI_REF="${LIBUI_REF:-ab7d0ff7f7eea5417705c39edc94fe1c51214b93}"
 
 if [ ! -d "$SRC/.git" ]; then
   echo "==> Cloning libui-ng @ ${LIBUI_REF}…"

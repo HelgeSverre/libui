@@ -23,7 +23,8 @@ class Button extends Control
      */
     public function __construct(string $text)
     {
-        $this->handle = \Libui\Ffi::get()->uiNewButton($text);
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewButton($text));
     }
 
     /**
@@ -35,7 +36,7 @@ class Button extends Control
      */
     public function text(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiButtonText($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiButtonText($this->handle()));
     }
 
     /**
@@ -47,7 +48,7 @@ class Button extends Control
      */
     public function setText(string $text): static
     {
-        \Libui\Ffi::get()->uiButtonSetText($this->handle, $text);
+        \Libui\Ffi::get()->uiButtonSetText($this->handle(), $text);
         return $this;
     }
 
@@ -69,7 +70,7 @@ class Button extends Control
                 \fwrite(\STDERR, "[onClicked] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiButtonOnClicked($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiButtonOnClicked($this->handle(), $fn, null);
         return $this;
     }
 }

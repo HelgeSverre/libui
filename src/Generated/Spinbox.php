@@ -24,7 +24,8 @@ class Spinbox extends Control
      */
     public function __construct(int $min, int $max)
     {
-        $this->handle = \Libui\Ffi::get()->uiNewSpinbox($min, $max);
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewSpinbox($min, $max));
     }
 
     /**
@@ -36,7 +37,7 @@ class Spinbox extends Control
      */
     public function value(): int
     {
-        return \Libui\Ffi::get()->uiSpinboxValue($this->handle);
+        return \Libui\Ffi::get()->uiSpinboxValue($this->handle());
     }
 
     /**
@@ -49,7 +50,7 @@ class Spinbox extends Control
      */
     public function setValue(int $value): static
     {
-        \Libui\Ffi::get()->uiSpinboxSetValue($this->handle, $value);
+        \Libui\Ffi::get()->uiSpinboxSetValue($this->handle(), $value);
         return $this;
     }
 
@@ -72,7 +73,7 @@ class Spinbox extends Control
                 \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiSpinboxOnChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiSpinboxOnChanged($this->handle(), $fn, null);
         return $this;
     }
 }

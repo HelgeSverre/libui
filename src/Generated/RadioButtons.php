@@ -21,7 +21,8 @@ class RadioButtons extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewRadioButtons();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewRadioButtons());
     }
 
     /**
@@ -33,7 +34,7 @@ class RadioButtons extends Control
      */
     public function append(string $text): static
     {
-        \Libui\Ffi::get()->uiRadioButtonsAppend($this->handle, $text);
+        \Libui\Ffi::get()->uiRadioButtonsAppend($this->handle(), $text);
         return $this;
     }
 
@@ -46,7 +47,7 @@ class RadioButtons extends Control
      */
     public function selected(): int
     {
-        return \Libui\Ffi::get()->uiRadioButtonsSelected($this->handle);
+        return \Libui\Ffi::get()->uiRadioButtonsSelected($this->handle());
     }
 
     /**
@@ -58,7 +59,7 @@ class RadioButtons extends Control
      */
     public function setSelected(int $index): static
     {
-        \Libui\Ffi::get()->uiRadioButtonsSetSelected($this->handle, $index);
+        \Libui\Ffi::get()->uiRadioButtonsSetSelected($this->handle(), $index);
         return $this;
     }
 
@@ -81,7 +82,7 @@ class RadioButtons extends Control
                 \fwrite(\STDERR, "[onSelected] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiRadioButtonsOnSelected($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiRadioButtonsOnSelected($this->handle(), $fn, null);
         return $this;
     }
 }

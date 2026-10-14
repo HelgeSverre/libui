@@ -21,7 +21,8 @@ class EditableCombobox extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewEditableCombobox();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewEditableCombobox());
     }
 
     /**
@@ -33,7 +34,7 @@ class EditableCombobox extends Control
      */
     public function append(string $text): static
     {
-        \Libui\Ffi::get()->uiEditableComboboxAppend($this->handle, $text);
+        \Libui\Ffi::get()->uiEditableComboboxAppend($this->handle(), $text);
         return $this;
     }
 
@@ -46,7 +47,7 @@ class EditableCombobox extends Control
      */
     public function text(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEditableComboboxText($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEditableComboboxText($this->handle()));
     }
 
     /**
@@ -58,7 +59,7 @@ class EditableCombobox extends Control
      */
     public function setText(string $text): static
     {
-        \Libui\Ffi::get()->uiEditableComboboxSetText($this->handle, $text);
+        \Libui\Ffi::get()->uiEditableComboboxSetText($this->handle(), $text);
         return $this;
     }
 
@@ -81,7 +82,7 @@ class EditableCombobox extends Control
                 \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiEditableComboboxOnChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiEditableComboboxOnChanged($this->handle(), $fn, null);
         return $this;
     }
 
@@ -94,7 +95,7 @@ class EditableCombobox extends Control
      */
     public function placeholder(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEditableComboboxPlaceholder($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEditableComboboxPlaceholder($this->handle()));
     }
 
     /**
@@ -106,7 +107,7 @@ class EditableCombobox extends Control
      */
     public function setPlaceholder(string $text): static
     {
-        \Libui\Ffi::get()->uiEditableComboboxSetPlaceholder($this->handle, $text);
+        \Libui\Ffi::get()->uiEditableComboboxSetPlaceholder($this->handle(), $text);
         return $this;
     }
 }

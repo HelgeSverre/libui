@@ -19,21 +19,37 @@ use Libui\Text\TextLayout;
  */
 final class DrawContext
 {
+    private bool $active = true;
+
     public function __construct(
         private readonly \FFI\CData $ctx,
     ) {}
 
+    /** Native draw contexts expire as soon as the Area draw callback returns. @internal */
+    public function invalidate(): void
+    {
+        $this->active = false;
+    }
+
+    private function handle(): \FFI\CData
+    {
+        if (! $this->active) {
+            throw new \LogicException('The draw context is only valid during its draw callback.');
+        }
+        return $this->ctx;
+    }
+
     public function fill(Path $path, Brush $brush): void
     {
         // libui takes the brush/stroke structs by pointer.
-        Ffi::get()->uiDrawFill($this->ctx, $path->handle(), $brush->toCData());
+        Ffi::get()->uiDrawFill($this->handle(), $path->drawingHandle(), $brush->toCData());
     }
 
     public function stroke(Path $path, Brush $brush, StrokeParams $stroke): void
     {
         Ffi::get()->uiDrawStroke(
-            $this->ctx,
-            $path->handle(),
+            $this->handle(),
+            $path->drawingHandle(),
             $brush->toCData(),
             $stroke->toCData(),
         );
@@ -102,31 +118,31 @@ final class DrawContext
     /** Push the current clip/transform state onto libui's stack. */
     public function save(): void
     {
-        Ffi::get()->uiDrawSave($this->ctx);
+        Ffi::get()->uiDrawSave($this->handle());
     }
 
     /** Pop the most recently saved clip/transform state. */
     public function restore(): void
     {
-        Ffi::get()->uiDrawRestore($this->ctx);
+        Ffi::get()->uiDrawRestore($this->handle());
     }
 
     /** Intersect the current clip region with the given path. */
     public function clip(Path $path): void
     {
-        Ffi::get()->uiDrawClip($this->ctx, $path->handle());
+        Ffi::get()->uiDrawClip($this->handle(), $path->drawingHandle());
     }
 
     /** Compose the given affine transform onto the current matrix. */
     public function transform(Matrix $matrix): void
     {
-        Ffi::get()->uiDrawTransform($this->ctx, $matrix->addr());
+        Ffi::get()->uiDrawTransform($this->handle(), $matrix->addr());
     }
 
     /** Draw a laid-out text block with its top-left corner at ($x, $y). */
     public function text(TextLayout $layout, float $x, float $y): void
     {
-        Ffi::get()->uiDrawText($this->ctx, $layout->handle(), $x, $y);
+        Ffi::get()->uiDrawText($this->handle(), $layout->handle(), $x, $y);
     }
 
     /**

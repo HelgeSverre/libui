@@ -21,7 +21,8 @@ class Tab extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewTab();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewTab());
     }
 
     /**
@@ -33,7 +34,7 @@ class Tab extends Control
      */
     public function selected(): int
     {
-        return \Libui\Ffi::get()->uiTabSelected($this->handle);
+        return \Libui\Ffi::get()->uiTabSelected($this->handle());
     }
 
     /**
@@ -46,7 +47,7 @@ class Tab extends Control
      */
     public function setSelected(int $index): static
     {
-        \Libui\Ffi::get()->uiTabSetSelected($this->handle, $index);
+        \Libui\Ffi::get()->uiTabSetSelected($this->handle(), $index);
         return $this;
     }
 
@@ -69,7 +70,7 @@ class Tab extends Control
                 \fwrite(\STDERR, "[onSelected] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiTabOnSelected($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiTabOnSelected($this->handle(), $fn, null);
         return $this;
     }
 
@@ -83,7 +84,9 @@ class Tab extends Control
      */
     public function append(string $name, \Libui\Control $c): static
     {
-        \Libui\Ffi::get()->uiTabAppend($this->handle, $name, \Libui\Ffi::control($c->handle()));
+        $this->assertCanAdopt($c);
+        \Libui\Ffi::get()->uiTabAppend($this->handle(), $name, \Libui\Ffi::control($c->handle()));
+        $this->adoptChild($c);
         return $this;
     }
 
@@ -98,7 +101,10 @@ class Tab extends Control
      */
     public function insertAt(string $name, int $index, \Libui\Control $c): static
     {
-        \Libui\Ffi::get()->uiTabInsertAt($this->handle, $name, $index, \Libui\Ffi::control($c->handle()));
+        $this->assertCanAdopt($c);
+        $this->assertChildIndex($index, true);
+        \Libui\Ffi::get()->uiTabInsertAt($this->handle(), $name, $index, \Libui\Ffi::control($c->handle()));
+        $this->adoptChild($c, $index);
         return $this;
     }
 
@@ -112,7 +118,9 @@ class Tab extends Control
      */
     public function delete(int $index): static
     {
-        \Libui\Ffi::get()->uiTabDelete($this->handle, $index);
+        $this->assertChildIndex($index);
+        \Libui\Ffi::get()->uiTabDelete($this->handle(), $index);
+        $this->releaseChild($index);
         return $this;
     }
 
@@ -125,7 +133,7 @@ class Tab extends Control
      */
     public function numPages(): int
     {
-        return \Libui\Ffi::get()->uiTabNumPages($this->handle);
+        return \Libui\Ffi::get()->uiTabNumPages($this->handle());
     }
 
     /**
@@ -138,7 +146,8 @@ class Tab extends Control
      */
     public function margined(int $index): bool
     {
-        return \Libui\Ffi::get()->uiTabMargined($this->handle, $index) !== 0;
+        $this->assertChildIndex($index);
+        return \Libui\Ffi::get()->uiTabMargined($this->handle(), $index) !== 0;
     }
 
     /**
@@ -151,7 +160,8 @@ class Tab extends Control
      */
     public function setMargined(int $index, bool $margined): static
     {
-        \Libui\Ffi::get()->uiTabSetMargined($this->handle, $index, (int) $margined);
+        $this->assertChildIndex($index);
+        \Libui\Ffi::get()->uiTabSetMargined($this->handle(), $index, (int) $margined);
         return $this;
     }
 }

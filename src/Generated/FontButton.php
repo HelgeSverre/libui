@@ -21,7 +21,8 @@ class FontButton extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewFontButton();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewFontButton());
     }
 
     /**
@@ -33,7 +34,7 @@ class FontButton extends Control
      */
     public function font(\FFI\CData $desc): static
     {
-        \Libui\Ffi::get()->uiFontButtonFont($this->handle, $desc);
+        \Libui\Ffi::get()->uiFontButtonFont($this->handle(), $desc);
         return $this;
     }
 
@@ -55,7 +56,7 @@ class FontButton extends Control
                 \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiFontButtonOnChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiFontButtonOnChanged($this->handle(), $fn, null);
         return $this;
     }
 }

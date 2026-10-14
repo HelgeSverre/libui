@@ -244,6 +244,22 @@ final class AppTest extends LibuiTestCase
         $this->assertSame($app, $result);
     }
 
+    public function testAppRejectsDuplicateWindows(): void
+    {
+        $app = App::new();
+        $window = new Window('Only once', 100, 100, false);
+        $app->window($window);
+
+        $this->expectException(\LogicException::class);
+        $app->window($window);
+    }
+
+    public function testAppRequiresAWindowBeforeRun(): void
+    {
+        $this->expectException(\LogicException::class);
+        App::new()->run();
+    }
+
     public function testAppOnShouldQuitMethodIsFluent(): void
     {
         $app = App::new();

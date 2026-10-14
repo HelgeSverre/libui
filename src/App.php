@@ -31,6 +31,12 @@ final class App
     /** Register a window to show when the app runs. The first one drives app lifetime. */
     public function window(Window $window): static
     {
+        if ($window->isDestroyed()) {
+            throw new \LogicException('A destroyed window cannot be registered.');
+        }
+        if (\in_array($window, $this->windows, true)) {
+            throw new \LogicException('A window can only be registered once.');
+        }
         $this->windows[] = $window;
         return $this;
     }
@@ -48,30 +54,33 @@ final class App
     /** Initialise libui, show the windows, run the loop until quit, then uninit. */
     public function run(): void
     {
+        if ($this->windows === []) {
+            throw new \LogicException('Register at least one window before running the app.');
+        }
         Ffi::init();
-
-        if ($this->shouldQuit !== null) {
-            Ffi::onShouldQuit($this->shouldQuit);
-        }
-
-        // Track which windows libui has already destroyed (a close handler that
-        // returns true triggers uiControlDestroy), so the post-loop sweep below
-        // doesn't double-free them.
-        $closed = [];
-        foreach ($this->windows as $index => $window) {
-            $closed[$index] = false;
-            $window->onClosing(static function () use (&$closed, $index) {
-                $closed[$index] = true;
-                // Closing the primary (first) window quits the app; others just close.
-                if ($index === 0) {
-                    Ffi::quit();
-                }
-                return true; // let libui destroy this window now
-            });
-            $window->show();
-        }
-
         try {
+            if ($this->shouldQuit !== null) {
+                Ffi::onShouldQuit($this->shouldQuit);
+            }
+
+            // Track which windows libui has already destroyed (a close handler that
+            // returns true triggers uiControlDestroy), so the post-loop sweep below
+            // doesn't double-free them.
+            $closed = [];
+            foreach ($this->windows as $index => $window) {
+                $closed[$index] = false;
+                $window->onClosing(static function () use (&$closed, $index, $window) {
+                    $window->notifyClosing();
+                    $closed[$index] = true;
+                    // Closing the primary (first) window quits the app; others just close.
+                    if ($index === 0) {
+                        Ffi::quit();
+                    }
+                    return true; // let libui destroy this window now
+                });
+                $window->show();
+            }
+
             Ffi::main();
 
             // Destroy any window still alive (e.g. the app was quit via a
@@ -81,6 +90,7 @@ final class App
                 if ($closed[$index]) {
                     continue;
                 }
+                $window->notifyClosing();
                 $window->destroy();
             }
         } finally {

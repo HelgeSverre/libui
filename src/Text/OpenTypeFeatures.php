@@ -16,13 +16,19 @@ use Libui\Ffi;
  */
 final class OpenTypeFeatures
 {
+    /** Native ownership cannot be duplicated by PHP object cloning. */
+    private function __clone(): void {}
+
     private \FFI\CData $otf;
 
-    private bool $freed = false;
+    private bool $freed = true;
 
     public function __construct()
     {
+        Ffi::assertInitialized();
         $this->otf = Ffi::get()->uiNewOpenTypeFeatures();
+        $this->freed = false;
+        \Libui\Lifecycle::registerDrawingResource($this);
     }
 
     /**
@@ -36,7 +42,7 @@ final class OpenTypeFeatures
 
         // PHP's FFI binds a C `char` parameter to a one-character PHP string,
         // not an int — pass the raw bytes.
-        Ffi::get()->uiOpenTypeFeaturesAdd($this->otf, $tag[0], $tag[1], $tag[2], $tag[3], $value);
+        Ffi::get()->uiOpenTypeFeaturesAdd($this->handle(), $tag[0], $tag[1], $tag[2], $tag[3], $value);
 
         return $this;
     }
@@ -54,7 +60,7 @@ final class OpenTypeFeatures
         $ffi = Ffi::get();
         $out = $ffi->new('uint32_t');
         // char params bind to one-character PHP strings (see add()).
-        $present = $ffi->uiOpenTypeFeaturesGet($this->otf, $tag[0], $tag[1], $tag[2], $tag[3], \FFI::addr($out));
+        $present = $ffi->uiOpenTypeFeaturesGet($this->handle(), $tag[0], $tag[1], $tag[2], $tag[3], \FFI::addr($out));
 
         // @phpstan-ignore-next-line  scalar FFI\CData value access (uint32_t out-param)
         return $present !== 0 ? $out->cdata : null;
@@ -62,6 +68,9 @@ final class OpenTypeFeatures
 
     public function handle(): \FFI\CData
     {
+        if ($this->freed) {
+            throw new \LogicException('These native features have been freed.');
+        }
         return $this->otf;
     }
 

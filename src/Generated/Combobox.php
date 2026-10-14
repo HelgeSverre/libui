@@ -21,7 +21,8 @@ class Combobox extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewCombobox();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewCombobox());
     }
 
     /**
@@ -33,7 +34,7 @@ class Combobox extends Control
      */
     public function append(string $text): static
     {
-        \Libui\Ffi::get()->uiComboboxAppend($this->handle, $text);
+        \Libui\Ffi::get()->uiComboboxAppend($this->handle(), $text);
         return $this;
     }
 
@@ -47,7 +48,8 @@ class Combobox extends Control
      */
     public function insertAt(int $index, string $text): static
     {
-        \Libui\Ffi::get()->uiComboboxInsertAt($this->handle, $index, $text);
+        $this->assertIndex($index, $this->numItems(), true);
+        \Libui\Ffi::get()->uiComboboxInsertAt($this->handle(), $index, $text);
         return $this;
     }
 
@@ -61,7 +63,8 @@ class Combobox extends Control
      */
     public function delete(int $index): static
     {
-        \Libui\Ffi::get()->uiComboboxDelete($this->handle, $index);
+        $this->assertIndex($index, $this->numItems(), false);
+        \Libui\Ffi::get()->uiComboboxDelete($this->handle(), $index);
         return $this;
     }
 
@@ -72,7 +75,7 @@ class Combobox extends Control
      */
     public function clear(): static
     {
-        \Libui\Ffi::get()->uiComboboxClear($this->handle);
+        \Libui\Ffi::get()->uiComboboxClear($this->handle());
         return $this;
     }
 
@@ -85,7 +88,7 @@ class Combobox extends Control
      */
     public function numItems(): int
     {
-        return \Libui\Ffi::get()->uiComboboxNumItems($this->handle);
+        return \Libui\Ffi::get()->uiComboboxNumItems($this->handle());
     }
 
     /**
@@ -97,7 +100,7 @@ class Combobox extends Control
      */
     public function selected(): int
     {
-        return \Libui\Ffi::get()->uiComboboxSelected($this->handle);
+        return \Libui\Ffi::get()->uiComboboxSelected($this->handle());
     }
 
     /**
@@ -109,7 +112,7 @@ class Combobox extends Control
      */
     public function setSelected(int $index): static
     {
-        \Libui\Ffi::get()->uiComboboxSetSelected($this->handle, $index);
+        \Libui\Ffi::get()->uiComboboxSetSelected($this->handle(), $index);
         return $this;
     }
 
@@ -132,7 +135,7 @@ class Combobox extends Control
                 \fwrite(\STDERR, "[onSelected] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiComboboxOnSelected($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiComboboxOnSelected($this->handle(), $fn, null);
         return $this;
     }
 }

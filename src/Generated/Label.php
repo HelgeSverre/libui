@@ -23,7 +23,8 @@ class Label extends Control
      */
     public function __construct(string $text)
     {
-        $this->handle = \Libui\Ffi::get()->uiNewLabel($text);
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewLabel($text));
     }
 
     /**
@@ -35,7 +36,7 @@ class Label extends Control
      */
     public function text(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiLabelText($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiLabelText($this->handle()));
     }
 
     /**
@@ -47,7 +48,7 @@ class Label extends Control
      */
     public function setText(string $text): static
     {
-        \Libui\Ffi::get()->uiLabelSetText($this->handle, $text);
+        \Libui\Ffi::get()->uiLabelSetText($this->handle(), $text);
         return $this;
     }
 }

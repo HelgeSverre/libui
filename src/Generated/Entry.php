@@ -21,7 +21,8 @@ class Entry extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewEntry();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewEntry());
     }
 
     /**
@@ -31,6 +32,7 @@ class Entry extends Control
      */
     public static function password(): static
     {
+        \Libui\Ffi::assertInitialized();
         return static::wrap(\Libui\Ffi::get()->uiNewPasswordEntry());
     }
 
@@ -41,6 +43,7 @@ class Entry extends Control
      */
     public static function search(): static
     {
+        \Libui\Ffi::assertInitialized();
         return static::wrap(\Libui\Ffi::get()->uiNewSearchEntry());
     }
 
@@ -53,7 +56,7 @@ class Entry extends Control
      */
     public function text(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEntryText($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEntryText($this->handle()));
     }
 
     /**
@@ -65,7 +68,7 @@ class Entry extends Control
      */
     public function setText(string $text): static
     {
-        \Libui\Ffi::get()->uiEntrySetText($this->handle, $text);
+        \Libui\Ffi::get()->uiEntrySetText($this->handle(), $text);
         return $this;
     }
 
@@ -87,7 +90,7 @@ class Entry extends Control
                 \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiEntryOnChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiEntryOnChanged($this->handle(), $fn, null);
         return $this;
     }
 
@@ -100,7 +103,7 @@ class Entry extends Control
      */
     public function readOnly(): bool
     {
-        return \Libui\Ffi::get()->uiEntryReadOnly($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiEntryReadOnly($this->handle()) !== 0;
     }
 
     /**
@@ -112,7 +115,7 @@ class Entry extends Control
      */
     public function setReadOnly(bool $readonly): static
     {
-        \Libui\Ffi::get()->uiEntrySetReadOnly($this->handle, (int) $readonly);
+        \Libui\Ffi::get()->uiEntrySetReadOnly($this->handle(), (int) $readonly);
         return $this;
     }
 
@@ -125,7 +128,7 @@ class Entry extends Control
      */
     public function placeholder(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEntryPlaceholder($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiEntryPlaceholder($this->handle()));
     }
 
     /**
@@ -138,7 +141,7 @@ class Entry extends Control
      */
     public function setPlaceholder(string $text): static
     {
-        \Libui\Ffi::get()->uiEntrySetPlaceholder($this->handle, $text);
+        \Libui\Ffi::get()->uiEntrySetPlaceholder($this->handle(), $text);
         return $this;
     }
 }

@@ -24,14 +24,19 @@ final class Area extends Control
     /** The uiAreaHandler struct; retained so libui's pointer stays valid. */
     private \FFI\CData $handler;
 
+    private bool $inMouseDown = false;
+
     public function __construct(AreaDelegate $delegate, ?int $scrollWidth = null, ?int $scrollHeight = null)
     {
+        Ffi::assertInitialized();
         $ffi = Ffi::get();
         $this->handler = $this->makeHandler($delegate);
 
-        $this->handle = $scrollWidth !== null
-            ? $ffi->uiNewScrollingArea(\FFI::addr($this->handler), $scrollWidth, $scrollHeight ?? 0)
-            : $ffi->uiNewArea(\FFI::addr($this->handler));
+        $this->initializeHandle(
+            $scrollWidth !== null
+                ? $ffi->uiNewScrollingArea(\FFI::addr($this->handler), $scrollWidth, $scrollHeight ?? 0)
+                : $ffi->uiNewArea(\FFI::addr($this->handler)),
+        );
 
         $delegate->bindArea($this); // let the delegate call $this->redraw()
     }
@@ -43,12 +48,12 @@ final class Area extends Control
 
     public function queueRedrawAll(): void
     {
-        Ffi::get()->uiAreaQueueRedrawAll($this->handle);
+        Ffi::get()->uiAreaQueueRedrawAll($this->handle());
     }
 
     public function setSize(int $width, int $height): void
     {
-        Ffi::get()->uiAreaSetSize($this->handle, $width, $height);
+        Ffi::get()->uiAreaSetSize($this->handle(), $width, $height);
     }
 
     /**
@@ -59,7 +64,7 @@ final class Area extends Control
      */
     public function scrollTo(float $x, float $y, float $width, float $height): void
     {
-        Ffi::get()->uiAreaScrollTo($this->handle, $x, $y, $width, $height);
+        Ffi::get()->uiAreaScrollTo($this->handle(), $x, $y, $width, $height);
     }
 
     /**
@@ -72,7 +77,8 @@ final class Area extends Control
      */
     public function beginUserWindowMove(): void
     {
-        Ffi::get()->uiAreaBeginUserWindowMove($this->handle);
+        $this->assertMouseDown();
+        Ffi::get()->uiAreaBeginUserWindowMove($this->handle());
     }
 
     /**
@@ -85,7 +91,16 @@ final class Area extends Control
      */
     public function beginUserWindowResize(WindowResizeEdge $edge): void
     {
-        Ffi::get()->uiAreaBeginUserWindowResize($this->handle, $edge->value);
+        $this->assertMouseDown();
+        Ffi::get()->uiAreaBeginUserWindowResize($this->handle(), $edge->value);
+    }
+
+    private function assertMouseDown(): void
+    {
+        $this->assertAlive();
+        if (! $this->inMouseDown) {
+            throw new \LogicException('Window move/resize must start inside a native mouse-down callback.');
+        }
     }
 
     private function makeHandler(AreaDelegate $delegate): \FFI\CData
@@ -96,10 +111,22 @@ final class Area extends Control
         // escaping one is a hard fatal ("throwing from FFI callbacks is not
         // allowed"), so each is guarded and reports to STDERR instead.
         $handler->Draw = static::keep(static function ($ah, $area, $params) use ($delegate): void {
-            self::guard(static fn () => $delegate->draw(new DrawContext($params->Context), AreaDrawParams::fromCData($params)));
+            $context = new DrawContext($params->Context);
+            try {
+                self::guard(static fn () => $delegate->draw($context, AreaDrawParams::fromCData($params)));
+            } finally {
+                $context->invalidate();
+            }
         });
-        $handler->MouseEvent = static::keep(static function ($ah, $area, $event) use ($delegate): void {
-            self::guard(static fn () => $delegate->mouse(AreaMouseEvent::fromCData($event)));
+        $handler->MouseEvent = static::keep(function ($ah, $area, $event) use ($delegate): void {
+            $mouse = AreaMouseEvent::fromCData($event);
+            $previous = $this->inMouseDown;
+            $this->inMouseDown = $mouse->down !== 0;
+            try {
+                self::guard(static fn () => $delegate->mouse($mouse));
+            } finally {
+                $this->inMouseDown = $previous;
+            }
         });
         $handler->MouseCrossed = static::keep(static function ($ah, $area, $left) use ($delegate): void {
             self::guard(static fn () => $delegate->mouseCrossed($left !== 0));

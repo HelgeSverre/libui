@@ -21,7 +21,8 @@ class Separator extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewHorizontalSeparator();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewHorizontalSeparator());
     }
 
     /**
@@ -31,6 +32,7 @@ class Separator extends Control
      */
     public static function vertical(): static
     {
+        \Libui\Ffi::assertInitialized();
         return static::wrap(\Libui\Ffi::get()->uiNewVerticalSeparator());
     }
 }

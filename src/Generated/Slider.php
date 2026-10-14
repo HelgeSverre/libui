@@ -24,7 +24,8 @@ class Slider extends Control
      */
     public function __construct(int $min, int $max)
     {
-        $this->handle = \Libui\Ffi::get()->uiNewSlider($min, $max);
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewSlider($min, $max));
     }
 
     /**
@@ -36,7 +37,7 @@ class Slider extends Control
      */
     public function value(): int
     {
-        return \Libui\Ffi::get()->uiSliderValue($this->handle);
+        return \Libui\Ffi::get()->uiSliderValue($this->handle());
     }
 
     /**
@@ -48,7 +49,7 @@ class Slider extends Control
      */
     public function setValue(int $value): static
     {
-        \Libui\Ffi::get()->uiSliderSetValue($this->handle, $value);
+        \Libui\Ffi::get()->uiSliderSetValue($this->handle(), $value);
         return $this;
     }
 
@@ -61,7 +62,7 @@ class Slider extends Control
      */
     public function hasToolTip(): bool
     {
-        return \Libui\Ffi::get()->uiSliderHasToolTip($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiSliderHasToolTip($this->handle()) !== 0;
     }
 
     /**
@@ -73,7 +74,7 @@ class Slider extends Control
      */
     public function setHasToolTip(bool $hasToolTip): static
     {
-        \Libui\Ffi::get()->uiSliderSetHasToolTip($this->handle, (int) $hasToolTip);
+        \Libui\Ffi::get()->uiSliderSetHasToolTip($this->handle(), (int) $hasToolTip);
         return $this;
     }
 
@@ -96,7 +97,7 @@ class Slider extends Control
                 \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiSliderOnChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiSliderOnChanged($this->handle(), $fn, null);
         return $this;
     }
 
@@ -118,7 +119,7 @@ class Slider extends Control
                 \fwrite(\STDERR, "[onReleased] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiSliderOnReleased($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiSliderOnReleased($this->handle(), $fn, null);
         return $this;
     }
 
@@ -132,7 +133,7 @@ class Slider extends Control
      */
     public function setRange(int $min, int $max): static
     {
-        \Libui\Ffi::get()->uiSliderSetRange($this->handle, $min, $max);
+        \Libui\Ffi::get()->uiSliderSetRange($this->handle(), $min, $max);
         return $this;
     }
 }

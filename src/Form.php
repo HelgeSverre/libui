@@ -22,8 +22,9 @@ class Form extends Generated\Form
     /** Append a labelled field; $stretchy (bool, or the raw 0/1 int) defaults to off. */
     public function append(string $label, Control $c, bool|int $stretchy = false): static
     {
+        parent::append($label, $c, (int) $stretchy);
         $this->fields[] = [$label, $c];
-        return parent::append($label, $c, (int) $stretchy);
+        return $this;
     }
 
     /** Append a labelled field that grows to fill vertical space. */
@@ -35,11 +36,12 @@ class Form extends Generated\Form
     /** Remove the field at $index, keeping the tracked list in sync. */
     public function delete(int $index): static
     {
+        parent::delete($index);
         if ($index >= 0 && $index < \count($this->fields)) {
             \array_splice($this->fields, $index, 1);
         }
 
-        return parent::delete($index);
+        return $this;
     }
 
     /**

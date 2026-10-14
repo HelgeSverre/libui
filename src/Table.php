@@ -44,6 +44,7 @@ final class Table extends Control
      */
     public function __construct(TableModel $model, ?int $rowBackgroundModelColumn = null)
     {
+        Ffi::assertInitialized();
         $ffi = Ffi::get();
         $this->model = $model;
 
@@ -51,7 +52,8 @@ final class Table extends Control
         $this->params->Model = $model->handle();
         $this->params->RowBackgroundColorModelColumn = $rowBackgroundModelColumn ?? self::NO_ROW_BACKGROUND;
 
-        $this->handle = $ffi->uiNewTable(\FFI::addr($this->params));
+        $this->initializeHandle($ffi->uiNewTable(\FFI::addr($this->params)));
+        $model->registerTable($this);
     }
 
     /** Convenience: build the model from a delegate and wrap it in a table. */
@@ -148,7 +150,7 @@ final class Table extends Control
         }
 
         $ffi->uiTableAppendTextColumn(
-            $this->handle,
+            $this->handle(),
             $name,
             $modelColumn,
             $editableModelColumn ?? self::NEVER_EDITABLE,
@@ -184,7 +186,7 @@ final class Table extends Control
     public function appendImageColumn(string $name, int $imageModelColumn): static
     {
         Ffi::get()->uiTableAppendImageColumn(
-            $this->handle,
+            $this->handle(),
             $name,
             $imageModelColumn,
         );
@@ -203,7 +205,7 @@ final class Table extends Control
         ?int $textEditableModelColumn = null,
     ): static {
         Ffi::get()->uiTableAppendImageTextColumn(
-            $this->handle,
+            $this->handle(),
             $name,
             $imageModelColumn,
             $textModelColumn,
@@ -220,7 +222,7 @@ final class Table extends Control
     public function appendCheckboxColumn(string $name, int $modelColumn, ?int $editableModelColumn = null): static
     {
         Ffi::get()->uiTableAppendCheckboxColumn(
-            $this->handle,
+            $this->handle(),
             $name,
             $modelColumn,
             $editableModelColumn ?? self::NEVER_EDITABLE,
@@ -241,7 +243,7 @@ final class Table extends Control
         ?int $textEditableModelColumn = null,
     ): static {
         Ffi::get()->uiTableAppendCheckboxTextColumn(
-            $this->handle,
+            $this->handle(),
             $name,
             $checkboxModelColumn,
             $checkboxEditableModelColumn ?? self::NEVER_EDITABLE,
@@ -259,7 +261,7 @@ final class Table extends Control
     public function appendProgressBarColumn(string $name, int $modelColumn): static
     {
         Ffi::get()->uiTableAppendProgressBarColumn(
-            $this->handle,
+            $this->handle(),
             $name,
             $modelColumn,
         );
@@ -279,7 +281,7 @@ final class Table extends Control
     public function appendButtonColumn(string $name, int $modelColumn, ?int $clickableModelColumn = null): static
     {
         Ffi::get()->uiTableAppendButtonColumn(
-            $this->handle,
+            $this->handle(),
             $name,
             $modelColumn,
             $clickableModelColumn ?? self::NEVER_EDITABLE,
@@ -290,20 +292,20 @@ final class Table extends Control
     /** Whether the column header row is shown. */
     public function headerVisible(): bool
     {
-        return Ffi::get()->uiTableHeaderVisible($this->handle) !== 0;
+        return Ffi::get()->uiTableHeaderVisible($this->handle()) !== 0;
     }
 
     /** Show or hide the column header row. */
     public function setHeaderVisible(bool $visible): static
     {
-        Ffi::get()->uiTableHeaderSetVisible($this->handle, (int) $visible);
+        Ffi::get()->uiTableHeaderSetVisible($this->handle(), (int) $visible);
         return $this;
     }
 
     /** Set a column's width in pixels. */
     public function setColumnWidth(int $column, int $width): static
     {
-        Ffi::get()->uiTableColumnSetWidth($this->handle, $column, $width);
+        Ffi::get()->uiTableColumnSetWidth($this->handle(), $column, $width);
         return $this;
     }
 
@@ -318,7 +320,7 @@ final class Table extends Control
      */
     public function selectionMode(): TableSelectionMode
     {
-        return TableSelectionMode::from(Ffi::get()->uiTableGetSelectionMode($this->handle));
+        return TableSelectionMode::from(Ffi::get()->uiTableGetSelectionMode($this->handle()));
     }
 
     /**
@@ -328,7 +330,7 @@ final class Table extends Control
      */
     public function setSelectionMode(TableSelectionMode $mode): static
     {
-        Ffi::get()->uiTableSetSelectionMode($this->handle, $mode->value);
+        Ffi::get()->uiTableSetSelectionMode($this->handle(), $mode->value);
         return $this;
     }
 
@@ -340,7 +342,7 @@ final class Table extends Control
     public function selectedRows(): array
     {
         $ffi = Ffi::get();
-        $sel = $ffi->uiTableGetSelection($this->handle);
+        $sel = $ffi->uiTableGetSelection($this->handle());
 
         $numSelected = $sel->NumRows;
         $rows = [];
@@ -372,7 +374,7 @@ final class Table extends Control
         if ($rows === []) {
             $sel->NumRows = 0;
             $sel->Rows = null;
-            $ffi->uiTableSetSelection($this->handle, \FFI::addr($sel));
+            $ffi->uiTableSetSelection($this->handle(), \FFI::addr($sel));
             return $this;
         }
 
@@ -387,7 +389,7 @@ final class Table extends Control
 
         $sel->NumRows = $count;
         $sel->Rows = $ffi->cast('int *', \FFI::addr($buffer[0]));
-        $ffi->uiTableSetSelection($this->handle, \FFI::addr($sel));
+        $ffi->uiTableSetSelection($this->handle(), \FFI::addr($sel));
 
         return $this;
     }
@@ -406,7 +408,7 @@ final class Table extends Control
                 fwrite(STDERR, "[Table::onSelectionChanged] {$e->getMessage()}\n");
             }
         });
-        Ffi::get()->uiTableOnSelectionChanged($this->handle, $fn, null);
+        Ffi::get()->uiTableOnSelectionChanged($this->handle(), $fn, null);
         return $this;
     }
 
@@ -426,7 +428,7 @@ final class Table extends Control
                 fwrite(STDERR, "[Table::onRowClicked] {$e->getMessage()}\n");
             }
         });
-        Ffi::get()->uiTableOnRowClicked($this->handle, $fn, null);
+        Ffi::get()->uiTableOnRowClicked($this->handle(), $fn, null);
         return $this;
     }
 
@@ -446,7 +448,7 @@ final class Table extends Control
                 fwrite(STDERR, "[Table::onRowDoubleClicked] {$e->getMessage()}\n");
             }
         });
-        Ffi::get()->uiTableOnRowDoubleClicked($this->handle, $fn, null);
+        Ffi::get()->uiTableOnRowDoubleClicked($this->handle(), $fn, null);
         return $this;
     }
 
@@ -466,7 +468,7 @@ final class Table extends Control
                 fwrite(STDERR, "[Table::onHeaderClicked] {$e->getMessage()}\n");
             }
         });
-        Ffi::get()->uiTableHeaderOnClicked($this->handle, $fn, null);
+        Ffi::get()->uiTableHeaderOnClicked($this->handle(), $fn, null);
         return $this;
     }
 
@@ -475,7 +477,7 @@ final class Table extends Control
      */
     public function setSortIndicator(int $column, SortIndicator $indicator): static
     {
-        Ffi::get()->uiTableHeaderSetSortIndicator($this->handle, $column, $indicator->value);
+        Ffi::get()->uiTableHeaderSetSortIndicator($this->handle(), $column, $indicator->value);
         return $this;
     }
 
@@ -484,6 +486,6 @@ final class Table extends Control
      */
     public function sortIndicator(int $column): SortIndicator
     {
-        return SortIndicator::from(Ffi::get()->uiTableHeaderSortIndicator($this->handle, $column));
+        return SortIndicator::from(Ffi::get()->uiTableHeaderSortIndicator($this->handle(), $column));
     }
 }

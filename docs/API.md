@@ -43,6 +43,7 @@ _No public methods._
 
 The single FFI handle bound to libui-ng, plus library lifecycle and the low-level marshalling helpers the generated classes and the drawing adapter rely on.
 
+- `static assertInitialized(): void` — Reject GUI operations before init() or after uninit() instead of entering native code. @internal
 - `static borrowedString(?CData $ptr): string` — Copies a borrowed C string into PHP without freeing it.
 - `static control(CData $handle): CData` — Upcasts any libui widget handle to the generic uiControl pointer type.
 - `static get(): FFI` — Returns the singleton FFI instance bound to libui-ng.
@@ -94,6 +95,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `getPosition(): array` — The window's current position, measured from the top-left of the screen.
 - `keepAbove(): int` — Returns whether or not the window is kept in front of other windows.
 - `margined(): bool` — Returns whether or not the window has a margin.
+- `notifyClosing(): void` — Invoke the configured cleanup when Window or App accepts a close. @internal
 - `onClose(callable $cb): static` — Run cleanup when the window is closed, before the app quits. Unlike the raw onClosing(), you don't manage the loop or return a value.
 - `onClosing(callable $cb): static` — Track destruction when libui accepts the closing callback. This keeps destroy() safe in afterClose cleanup even when the OS closed the window.
 - `onContentSizeChanged(callable $cb): static` — Registers a callback for when the window content size is changed.
@@ -103,7 +105,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 - `resizeable(): bool` — Returns whether or not the window is user resizeable.
 - `run(?callable $afterClose = null): void` — Show the window and run the event loop until it closes — the all-in-one entry point for a single-window app. Initialises libui if needed, wires the close button to quit (after any onClose() cleanup), and uninits on exit.
 - `setBorderless(bool $borderless): static` — Sets whether or not the window is borderless.
-- `setChild(Control $child): static` — Sets the window's child.
+- `setChild(?Control $child): static` — Sets the window's child.
 - `setContentSize(int $width, int $height): static` — Sets the window content size.
 - `setCornerStyle(WindowCornerStyle $style): static` — Sets the window's corner style. Most relevant for borderless windows. On Windows this maps to the DWM corner preferen...
 - `setFullscreen(bool $fullscreen): static` — Sets whether or not the window is full screen.
@@ -347,6 +349,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 Process-wide registry of native resources that must be released before uiUninit() — libui's leak checker aborts in uiUninit() if a uiTableModel or uiImage is left unfreed, so `Ffi::uninit()` drains this registry first.
 
 - `static freeAll(): void` — Free every still-live registered resource exactly once.
+- `static registerDrawingResource(TextLayout|AttributedString|OpenTypeFeatures|Attribute|Path $resource): void` — Drawing resources retain RAII cleanup and are also swept on shutdown. @internal
 - `static registerImage(Image $image): void`
 - `static registerModel(TableModel $model): void`
 - `static unregisterImage(Image $image): void`
@@ -561,7 +564,7 @@ _Plus the common widget verbs from [`Control`](#control)._
 
 - `__construct(string $title)` — Creates a new group.
 - `margined(): bool` — Returns whether or not the group has a margin.
-- `setChild(Control $c): static` — Sets the group's child.
+- `setChild(?Control $c): static` — Sets the group's child.
 - `setMargined(bool $margined): static` — Sets whether or not the group has a margin. The margin size is determined by the OS defaults.
 - `setTitle(string $title): static` — Sets the group title.
 - `title(): string` — Returns the group title.
@@ -635,6 +638,7 @@ Bridges a `TableModelDelegate` to libui's uiTableModel.
 - `__construct(TableModelDelegate $delegate)`
 - `free(): void` — Release the underlying uiTableModel.
 - `handle(): CData` — The raw uiTableModel* — pass this into a `Table`.
+- `registerTable(Table $table): void` — Keep native model teardown behind the last table using it. @internal
 - `rowChanged(int $index): void` — Notify libui that the row at $index changed so it can repaint it.
 - `rowDeleted(int $index): void` — Notify libui that the row at $index was removed.
 - `rowInserted(int $index): void` — Notify libui that a new row appeared at $index so it can refresh.
@@ -713,6 +717,7 @@ The drawing surface handed to an area's draw handler. Wraps a uiDrawContext*; on
 - `fillCircle(float $cx, float $cy, float $radius, Brush|Color $paint): void`
 - `fillPath(Brush $brush, callable $build, DrawFillMode $fillMode = DrawFillMode::Winding): void` — Build a path with $build, fill it, and free it — no manual end()/free().
 - `fillRect(float $x, float $y, float $width, float $height, Brush|Color $paint): void`
+- `invalidate(): void` — Native draw contexts expire as soon as the Area draw callback returns. @internal
 - `restore(): void` — Pop the most recently saved clip/transform state.
 - `save(): void` — Push the current clip/transform state onto libui's stack.
 - `stroke(Path $path, Brush $brush, StrokeParams $stroke): void`
@@ -794,6 +799,7 @@ A vector path, built then filled/stroked into a DrawContext.
 - `bezierTo(float $c1x, float $c1y, float $c2x, float $c2y, float $endX, float $endY): Path` — Cubic Bézier curve to (endX, endY) via the two control points.
 - `circle(float $cx, float $cy, float $radius): Path` — A full circle as a closed figure (single 0..2π arc).
 - `closeFigure(): Path`
+- `drawingHandle(): CData` — A finalized path safe to pass to native drawing operations. @internal
 - `ellipse(float $cx, float $cy, float $rx, float $ry): Path` — An axis-aligned ellipse approximated with four cubic Béziers (kappa method). Paths have no transform, so a circle-plus-scale is not available here.
 - `end(): Path` — Finalise the path; required before it can be drawn.
 - `free(): void` — Free the native path. Idempotent, and runs automatically on destruction.
@@ -851,10 +857,11 @@ A single text attribute (a family, size, weight, colour, …) built via one of t
 - `static underlineColor(UnderlineColor $color): Attribute`
 - `static weight(TextWeight $weight): Attribute`
 - `__construct(AttributeType $type, int $start, int $end, mixed ...$params)` — Create an attribute with a range. The attribute type and additional parameters vary by type: - Family: (AttributeType::Family, start, end, string $family) - Size: (AttributeType::Size, start, end, float $size) - Weight: (AttributeType::Weight, start, end, TextWeight $weight) - Italic: (AttributeType::Italic, start, end, TextItalic $italic) - Stretch: (AttributeType::Stretch, start, end, TextStretch $stretch) - Color: (AttributeType::Color, start, end, float $r, float $g, float $b, float $a) - Background: (AttributeType::Background, start, end, float $r, float $g, float $b, float $a) - Underline: (AttributeType::Underline, start, end, Underline $underline) - UnderlineColor: (AttributeType::UnderlineColor, start, end, UnderlineColor $color, [r, g, b, a]) - Features: (AttributeType::Features, start, end, OpenTypeFeatures $features)
-- `free(): void`
+- `free(): void` — Release an attribute that has not been transferred to native text.
 - `getEnd(): int`
 - `getStart(): int`
 - `handle(): CData`
+- `transferHandle(): CData` — Transfer ownership to an attributed string exactly once. @internal
 
 ### `AttributedString`
 
@@ -871,6 +878,7 @@ A string with per-range styling, wrapping uiAttributedString*.
 - `insert(string $text, int $at): AttributedString`
 - `len(): int` — Current length in bytes (matches strlen of the underlying UTF-8).
 - `length(): int` — Alias for len().
+- `registerLayout(TextLayout $layout): void` — Keep explicit string teardown behind every layout that uses it. @internal
 - `setAttribute(Attribute $attribute, ?int $start = null, ?int $end = null): AttributedString`
 
 ### `FontDescriptor`
@@ -933,6 +941,7 @@ A laid-out, ready-to-draw block of attributed text, wrapping uiDrawTextLayout*.
 - `free(): void` — Free the native layout. Idempotent, and runs automatically on destruction.
 - `handle(): CData`
 - `height(): float`
+- `isFreed(): bool` — Whether this layout no longer owns a native pointer. @internal
 - `setFont(FontDescriptor $font): TextLayout`
 - `setWidth(float $width): TextLayout`
 - `width(): float`

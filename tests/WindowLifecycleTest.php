@@ -54,12 +54,17 @@ final class WindowLifecycleTest extends TestCase
             return false;
         });
 
+        $cleanup = 0;
+        $window->onClose(static function () use (&$cleanup): void {
+            ++$cleanup;
+        });
         $destroyedBeforeCleanup = false;
         $window->run(static function () use ($window, &$destroyedBeforeCleanup): void {
             $destroyedBeforeCleanup = $window->isDestroyed();
         });
 
         $this->assertTrue($destroyedBeforeCleanup);
+        $this->assertSame(1, $cleanup);
         $window->destroy(); // Must be safe after run() has already freed it.
     }
 
@@ -75,9 +80,50 @@ final class WindowLifecycleTest extends TestCase
             return false;
         });
 
+        $cleanup = 0;
+        $first->onClose(static function () use (&$cleanup): void {
+            ++$cleanup;
+        });
+        $second->onClose(static function () use (&$cleanup): void {
+            ++$cleanup;
+        });
         App::new()->window($first)->window($second)->run();
 
         $this->assertTrue($first->isDestroyed());
         $this->assertTrue($second->isDestroyed());
+        $this->assertSame(2, $cleanup);
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testAppRunsWindowCleanupBeforeNativeRecursiveDestruction(): void
+    {
+        if (PHP_OS_FAMILY !== 'Windows') {
+            $this->markTestSkipped('Uses a native Windows close message.');
+        }
+        Ffi::init();
+        $window = new Window('App native close', 100, 100);
+        $child = new \Libui\Button('child');
+        $window->setChild($child);
+        $cleanup = 0;
+        $window->onClose(static function () use (&$cleanup, $child): void {
+            if ($child->text() === 'child') {
+                ++$cleanup;
+            }
+        });
+        $user32 = \FFI::cdef(
+            'int PostMessageW(uintptr_t hwnd, unsigned int message, uintptr_t wparam, intptr_t lparam);',
+            'user32.dll',
+        );
+        Ffi::timer(10, static function () use ($window, $user32): bool {
+            $hwnd = Ffi::get()->uiControlHandle($window->asControl());
+            // @phpstan-ignore-next-line dynamic Windows API call on a local FFI handle
+            $user32->PostMessageW($hwnd, 0x0010, 0, 0);
+            return false;
+        });
+        App::new()->window($window)->run();
+        $this->assertSame(1, $cleanup);
+        $this->assertTrue($child->isDestroyed());
+        $child->destroy();
     }
 }

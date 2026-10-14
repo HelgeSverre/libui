@@ -18,10 +18,14 @@ use Libui\Generated\Enum\DrawTextAlign;
  */
 final class TextLayout
 {
+    /** Native ownership cannot be duplicated by PHP object cloning. */
+    private function __clone(): void {}
+
     private \FFI\CData $layout;
     private \FFI\CData $params;
-    private bool $freed = false;
+    private bool $freed = true;
     private float $width;
+    private DrawTextAlign $align;
 
     /**
      * The source string and font, retained for this layout's lifetime: the params
@@ -31,7 +35,7 @@ final class TextLayout
      */
     private readonly AttributedString $string;
 
-    private readonly FontDescriptor $font;
+    private FontDescriptor $font;
 
     public function __construct(
         AttributedString $string,
@@ -39,32 +43,35 @@ final class TextLayout
         float $width = 0.0,
         DrawTextAlign $align = DrawTextAlign::Left,
     ) {
+        Ffi::assertInitialized();
         $ffi = Ffi::get();
         $font ??= new FontDescriptor();
 
-        $params = $ffi->new('uiDrawTextLayoutParams');
-        $params->String = $string->handle();
-        $params->DefaultFont = $font->addr();
-        $params->Width = $width;
-        $params->Align = $align->value;
-
         $this->string = $string; // retain — see the property docblock above
         $this->font = $font;
+        $this->width = $width;
+        $this->align = $align;
+        $params = $this->newParams();
         $this->params = $params; // keep params alive for the call
         $this->layout = $ffi->uiDrawNewTextLayout(\FFI::addr($params));
-        $this->width = $width;
+        $this->freed = false;
+        \Libui\Lifecycle::registerDrawingResource($this);
+        $string->registerLayout($this);
     }
 
     public function handle(): \FFI\CData
     {
+        if ($this->freed) {
+            throw new \LogicException('This native resource has been freed.');
+        }
         return $this->layout;
     }
 
     public function setWidth(float $width): self
     {
+        $this->handle();
         $this->width = $width;
-        // Note: width is set in params at construction, changing it requires recreating the layout
-        // For test purposes, we just store it
+        $this->rebuild();
         return $this;
     }
 
@@ -80,9 +87,36 @@ final class TextLayout
 
     public function setFont(FontDescriptor $font): self
     {
-        // Note: font is set in params at construction, changing it requires recreating the layout
-        // For test purposes, we just return this
+        $this->handle();
+        $this->font = $font;
+        $this->rebuild();
         return $this;
+    }
+
+    private function newParams(): \FFI\CData
+    {
+        $params = Ffi::get()->new('uiDrawTextLayoutParams');
+        $params->String = $this->string->handle();
+        $params->DefaultFont = $this->font->addr();
+        $params->Width = $this->width;
+        $params->Align = $this->align->value;
+        return $params;
+    }
+
+    /** Recreate the native layout after changing construction-only parameters. */
+    private function rebuild(): void
+    {
+        $params = $this->newParams();
+        $replacement = Ffi::get()->uiDrawNewTextLayout(\FFI::addr($params));
+        Ffi::get()->uiDrawFreeTextLayout($this->layout);
+        $this->params = $params;
+        $this->layout = $replacement;
+    }
+
+    /** Whether this layout no longer owns a native pointer. @internal */
+    public function isFreed(): bool
+    {
+        return $this->freed;
     }
 
     /**
@@ -96,7 +130,7 @@ final class TextLayout
     {
         $ffi = Ffi::get();
         $out = $ffi->new('double[2]');
-        $ffi->uiDrawTextLayoutExtents($this->layout, \FFI::addr($out[0]), \FFI::addr($out[1]));
+        $ffi->uiDrawTextLayoutExtents($this->handle(), \FFI::addr($out[0]), \FFI::addr($out[1]));
         return [$out[0], $out[1]];
     }
 
@@ -107,7 +141,7 @@ final class TextLayout
     {
         $ffi = Ffi::get();
         $out = $ffi->new('double[2]');
-        $ffi->uiDrawTextLayoutExtents($this->layout, \FFI::addr($out[0]), \FFI::addr($out[1]));
+        $ffi->uiDrawTextLayoutExtents($this->handle(), \FFI::addr($out[0]), \FFI::addr($out[1]));
         return $out;
     }
 

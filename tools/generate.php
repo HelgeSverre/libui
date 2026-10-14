@@ -976,14 +976,49 @@ function emitMethod(array $function, string $type, array $context): ?string
             docBlock($name, $docs, '    ', $docTags)
             . "    public function {$method}(callable \$cb): static\n    {\n"
             . "{$body}\n"
-            . "        \\Libui\\Ffi::get()->{$name}(\$this->handle, \$fn, null);\n"
+            . "        \\Libui\\Ffi::get()->{$name}(\$this->handle(), \$fn, null);\n"
             . "        return \$this;\n    }\n"
         );
     }
 
     // --- ordinary methods ----------------------------------------------------
+    $ownership = match ($name) {
+        'uiBoxAppend' => ['append', 'child'],
+        'uiFormAppend', 'uiTabAppend', 'uiGridAppend' => ['append', 'c'],
+        'uiTabInsertAt' => ['insert', 'c'],
+        'uiGridInsertAt' => ['gridInsert', 'c'],
+        'uiWindowSetChild' => ['replace', 'child'],
+        'uiGroupSetChild' => ['replace', 'c'],
+        'uiBoxDelete', 'uiTabDelete', 'uiFormDelete' => ['delete', 'index'],
+        default => null,
+    };
+    $before = '';
+    $after = '';
+    if ($ownership !== null) {
+        [$operation, $childName] = $ownership;
+        $child = '$' . $childName;
+        if ($operation === 'delete') {
+            $before = "        \$this->assertChildIndex(\$index);\n";
+            $after = "        \$this->releaseChild(\$index);\n";
+        } else {
+            $before = "        \$this->assertCanAdopt({$child}" . ($operation === 'replace' ? ', true' : '') . ");\n";
+            if ($operation === 'insert') {
+                $before .= "        \$this->assertChildIndex(\$index, true);\n";
+            } elseif ($operation === 'gridInsert') {
+                $before .= "        \$this->assertOwnsChild(\$existing);\n";
+            }
+            $after = $operation === 'replace'
+                ? "        \$this->replaceChild({$child});\n"
+                : "        \$this->adoptChild({$child}" . ($operation === 'insert' ? ', $index' : '') . ");\n";
+        }
+    }
+    if (in_array($name, ['uiTabMargined', 'uiTabSetMargined'], true)) {
+        $before = "        \$this->assertChildIndex(\$index);\n";
+    } elseif (in_array($name, ['uiComboboxDelete', 'uiComboboxInsertAt'], true)) {
+        $before = "        \$this->assertIndex(\$index, \$this->numItems(), " . ($name === 'uiComboboxInsertAt' ? 'true' : 'false') . ");\n";
+    }
     $signature = [];
-    $args = ['$this->handle'];
+    $args = ['$this->handle()'];
     $docTags = [];
     foreach ($params as $index => $param) {
         $classification = classify($param['type'], $enums, $types);
@@ -992,10 +1027,16 @@ function emitMethod(array $function, string $type, array $context): ?string
                 ? 'bool'
                 : phpTypeForParam($classification);
         $variable = '$' . ($param['name'] ?: "a{$index}");
+        $nullableChild = $ownership !== null && $ownership[0] === 'replace' && $param['name'] === $ownership[1];
+        if ($nullableChild) {
+            $phpType = '?' . $phpType;
+        }
         $signature[] = "{$phpType} {$variable}";
-        $args[] = $phpType === 'bool'
-            ? "(int) {$variable}"
-            : marshalArg($classification, $variable);
+        $args[] = match (true) {
+            $nullableChild => "{$variable} === null ? null : " . marshalArg($classification, $variable),
+            $phpType === 'bool' => "(int) {$variable}",
+            default => marshalArg($classification, $variable),
+        };
         $docTags[] = methodParamDoc(
             $name,
             $docs,
@@ -1016,7 +1057,7 @@ function emitMethod(array $function, string $type, array $context): ?string
             . "    public function {$method}("
             . implode(', ', $signature)
             . "): static\n    {\n"
-            . "        {$call};\n        return \$this;\n    }\n"
+            . "{$before}        {$call};\n{$after}        return \$this;\n    }\n"
         );
     }
 
@@ -1033,6 +1074,7 @@ function emitMethod(array $function, string $type, array $context): ?string
         . "    public function {$method}("
         . implode(', ', $signature)
         . "): {$phpReturnType}\n    {\n"
+        . $before
         . returnStatement(
             $returnClassification,
             $call,
@@ -1082,9 +1124,10 @@ function emitWidget(string $type, array $members, array $constructorConfig, arra
             . '    public function __construct('
             . implode(', ', $signature)
             . ")\n    {\n"
-            . "        \$this->handle = \\Libui\\Ffi::get()->{$primaryFn}("
+            . "        \\Libui\\Ffi::assertInitialized();\n"
+            . "        \$this->initializeHandle(\\Libui\\Ffi::get()->{$primaryFn}("
             . implode(', ', $args)
-            . ");\n    }\n";
+            . "));\n    }\n";
     }
     foreach ($constructorConfig['factories'] ?? [] as $factoryMethod => $fnName) {
         if (! isset($functions[$fnName])) {
@@ -1108,6 +1151,7 @@ function emitWidget(string $type, array $members, array $constructorConfig, arra
             . "    public static function {$factoryMethod}("
             . implode(', ', $signature)
             . "): static\n    {\n"
+            . "        \\Libui\\Ffi::assertInitialized();\n"
             . "        return static::wrap(\\Libui\\Ffi::get()->{$fnName}("
             . implode(', ', $args)
             . "));\n    }\n";

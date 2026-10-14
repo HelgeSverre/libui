@@ -27,6 +27,17 @@ final class Lifecycle
     /** @var \SplObjectStorage<Image,null>|null */
     private static ?\SplObjectStorage $images = null;
 
+    /** @var \WeakMap<\Libui\Text\TextLayout|\Libui\Text\AttributedString|\Libui\Text\OpenTypeFeatures|\Libui\Text\Attribute|\Libui\Draw\Path,null>|null */
+    private static ?\WeakMap $drawingResources = null;
+
+    /** Drawing resources retain RAII cleanup and are also swept on shutdown. @internal */
+    public static function registerDrawingResource(
+        \Libui\Text\TextLayout|\Libui\Text\AttributedString|\Libui\Text\OpenTypeFeatures|\Libui\Text\Attribute|\Libui\Draw\Path $resource,
+    ): void {
+        self::$drawingResources ??= new \WeakMap();
+        self::$drawingResources[$resource] = null;
+    }
+
     public static function registerModel(TableModel $model): void
     {
         self::$models ??= new \SplObjectStorage();
@@ -66,6 +77,17 @@ final class Lifecycle
      */
     public static function freeAll(): void
     {
+        $resources = [];
+        foreach (self::$drawingResources ?? [] as $resource => $_) {
+            $resources[] = $resource;
+        }
+        // Layouts must be freed before the strings retained in their params.
+        \usort($resources, static fn ($a, $b) => ($a instanceof \Libui\Text\TextLayout ? 0 : 1) <=> ($b instanceof \Libui\Text\TextLayout ? 0 : 1));
+        foreach ($resources as $resource) {
+            $resource->free();
+        }
+        self::$drawingResources = null;
+
         if (self::$models !== null) {
             // Snapshot: free() mutates the storage via unregisterModel().
             foreach (iterator_to_array(self::$models) as $model) {

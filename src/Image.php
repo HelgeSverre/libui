@@ -12,6 +12,9 @@ namespace Libui;
  */
 final class Image
 {
+    /** Native ownership cannot be duplicated by PHP object cloning. */
+    private function __clone(): void {}
+
     private ?\FFI\CData $handle;
 
     /** Whether {@see free()} has already released the image (guards double-free). */
@@ -29,6 +32,7 @@ final class Image
      */
     public function __construct(float $width, float $height)
     {
+        Ffi::assertInitialized();
         $this->handle = Ffi::get()->uiNewImage($width, $height);
         Lifecycle::registerImage($this);
     }
