@@ -47,14 +47,14 @@ use one initialization lifetime per PHP process.
 
 | Check | Observed result |
 | --- | --- |
-| macOS arm64, PHP 8.5 | 783 tests; complete suite runs in the PR's CI |
-| Linux aarch64, PHP 8.5 | 783 tests; 1739 assertions; 7 platform-specific skips; exit 0 |
-| Linux x86_64, PHP 8.5 | 783 tests; 1739 assertions; 7 platform-specific skips; exit 0 |
+| macOS arm64, PHP 8.5 | 783 tests; 1746 assertions; 2 platform-specific skips; exit 0 |
+| Linux aarch64, PHP 8.5 | 783 tests; 1741 assertions; 5 platform-specific skips; exit 0 |
+| Linux x86_64, PHP 8.5 | 783 tests; 1741 assertions; 5 platform-specific skips; exit 0 |
 | Native Linux x86_64 ownership/text executable | 200 cycles and timer teardown; ASan + UBSan; GTK warnings fatal; exit 0 |
 | PHPStan | No errors, without new baseline suppressions |
 | Mago formatting and lint | Pass |
 | Generated code | Regenerated from the pinned header; syntax/drift gate included in CI |
-| Windows | Full suite, real WM_CLOSE cleanup, and 14 native emoji rendering checks run in the PR's CI |
+| Windows x86_64, PHP 8.5 | 783 tests; 1739 assertions; 6 platform-specific skips; real WM_CLOSE cleanup and 14 native emoji rendering checks; exit 0 |
 
 Sanitizers cover a separately compiled native executable and are now a CI job.
 The existing PHP binary rejected sanitizer preloading at startup, so the PHP
@@ -82,5 +82,5 @@ leak checks and explicit cleanup regressions provide separate teardown evidence.
   coverage, not exhaustive native fuzzing. GTK global leak accounting, thread
   misuse, and every backend's callback reentrancy behavior remain outside this pass.
 
-Review verdict: the reproduced failures have fixes and regressions. Merge should
-require the complete cross-platform CI, including the native sanitizer job.
+Review verdict: the reproduced failures have fixes and regressions. The complete
+cross-platform CI passed, including the native sanitizer job.

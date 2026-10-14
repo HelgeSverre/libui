@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## [0.8.1] - 2026-10-14
+
 ### Fixed
 
 - Track native control ownership and recursively invalidate descendants; reject stale handles, duplicate parents, ownership cycles, and invalid container indices before native calls.
@@ -42,6 +44,7 @@
 - Release assets now use the verified packaged binaries, including the notarized macOS library.
 - Updated development tooling to PHPStan 2.3.1, PHPUnit 13.4.2, and Mago 1.56.3, with compatible transitive updates. Runtime requirements remain PHP 8.5+ and FFI.
 
+[0.8.1]: https://github.com/HelgeSverre/libui/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/HelgeSverre/libui/compare/v0.7.1...v0.8.0
 
 Earlier releases: [GitHub release history](https://github.com/HelgeSverre/libui/releases).
