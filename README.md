@@ -26,6 +26,15 @@ Prebuilt `libui` binaries ship inside the package for **macOS**, **Linux**
 (x86_64 + aarch64) and **Windows** — there's no compiler or build step. Linux just
 needs **GTK 3** installed at runtime; see [Platform support](#platform-support).
 
+> **macOS Gatekeeper:** the bundled binary is signed with a Developer ID and
+> notarized, so they load normally. If you build the dylib yourself or grab one
+> from an unsigned source, macOS may block it with
+> *"library load disallowed by system policy."* Clear the download quarantine with:
+>
+> ```sh
+> xattr -dr com.apple.quarantine vendor/helgesverre/libui/lib/darwin/libui.dylib
+> ```
+
 ## Quick start
 
 ```php
@@ -217,6 +226,24 @@ composer build-lib   # build lib/<platform>/libui.* from libui-ng
 `build-lib` needs `meson` + `ninja` (`brew install meson ninja`), plus the
 **GTK 3** dev headers on Linux (`apt install libgtk-3-dev`). On macOS the
 prebuilt dylib is already committed, so this is only needed to refresh it.
+
+### Native library (our `libui-ng` fork)
+
+The bundled binaries are **not** built from upstream — they come from our
+maintained fork, [`HelgeSverre/libui-ng`](https://github.com/HelgeSverre/libui-ng),
+pinned to a commit by `LIBUI_REF` in [`build-libui.sh`](build-libui.sh). The fork
+carries fixes that aren't upstream yet, each as a reviewable commit:
+
+- color-emoji rendering in Windows custom drawing and native entry controls;
+- custom-chrome / borderless windows (drag handle, corner style, key focus);
+- a `uiAttribute` memory-leak fix (orphaned attributes on equal-value span merges).
+
+`patches/` keeps these as standalone diffs for history and review; since they're
+already baked into the pinned fork ref, `build-libui.sh` re-applies them as a
+no-op. **To change native behaviour:** commit to the fork, bump `LIBUI_REF`, then
+`composer build-lib` (which on macOS also re-signs the dylib with a Developer ID
+and which you can follow with `composer notarize`). See
+[`patches/README.md`](patches/README.md).
 
 ### Run the examples
 

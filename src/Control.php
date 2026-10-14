@@ -16,6 +16,13 @@ abstract class Control
     protected \FFI\CData $handle;
 
     /**
+     * Whether destroy() has already freed this control. Guards against a double
+     * uiControlDestroy() (which frees an already-freed pointer and crashes).
+     * Child controls destroyed by their native parent must not be used again.
+     */
+    private bool $destroyed = false;
+
+    /**
      * Native callback trampolines, retained for the process lifetime.
      *
      * PHP closures handed to C as function pointers are otherwise garbage-
@@ -169,7 +176,23 @@ abstract class Control
      */
     public function destroy(): void
     {
+        if ($this->destroyed) {
+            return;
+        }
+        $this->destroyed = true;
         Ffi::get()->uiControlDestroy($this->asControl());
+    }
+
+    /** Whether this control has been destroyed explicitly or by its close callback. */
+    public function isDestroyed(): bool
+    {
+        return $this->destroyed;
+    }
+
+    /** Record destruction performed by a native lifecycle callback. */
+    protected function markDestroyed(): void
+    {
+        $this->destroyed = true;
     }
 
     /**

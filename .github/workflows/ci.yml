@@ -71,12 +71,12 @@ jobs:
         run: |
           mkdir -p third_party/libui-ng
           curl -fsSL -o third_party/libui-ng/ui.h \
-            https://raw.githubusercontent.com/libui-ng/libui-ng/43ba1ef553c8993a43a67f1ce6e35983a2660d8c/ui.h
+            https://raw.githubusercontent.com/HelgeSverre/libui-ng/3880d58fe91b8118700878ac9e010cffbc0aedd6/ui.h
       - name: Regenerate and assert no drift
         run: |
           composer regen
           git diff --exit-code -- src/Generated src/Native/libui.gen.h \
-            || { echo '::error::Generated files are stale — run `composer regen` and commit the result.'; exit 1; }
+            || { echo '::error::Generated files are stale — run composer regen and commit the result.'; exit 1; }
 
   # Build libui on each real OS/arch and run the full suite against it. macOS
   # uses the committed universal dylib; Linux/Windows build from source. GUI
@@ -84,7 +84,6 @@ jobs:
   test:
     name: test · ${{ matrix.label }} · PHP ${{ matrix.php }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
@@ -134,3 +133,21 @@ jobs:
           else
             composer test
           fi
+
+      - name: Set up MSVC for native rendering regression (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Native entry color rendering (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $buildScript = Get-Content build-libui.sh -Raw
+          $nativeRef = [regex]::Match($buildScript, 'LIBUI_REF="\$\{LIBUI_REF:-([0-9a-f]{40})\}"').Groups[1].Value
+          if (!$nativeRef) { throw 'Cannot read the pinned native revision' }
+          New-Item -ItemType Directory -Force third_party/libui-ng | Out-Null
+          Invoke-WebRequest "https://raw.githubusercontent.com/HelgeSverre/libui-ng/$nativeRef/ui.h" -OutFile third_party/libui-ng/ui.h
+          cl /nologo /EHsc /Ithird_party/libui-ng scripts/windows-entry-color-test.cpp user32.lib gdi32.lib /Fe:windows-entry-color-test.exe
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & .\windows-entry-color-test.exe (Resolve-Path lib/windows-x86_64/libui.dll).Path
+          exit $LASTEXITCODE

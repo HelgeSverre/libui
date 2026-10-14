@@ -34,6 +34,8 @@ use Libui\Draw\Brush;
 use Libui\Draw\DrawContext;
 use Libui\Draw\Params\AreaDrawParams;
 use Libui\Draw\Params\AreaKeyEvent;
+use Libui\Draw\Params\AreaMouseEvent;
+use Libui\Draw\Params\AreaScrollEvent;
 use Libui\Draw\Path;
 use Libui\Ffi;
 use Libui\Generated\Enum\ExtKey;
@@ -138,6 +140,9 @@ function calcEval(string $s): ?float
 }
 
 $palette = new class extends AreaDelegate {
+    /** Height of the footer hint bar, reserved at the bottom of every view. */
+    private const float FOOTER = 34.0;
+
     public ?Area $area = null;
     public string $query = '';
     public int $selected = 0;
@@ -152,6 +157,9 @@ $palette = new class extends AreaDelegate {
     public ?string $resultValue = null;
 
     public string $calcExpr = '';
+
+    /** Accumulated wheel steps, so fractional trackpad deltas move one row at a time. */
+    private float $scrollAccum = 0.0;
 
     /** @var list<array{string,string,string}> icon, name, category */
     public array $commands = [
@@ -218,6 +226,36 @@ $palette = new class extends AreaDelegate {
         return array_values(array_filter($this->commands, fn (array $c) => fuzzy($this->query, $c[1])));
     }
 
+    /**
+     * Shared list geometry so the renderer and the click hit-test never drift,
+     * and so both reflow correctly when the (resizable) window changes height.
+     *
+     * @return array{top:float,rowH:float,bottom:float,visible:int,offset:int}
+     */
+    private function listLayout(float $h): array
+    {
+        $rowH = 46.0;
+        $top = 72.0;
+        $bottom = $h - self::FOOTER;
+        $visible = max(1, (int) (($bottom - $top) / $rowH));
+        $offset = $this->selected >= $visible ? $this->selected - $visible + 1 : 0;
+
+        return ['top' => $top, 'rowH' => $rowH, 'bottom' => $bottom, 'visible' => $visible, 'offset' => $offset];
+    }
+
+    /** Map a y-coordinate to a filtered-list index, or null if it's outside the rows. */
+    private function rowAt(float $y, float $h): ?int
+    {
+        $rows = $this->filtered();
+        $l = $this->listLayout($h);
+        if ($rows === [] || $y < $l['top'] || $y >= $l['bottom']) {
+            return null;
+        }
+        $row = $l['offset'] + (int) (($y - $l['top']) / $l['rowH']);
+
+        return $row < count($rows) ? $row : null;
+    }
+
     public function draw(DrawContext $ctx, AreaDrawParams $p): void
     {
         $w = $p->areaWidth;
@@ -232,13 +270,15 @@ $palette = new class extends AreaDelegate {
             default => $this->drawPalette($ctx, $w, $h, $c),
         };
 
-        // footer hint bar, shared across modes
+        // footer hint bar, shared across modes. Repaint its background first so a
+        // long list scrolled underneath cannot bleed through behind the text.
         $hint = match ($this->mode) {
             'calc' => 'type an expression   ·   esc  back',
             'result' => 'esc  back',
             default => '↑ ↓  navigate     ↵  run     esc  clear / close',
         };
-        $this->fill($ctx, $c['rule'], 0, $h - 34, $w, 1);
+        $this->fill($ctx, $c['bg'], 0, $h - self::FOOTER, $w, self::FOOTER);
+        $this->fill($ctx, $c['rule'], 0, $h - self::FOOTER, $w, 1);
         $ctx->drawString($hint, new FontDescriptor(FONT, 11.5), $c['category'], 22, $h - 26);
     }
 
@@ -260,9 +300,14 @@ $palette = new class extends AreaDelegate {
             return;
         }
 
-        $rowH = 46.0;
-        $y = 72.0;
-        foreach ($rows as $i => $cmd) {
+        // Clip the list to the band between the input rule and the footer, and
+        // scroll so the selected row is always visible (the command list is taller
+        // than the window once filtering is cleared / the window is shrunk).
+        ['top' => $top, 'rowH' => $rowH, 'bottom' => $bottom, 'visible' => $visible, 'offset' => $offset] = $this->listLayout($h);
+
+        $y = $top;
+        foreach (array_slice($rows, $offset, $visible) as $j => $cmd) {
+            $i = $offset + $j;
             $isSel = $i === $this->selected;
             if ($isSel) {
                 $this->fill($ctx, $c['sel'], 8, $y - 4, $w - 16, $rowH - 4, 0.18);
@@ -279,6 +324,14 @@ $palette = new class extends AreaDelegate {
             // category is positioned manually near the right edge.
             $ctx->drawString($cmd[2], new FontDescriptor(FONT, 12.0), $c['category'], $w - 132, $y + 12);
             $y += $rowH;
+        }
+
+        // "more below / above" affordance when the list overflows
+        if ($offset > 0) {
+            $ctx->drawString('▲', new FontDescriptor(FONT, 10.0), $c['category'], $w - 26, $top - 2);
+        }
+        if (($offset + $visible) < count($rows)) {
+            $ctx->drawString('▼', new FontDescriptor(FONT, 10.0), $c['category'], $w - 26, $bottom - 18);
         }
     }
 
@@ -317,6 +370,50 @@ $palette = new class extends AreaDelegate {
             default => '…',
         };
         $ctx->drawString($shown, new FontDescriptor(FONT, 22.0, TextWeight::Bold), $result === null ? $c['placeholder'] : $c['value'], 30, 150);
+    }
+
+    public function mouse(AreaMouseEvent $e): void
+    {
+        // The custom Area handles mouse events itself, so AppKit's background
+        // dragging does not start a move. Reserve the search header as a drag
+        // handle and leave the command rows available for normal clicks.
+        if ($e->down === 1 && $e->y < 64) {
+            $this->area?->beginUserWindowMove();
+            return;
+        }
+
+        // Click a list row to select and run it.
+        if ($this->mode !== 'palette' || $e->down !== 1) {
+            return;
+        }
+        $idx = $this->rowAt($e->y, $e->areaHeight);
+        $cmd = $idx === null ? null : $this->filtered()[$idx] ?? null;
+        if ($cmd === null) {
+            return;
+        }
+        $this->selected = $idx;
+        $this->run($cmd[1]);
+        $this->area?->queueRedrawAll();
+    }
+
+    public function scroll(AreaScrollEvent $e): void
+    {
+        // Wheel/trackpad moves the selection (and the list scrolls to follow).
+        if ($this->mode !== 'palette') {
+            return;
+        }
+        $count = count($this->filtered());
+        if ($count === 0) {
+            return;
+        }
+        $this->scrollAccum += $e->deltaY;
+        $step = (int) $this->scrollAccum;
+        if ($step === 0) {
+            return;
+        }
+        $this->scrollAccum -= $step;
+        $this->selected = max(0, min($count - 1, $this->selected + $step));
+        $this->area?->queueRedrawAll();
     }
 
     public function key(AreaKeyEvent $e): bool
@@ -534,11 +631,17 @@ Ffi::init();
 $area = new Area($palette);
 $palette->area = $area;
 
-// Custom chrome: a borderless, rounded, shadowed window you can drag by its body.
+// Custom chrome: a borderless, rounded, shadowed window you can drag by its header
+// and resize by its edges. The list reflows to whatever height you drag it to.
 $window = new Window('Command palette', 660, 460);
 $window
     ->setBorderless(true)
+    ->setResizeable(true)
     ->setCornerStyle(WindowCornerStyle::Rounded)
     ->setChild(new Box()->appendStretchy($area));
-$window->setTitlebar($area); // drag the palette body to move the window
+// Automatic screen detection currently uses CoreGraphics on macOS. Other
+// platforms keep the window manager's default placement.
+if (PHP_OS_FAMILY === 'Darwin') {
+    $window->centered();
+}
 $window->run();

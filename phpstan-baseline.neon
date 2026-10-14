@@ -31,6 +31,12 @@ parameters:
 			path: src/Area.php
 
 		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$MouseScrolled\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Area.php
+
+		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$cdata\.$#'
 			identifier: property.notFound
 			count: 4
@@ -281,6 +287,48 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: src/Draw/Params/AreaMouseEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$AreaHeight\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaScrollEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$AreaWidth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaScrollEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$DeltaX\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaScrollEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$DeltaY\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaScrollEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Modifiers\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaScrollEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$X\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaScrollEvent.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Y\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Draw/Params/AreaScrollEvent.php
 
 		-
 			message: '#^Access to an undefined property FFI\\CData\:\:\$Cap\.$#'
@@ -613,6 +661,54 @@ parameters:
 			path: tests/AreaKeyEventTest.php
 
 		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$AreaHeight\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/AreaScrollEventTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$AreaWidth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/AreaScrollEventTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$DeltaX\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/AreaScrollEventTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$DeltaY\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/AreaScrollEventTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Modifiers\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/AreaScrollEventTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$MouseScrolled\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/AreaScrollEventTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$X\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/AreaScrollEventTest.php
+
+		-
+			message: '#^Access to an undefined property FFI\\CData\:\:\$Y\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/AreaScrollEventTest.php
+
+		-
 			message: '#^Anonymous function has an unused use \$button\.$#'
 			identifier: closure.unusedUse
 			count: 1
@@ -734,12 +830,6 @@ parameters:
 
 		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''Libui\\\\Button should…''\|''Libui\\\\Checkbox…''\|''Libui\\\\Entry should…''\|''Libui\\\\Label should…'' will always evaluate to true\.$#'
-			identifier: method.alreadyNarrowedType
-			count: 1
-			path: tests/ControlTest.php
-
-		-
-			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''destroy\(\) should…'' will always evaluate to true\.$#'
 			identifier: method.alreadyNarrowedType
 			count: 1
 			path: tests/ControlTest.php

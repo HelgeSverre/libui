@@ -8,6 +8,7 @@ use Libui\Draw\DrawContext;
 use Libui\Draw\Params\AreaDrawParams;
 use Libui\Draw\Params\AreaKeyEvent;
 use Libui\Draw\Params\AreaMouseEvent;
+use Libui\Draw\Params\AreaScrollEvent;
 use Libui\Generated\Enum\WindowResizeEdge;
 
 /**
@@ -107,6 +108,9 @@ final class Area extends Control
             self::guard($delegate->dragBroken(...));
         });
         $handler->KeyEvent = static::keep(static fn ($ah, $area, $event) => self::guard(static fn () => $delegate->key(AreaKeyEvent::fromCData($event)) ? 1 : 0) ?? 0);
+        $handler->MouseScrolled = static::keep(static function ($ah, $area, $event) use ($delegate): void {
+            self::guard(static fn () => $delegate->scroll(AreaScrollEvent::fromCData($event)));
+        });
 
         return $handler;
     }

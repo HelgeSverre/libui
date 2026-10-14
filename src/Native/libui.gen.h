@@ -130,9 +130,9 @@ int uiWindowKeepAbove(const uiWindow *w);
 void uiWindowSetKeepAbove(uiWindow *w, int keepAbove);
 
 typedef unsigned int uiWindowCornerStyle; enum {
-	uiWindowCornerStyleNone,        
-	uiWindowCornerStyleRounded,     
-	uiWindowCornerStyleRoundedSmall 
+	uiWindowCornerStyleNone,
+	uiWindowCornerStyleRounded,
+	uiWindowCornerStyleRoundedSmall
 };
 
 void uiWindowSetTitlebar(uiWindow *w, uiControl *titlebar);
@@ -432,19 +432,21 @@ typedef struct uiArea uiArea;
 typedef struct uiAreaHandler uiAreaHandler;
 typedef struct uiAreaDrawParams uiAreaDrawParams;
 typedef struct uiAreaMouseEvent uiAreaMouseEvent;
+typedef struct uiAreaMouseScrollEvent uiAreaMouseScrollEvent;
 typedef struct uiAreaKeyEvent uiAreaKeyEvent;
 
 typedef struct uiDrawContext uiDrawContext;
 
 struct uiAreaHandler {
 	void (*Draw)(uiAreaHandler *, uiArea *, uiAreaDrawParams *);
-	
+
 	void (*MouseEvent)(uiAreaHandler *, uiArea *, uiAreaMouseEvent *);
-	
-	
+
 	void (*MouseCrossed)(uiAreaHandler *, uiArea *, int left);
 	void (*DragBroken)(uiAreaHandler *, uiArea *);
 	int (*KeyEvent)(uiAreaHandler *, uiArea *, uiAreaKeyEvent *);
+
+	void (*MouseScrolled)(uiAreaHandler *, uiArea *, uiAreaMouseScrollEvent *);
 };
 
 typedef unsigned int uiWindowResizeEdge; enum {
@@ -456,9 +458,7 @@ typedef unsigned int uiWindowResizeEdge; enum {
 	uiWindowResizeEdgeTopRight,
 	uiWindowResizeEdgeBottomLeft,
 	uiWindowResizeEdgeBottomRight,
-	
-	
-	
+
 };
 
 void uiAreaSetSize(uiArea *a, int width, int height);
@@ -474,7 +474,6 @@ uiArea *uiNewScrollingArea(uiAreaHandler *ah, int width, int height);
 struct uiAreaDrawParams {
 	uiDrawContext *Context;
 
-	
 	double AreaWidth;
 	double AreaHeight;
 
@@ -527,29 +526,19 @@ struct uiDrawMatrix {
 struct uiDrawBrush {
 	uiDrawBrushType Type;
 
-	
 	double R;
 	double G;
 	double B;
 	double A;
 
-	
-	double X0;		
-	double Y0;		
-	double X1;		
-	double Y1;		
-	double OuterRadius;		
+	double X0;
+	double Y0;
+	double X1;
+	double Y1;
+	double OuterRadius;
 	uiDrawBrushGradientStop *Stops;
 	size_t NumStops;
-	
-	
-	
-	
-	
 
-	
-
-	
 };
 
 struct uiDrawBrushGradientStop {
@@ -563,12 +552,11 @@ struct uiDrawBrushGradientStop {
 struct uiDrawStrokeParams {
 	uiDrawLineCap Cap;
 	uiDrawLineJoin Join;
-	
+
 	double Thickness;
 	double MiterLimit;
 	double *Dashes;
-	
-	
+
 	size_t NumDashes;
 	double DashPhase;
 };
@@ -694,7 +682,7 @@ typedef unsigned int uiUnderline; enum {
 	uiUnderlineNone,
 	uiUnderlineSingle,
 	uiUnderlineDouble,
-	uiUnderlineSuggestion,		
+	uiUnderlineSuggestion,
 };
 
 uiAttribute *uiNewUnderlineAttribute(uiUnderline u);
@@ -705,7 +693,7 @@ typedef unsigned int uiUnderlineColor; enum {
 	uiUnderlineColorCustom,
 	uiUnderlineColorSpelling,
 	uiUnderlineColorGrammar,
-	uiUnderlineColorAuxiliary,		
+	uiUnderlineColorAuxiliary,
 };
 
 uiAttribute *uiNewUnderlineColorAttribute(uiUnderlineColor u, double r, double g, double b, double a);
@@ -765,7 +753,7 @@ size_t uiAttributedStringGraphemeToByteIndex(uiAttributedString *s, size_t pos);
 typedef struct uiFontDescriptor uiFontDescriptor;
 
 struct uiFontDescriptor {
-	
+
 	char *Family;
 	double Size;
 	uiTextWeight Weight;
@@ -813,18 +801,17 @@ uiFontButton *uiNewFontButton(void);
 void uiFreeFontButtonFont(uiFontDescriptor *desc);
 
 typedef unsigned int uiModifiers; enum {
-	uiModifierCtrl  = 1 << 0, 
-	uiModifierAlt   = 1 << 1, 
-	uiModifierShift = 1 << 2, 
-	uiModifierSuper = 1 << 3, 
+	uiModifierCtrl  = 1 << 0,
+	uiModifierAlt   = 1 << 1,
+	uiModifierShift = 1 << 2,
+	uiModifierSuper = 1 << 3,
 };
 
 struct uiAreaMouseEvent {
-	
+
 	double X;
 	double Y;
 
-	
 	double AreaWidth;
 	double AreaHeight;
 
@@ -838,9 +825,23 @@ struct uiAreaMouseEvent {
 	uint64_t Held1To64;
 };
 
+struct uiAreaMouseScrollEvent {
+
+	double X;
+	double Y;
+
+	double AreaWidth;
+	double AreaHeight;
+
+	double DeltaX;
+	double DeltaY;
+
+	uiModifiers Modifiers;
+};
+
 typedef unsigned int uiExtKey; enum {
 	uiExtKeyEscape = 1,
-	uiExtKeyInsert,			
+	uiExtKeyInsert,
 	uiExtKeyDelete,
 	uiExtKeyHome,
 	uiExtKeyEnd,
@@ -850,7 +851,7 @@ typedef unsigned int uiExtKey; enum {
 	uiExtKeyDown,
 	uiExtKeyLeft,
 	uiExtKeyRight,
-	uiExtKeyF1,			
+	uiExtKeyF1,
 	uiExtKeyF2,
 	uiExtKeyF3,
 	uiExtKeyF4,
@@ -862,8 +863,8 @@ typedef unsigned int uiExtKey; enum {
 	uiExtKeyF10,
 	uiExtKeyF11,
 	uiExtKeyF12,
-	uiExtKeyN0,			
-	uiExtKeyN1,			
+	uiExtKeyN0,
+	uiExtKeyN1,
 	uiExtKeyN2,
 	uiExtKeyN3,
 	uiExtKeyN4,
@@ -916,17 +917,17 @@ void uiFormSetPadded(uiForm *f, int padded);
 uiForm *uiNewForm(void);
 
 typedef unsigned int uiAlign; enum {
-	uiAlignFill,	
-	uiAlignStart,	
-	uiAlignCenter,	
-	uiAlignEnd,	
+	uiAlignFill,
+	uiAlignStart,
+	uiAlignCenter,
+	uiAlignEnd,
 };
 
 typedef unsigned int uiAt; enum {
-	uiAtLeading,	
-	uiAtTop,	
-	uiAtTrailing,	
-	uiAtBottom,	
+	uiAtLeading,
+	uiAtTop,
+	uiAtTrailing,
+	uiAtBottom,
 };
 
 typedef struct uiGrid uiGrid;
@@ -988,19 +989,15 @@ typedef struct uiTableModel uiTableModel;
 
 typedef struct uiTableModelHandler uiTableModelHandler;
 struct uiTableModelHandler {
-	
+
 	int (*NumColumns)(uiTableModelHandler *, uiTableModel *);
 
-	
 	uiTableValueType (*ColumnType)(uiTableModelHandler *, uiTableModel *, int column);
 
-	
 	int (*NumRows)(uiTableModelHandler *, uiTableModel *);
 
-	
 	uiTableValue *(*CellValue)(uiTableModelHandler *mh, uiTableModel *m, int row, int column);
 
-	
 	void (*SetCellValue)(uiTableModelHandler *, uiTableModel *, int, int, const uiTableValue *);
 };
 
@@ -1016,15 +1013,15 @@ void uiTableModelRowDeleted(uiTableModel *m, int oldIndex);
 
 typedef struct uiTableTextColumnOptionalParams uiTableTextColumnOptionalParams;
 struct uiTableTextColumnOptionalParams {
-	
+
 	int ColorModelColumn;
 };
 
 typedef struct uiTableParams uiTableParams;
 struct uiTableParams {
-	
+
 	uiTableModel *Model;
-	
+
 	int RowBackgroundColorModelColumn;
 };
 
@@ -1097,11 +1094,11 @@ int uiTableColumnWidth(uiTable *t, int column);
 void uiTableColumnSetWidth(uiTable *t, int column, int width);
 
 typedef unsigned int uiTableSelectionMode; enum {
-	
+
         uiTableSelectionModeNone,
-        uiTableSelectionModeZeroOrOne,  
-        uiTableSelectionModeOne,        
-        uiTableSelectionModeZeroOrMany, 
+        uiTableSelectionModeZeroOrOne,
+        uiTableSelectionModeOne,
+        uiTableSelectionModeZeroOrMany,
 };
 
 uiTableSelectionMode uiTableGetSelectionMode(uiTable *t);
@@ -1113,8 +1110,8 @@ void uiTableOnSelectionChanged(uiTable *t, void (*f)(uiTable *t, void *data), vo
 typedef struct uiTableSelection uiTableSelection;
 struct uiTableSelection
 {
-	int NumRows; 
-	int *Rows;   
+	int NumRows;
+	int *Rows;
 };
 
 uiTableSelection* uiTableGetSelection(uiTable *t);

@@ -1,0 +1,327 @@
+diff --git a/windows/entry.cpp b/windows/entry.cpp
+index 58770791..9b1f5cc9 100644
+--- a/windows/entry.cpp
++++ b/windows/entry.cpp
+@@ -120,6 +120,7 @@ static uiEntry *finishNewEntry(DWORD style)
+ 
+ 	uiWindowsRegisterWM_COMMANDHandler(e->hwnd, onWM_COMMAND, uiControl(e));
+ 	uiEntryOnChanged(e, defaultOnChanged, NULL);
++	uiprivEntryEnableColorEmoji(e->hwnd);
+ 
+ 	return e;
+ }
+diff --git a/windows/entryemoji.cpp b/windows/entryemoji.cpp
+new file mode 100644
+index 00000000..f513b6ea
+--- /dev/null
++++ b/windows/entryemoji.cpp
+@@ -0,0 +1,262 @@
++// Color-font painting for native EDIT controls. Keep EDIT's text, selection,
++// input/IME, scrolling, and accessibility implementation authoritative.
++#include "uipriv_windows.hpp"
++#include "draw.hpp"
++#include "attrstr.hpp"
++#include <dwrite_2.h>
++#include <imm.h>
++
++class entryEmojiRenderer : public IDWriteTextRenderer {
++	ULONG refs;
++	HWND hwnd;
++	HDC dc;
++	ID2D1RenderTarget *rt;
++	IDWriteFactory2 *factory;
++	TEXTMETRICW metrics;
++	UINT32 lineStart;
++	UINT32 visibleStart, visibleEnd;
++	DWORD selectionStart, selectionEnd;
++	D2D1_COLOR_F background;
++public:
++	entryEmojiRenderer(HWND h, HDC d, ID2D1RenderTarget *target, IDWriteFactory2 *f,
++		const TEXTMETRICW &m, UINT32 start, D2D1_COLOR_F bg)
++		: refs(1), hwnd(h), dc(d), rt(target), factory(f), metrics(m), lineStart(start), background(bg)
++	{
++		SendMessageW(hwnd, EM_GETSEL, (WPARAM) &selectionStart, (LPARAM) &selectionEnd);
++		RECT rect;
++		SendMessageW(hwnd, EM_GETRECT, 0, (LPARAM) &rect);
++		LRESULT point = SendMessageW(hwnd, EM_POSFROMCHAR, start, 0);
++		int y = (SHORT) HIWORD(point) + metrics.tmHeight / 2;
++		if (y < rect.top) y = rect.top;
++		if (y >= rect.bottom) y = rect.bottom - 1;
++		UINT32 left = LOWORD(SendMessageW(hwnd, EM_CHARFROMPOS, 0, MAKELPARAM(rect.left, y)));
++		UINT32 right = LOWORD(SendMessageW(hwnd, EM_CHARFROMPOS, 0, MAKELPARAM(rect.right - 1, y)));
++		// EDIT reports character indices and coordinates in 16-bit words. Limit
++		// LTR painting to the hit-tested visible range before reading coordinates,
++		// so a distant glyph cannot wrap around into the viewport.
++		if ((GetWindowLongPtrW(hwnd, GWL_STYLE) & ES_MULTILINE) == 0) {
++			visibleStart = (UINT32) SendMessageW(hwnd, EM_GETFIRSTVISIBLELINE, 0, 0);
++			visibleEnd = visibleStart + ((right - (visibleStart & 0xFFFF)) & 0xFFFF) + 1;
++		} else {
++			visibleStart = start + ((left - (start & 0xFFFF)) & 0xFFFF);
++			visibleEnd = start + ((right - (start & 0xFFFF)) & 0xFFFF) + 1;
++		}
++	}
++	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void **out)
++	{
++		if (out == NULL) return E_POINTER;
++		*out = NULL;
++		if (iid != IID_IUnknown && iid != __uuidof(IDWriteTextRenderer) && iid != __uuidof(IDWritePixelSnapping))
++			return E_NOINTERFACE;
++		*out = this;
++		AddRef();
++		return S_OK;
++	}
++	ULONG STDMETHODCALLTYPE AddRef() { return ++refs; }
++	ULONG STDMETHODCALLTYPE Release() { ULONG n = --refs; if (!n) delete this; return n; }
++	HRESULT STDMETHODCALLTYPE IsPixelSnappingDisabled(void *, BOOL *out) { *out = FALSE; return S_OK; }
++	HRESULT STDMETHODCALLTYPE GetPixelsPerDip(void *, FLOAT *out) { *out = 1.0f; return S_OK; }
++	HRESULT STDMETHODCALLTYPE GetCurrentTransform(void *, DWRITE_MATRIX *out)
++	{
++		DWRITE_MATRIX identity = {1, 0, 0, 1, 0, 0};
++		*out = identity;
++		return S_OK;
++	}
++	HRESULT STDMETHODCALLTYPE DrawUnderline(void *, FLOAT, FLOAT, const DWRITE_UNDERLINE *, IUnknown *) { return S_OK; }
++	HRESULT STDMETHODCALLTYPE DrawStrikethrough(void *, FLOAT, FLOAT, const DWRITE_STRIKETHROUGH *, IUnknown *) { return S_OK; }
++	HRESULT STDMETHODCALLTYPE DrawInlineObject(void *, FLOAT, FLOAT, IDWriteInlineObject *, BOOL, BOOL, IUnknown *) { return S_OK; }
++
++	HRESULT STDMETHODCALLTYPE DrawGlyphRun(void *, FLOAT, FLOAT, DWRITE_MEASURING_MODE mode,
++		const DWRITE_GLYPH_RUN *run, const DWRITE_GLYPH_RUN_DESCRIPTION *description, IUnknown *)
++	{
++		if (description == NULL || description->clusterMap == NULL || run->glyphAdvances == NULL) return S_OK;
++		IDWriteFontFace2 *face = NULL;
++		if (FAILED(run->fontFace->QueryInterface(__uuidof(IDWriteFontFace2), (void **) &face))) return S_OK;
++		BOOL colorFont = face->IsColorFont();
++		face->Release();
++		if (!colorFont) return S_OK;
++		std::vector<bool> starts(run->glyphCount, false);
++		std::vector<UINT32> glyphEnds(run->glyphCount, run->glyphCount);
++		for (UINT32 j = 0; j < description->stringLength; ++j)
++			if (description->clusterMap[j] < run->glyphCount) starts[description->clusterMap[j]] = true;
++		UINT32 boundary = run->glyphCount;
++		for (UINT32 j = run->glyphCount; j-- > 0;) {
++			glyphEnds[j] = boundary;
++			if (starts[j]) boundary = j;
++		}
++		// Paint each shaped cluster at EDIT's own character position. This avoids
++		// drift between GDI and DirectWrite advances, including scrolled/wrapped text.
++		for (UINT32 i = 0; i < description->stringLength;) {
++			UINT32 end = i + 1;
++			UINT32 firstGlyph = description->clusterMap[i];
++			while (end < description->stringLength && description->clusterMap[end] == firstGlyph) ++end;
++			if (firstGlyph >= run->glyphCount) { i = end; continue; }
++			UINT32 lastGlyph = glyphEnds[firstGlyph];
++			UINT32 position = lineStart + description->textPosition + i;
++			UINT32 positionEnd = lineStart + description->textPosition + end;
++			if ((run->bidiLevel & 1) == 0 && (positionEnd <= visibleStart || position >= visibleEnd)) { i = end; continue; }
++			if (position < selectionEnd && positionEnd > selectionStart) { i = end; continue; }
++			if (firstGlyph >= lastGlyph) { i = end; continue; }
++			DWRITE_GLYPH_RUN cluster = *run;
++			cluster.glyphCount = lastGlyph - firstGlyph;
++			cluster.glyphIndices += firstGlyph;
++			if (cluster.glyphAdvances != NULL) cluster.glyphAdvances += firstGlyph;
++			if (cluster.glyphOffsets != NULL) cluster.glyphOffsets += firstGlyph;
++			LRESULT point = SendMessageW(hwnd, EM_POSFROMCHAR, position, 0);
++			if (point == -1) { i = end; continue; }
++			FLOAT x = (SHORT) LOWORD(point);
++			FLOAT y = (SHORT) HIWORD(point);
++			FLOAT advance = 0;
++			for (UINT32 j = 0; j < cluster.glyphCount; ++j) advance += cluster.glyphAdvances[j];
++			// RTL glyph runs use a right-edge origin.
++			FLOAT origin = x + ((cluster.bidiLevel & 1) ? advance : 0);
++			IDWriteColorGlyphRunEnumerator *layers = NULL;
++			HRESULT hr = factory->TranslateColorGlyphRun(origin, y + metrics.tmAscent,
++				&cluster, NULL, mode, NULL, 0, &layers);
++			if (FAILED(hr) || layers == NULL) { i = end; continue; } // Non-color glyphs retain EDIT's paint.
++			SIZE extent;
++			GetTextExtentPoint32W(dc, description->string + i, end - i, &extent);
++			LRESULT next = SendMessageW(hwnd, EM_POSFROMCHAR, positionEnd, 0);
++			FLOAT width = (FLOAT) extent.cx;
++			if (next != -1 && (SHORT) HIWORD(next) == y) {
++				FLOAT nativeWidth = (SHORT) LOWORD(next) - x;
++				if (nativeWidth > 0) width = nativeWidth;
++			}
++			ID2D1SolidColorBrush *brush = NULL;
++			hr = rt->CreateSolidColorBrush(background, &brush);
++			if (FAILED(hr)) { layers->Release(); i = end; continue; }
++			D2D1_RECT_F box = {x, y, x + width, y + metrics.tmHeight};
++			ID2D1SolidColorBrush *backgroundBrush = brush;
++			BOOL paintedBackground = FALSE;
++			for (;;) {
++				BOOL available = FALSE;
++				if (FAILED(layers->MoveNext(&available)) || !available) break;
++				const DWRITE_COLOR_GLYPH_RUN *layer = NULL;
++				if (FAILED(layers->GetCurrentRun(&layer)) || layer == NULL) break;
++				D2D1_COLOR_F color = layer->runColor;
++				if (layer->paletteIndex == 0xFFFF) {
++					COLORREF foreground = GetSysColor(IsWindowEnabled(hwnd) ? COLOR_WINDOWTEXT : COLOR_GRAYTEXT);
++					color = D2D1::ColorF(GetRValue(foreground) / 255.0f, GetGValue(foreground) / 255.0f, GetBValue(foreground) / 255.0f);
++				}
++				if (FAILED(rt->CreateSolidColorBrush(color, &brush))) break;
++				if (!paintedBackground) {
++					rt->FillRectangle(box, backgroundBrush);
++					paintedBackground = TRUE;
++				}
++				rt->DrawGlyphRun(D2D1::Point2F(layer->baselineOriginX, layer->baselineOriginY), &layer->glyphRun, brush, mode);
++				brush->Release();
++			}
++			backgroundBrush->Release();
++			layers->Release();
++			i = end;
++		}
++		return S_OK;
++	}
++};
++
++static void paintEntryEmoji(HWND hwnd, HDC dc)
++{
++	if (dwfactory == NULL || d2dfactory == NULL) return;
++	// Masking may be enabled after construction via EM_SETPASSWORDCHAR. Never
++	// draw the underlying text of a control that is currently masked.
++	if ((GetWindowLongPtrW(hwnd, GWL_STYLE) & ES_PASSWORD) != 0 ||
++		SendMessageW(hwnd, EM_GETPASSWORDCHAR, 0, 0) != 0) return;
++	// Let EDIT paint its IME composition decorations until the input commits.
++	HIMC composition = ImmGetContext(hwnd);
++	if (composition != NULL) {
++		LONG composing = ImmGetCompositionStringW(composition, GCS_COMPSTR, NULL, 0);
++		ImmReleaseContext(hwnd, composition);
++		if (composing > 0) return;
++	}
++	IDWriteFactory2 *factory = NULL;
++	if (FAILED(dwfactory->QueryInterface(__uuidof(IDWriteFactory2), (void **) &factory))) return;
++	RECT client = {}, textRect = {};
++	if (!GetClientRect(hwnd, &client)) { factory->Release(); return; }
++	SendMessageW(hwnd, EM_GETRECT, 0, (LPARAM) &textRect);
++	if (client.right == 0 || client.bottom == 0) { factory->Release(); return; }
++	HFONT font = (HFONT) SendMessageW(hwnd, WM_GETFONT, 0, 0);
++	HGDIOBJ oldFont = SelectObject(dc, font);
++	LOGFONTW lf;
++	TEXTMETRICW metrics;
++	if (font == NULL || GetObjectW(font, sizeof lf, &lf) == 0 || !GetTextMetricsW(dc, &metrics) || metrics.tmHeight <= 0) {
++		if (oldFont != NULL) SelectObject(dc, oldFont);
++		factory->Release();
++		return;
++	}
++	IDWriteTextFormat *format = NULL;
++	HRESULT hr = dwfactory->CreateTextFormat(lf.lfFaceName, NULL, (DWRITE_FONT_WEIGHT) lf.lfWeight,
++		lf.lfItalic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
++		(FLOAT) (metrics.tmHeight - metrics.tmInternalLeading), L"", &format);
++	if (FAILED(hr)) { SelectObject(dc, oldFont); factory->Release(); return; }
++	format->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
++	ID2D1DCRenderTarget *rt = NULL;
++	D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_SOFTWARE,
++		D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), 96, 96, D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE);
++	hr = d2dfactory->CreateDCRenderTarget(&props, &rt);
++	if (SUCCEEDED(hr)) hr = rt->BindDC(dc, &client);
++	ID2D1GdiInteropRenderTarget *interop = NULL;
++	if (SUCCEEDED(hr)) hr = rt->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget), (void **) &interop);
++	if (SUCCEEDED(hr)) {
++		rt->BeginDraw();
++		HDC targetDC = NULL;
++		hr = interop->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &targetDC);
++		if (SUCCEEDED(hr)) {
++			BitBlt(targetDC, 0, 0, client.right, client.bottom, dc, 0, 0, SRCCOPY);
++			interop->ReleaseDC(NULL);
++			D2D1_RECT_F clip = {(FLOAT) textRect.left, (FLOAT) textRect.top, (FLOAT) textRect.right, (FLOAT) textRect.bottom};
++			rt->PushAxisAlignedClip(clip, D2D1_ANTIALIAS_MODE_ALIASED);
++			LONG_PTR style = GetWindowLongPtrW(hwnd, GWL_STYLE);
++			COLORREF bg = GetSysColor((style & ES_READONLY) || !IsWindowEnabled(hwnd) ? COLOR_3DFACE : COLOR_WINDOW);
++			D2D1_COLOR_F background = D2D1::ColorF(GetRValue(bg) / 255.0f, GetGValue(bg) / 255.0f, GetBValue(bg) / 255.0f);
++			int firstLine = (style & ES_MULTILINE) ? (int) SendMessageW(hwnd, EM_GETFIRSTVISIBLELINE, 0, 0) : 0;
++			int count = (int) SendMessageW(hwnd, EM_GETLINECOUNT, 0, 0);
++			int visible = client.bottom / metrics.tmHeight + 2;
++			for (int line = firstLine; line < count && line < firstLine + visible; ++line) {
++				int start = (int) SendMessageW(hwnd, EM_LINEINDEX, line, 0);
++				int length = (int) SendMessageW(hwnd, EM_LINELENGTH, start, 0);
++				if (length <= 0) continue;
++				std::vector<WCHAR> text(length + 1);
++				*((WORD *) text.data()) = (WORD) (length < 65535 ? length : 65535);
++				length = (int) SendMessageW(hwnd, EM_GETLINE, line, (LPARAM) text.data());
++				IDWriteTextLayout *layout = NULL;
++				if (FAILED(dwfactory->CreateGdiCompatibleTextLayout(text.data(), length, format, 65535, 65535,
++					1, NULL, FALSE, &layout))) continue;
++				entryEmojiRenderer *renderer = new entryEmojiRenderer(hwnd, dc, rt, factory, metrics, start, background);
++				layout->Draw(NULL, renderer, 0, 0);
++				renderer->Release();
++				layout->Release();
++			}
++			rt->PopAxisAlignedClip();
++		}
++		rt->EndDraw();
++	}
++	if (interop != NULL) interop->Release();
++	if (rt != NULL) rt->Release();
++	format->Release();
++	factory->Release();
++	SelectObject(dc, oldFont);
++}
++
++static LRESULT CALLBACK entryEmojiSubclass(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam, UINT_PTR id, DWORD_PTR)
++{
++	if (message == WM_NCDESTROY) RemoveWindowSubclass(hwnd, entryEmojiSubclass, id);
++	BOOL hiddenCaret = message == WM_PAINT && HideCaret(hwnd);
++	LRESULT result = DefSubclassProc(hwnd, message, wparam, lparam);
++	if (message == WM_PAINT || message == WM_PRINTCLIENT) {
++		HDC dc = message == WM_PRINTCLIENT ? (HDC) wparam : GetDC(hwnd);
++		if (dc != NULL) {
++			paintEntryEmoji(hwnd, dc);
++			if (message == WM_PAINT) ReleaseDC(hwnd, dc);
++		}
++	}
++	if (hiddenCaret) ShowCaret(hwnd);
++	return result;
++}
++
++void uiprivEntryEnableColorEmoji(HWND hwnd)
++{
++	// Password controls keep the system's masking implementation untouched.
++	if ((GetWindowLongPtrW(hwnd, GWL_STYLE) & ES_PASSWORD) != 0) return;
++	if (!SetWindowSubclass(hwnd, entryEmojiSubclass, 0, 0))
++		logLastError(L"installing entry color-font painter");
++}
+diff --git a/windows/meson.build b/windows/meson.build
+index 80c7bd82..fb2dcca2 100644
+--- a/windows/meson.build
++++ b/windows/meson.build
+@@ -28,6 +28,7 @@ libui_sources += [
+ 	'windows/dwrite.cpp',
+ 	'windows/editablecombo.cpp',
+ 	'windows/entry.cpp',
++	'windows/entryemoji.cpp',
+ 	'windows/events.cpp',
+ 	'windows/fontbutton.cpp',
+ 	'windows/fontdialog.cpp',
+@@ -79,7 +80,7 @@ if libui_mode == 'shared'
+ endif
+ 
+ # TODO prune this list
+-foreach lib : ['user32', 'kernel32', 'gdi32', 'comctl32', 'uxtheme', 'msimg32', 'comdlg32', 'd2d1', 'dwrite', 'ole32', 'oleaut32', 'oleacc', 'uuid', 'windowscodecs']
++foreach lib : ['user32', 'kernel32', 'imm32', 'gdi32', 'comctl32', 'uxtheme', 'msimg32', 'comdlg32', 'd2d1', 'dwrite', 'ole32', 'oleaut32', 'oleacc', 'uuid', 'windowscodecs']
+ 	libui_deps += [
+ 		meson.get_compiler('cpp').find_library(lib,
+ 			required: true),
+diff --git a/windows/multilineentry.cpp b/windows/multilineentry.cpp
+index 5740b49d..828ee126 100644
+--- a/windows/multilineentry.cpp
++++ b/windows/multilineentry.cpp
+@@ -138,6 +138,7 @@ static uiMultilineEntry *finishMultilineEntry(DWORD style)
+ 
+ 	uiWindowsRegisterWM_COMMANDHandler(e->hwnd, onWM_COMMAND, uiControl(e));
+ 	uiMultilineEntryOnChanged(e, defaultOnChanged, NULL);
++	uiprivEntryEnableColorEmoji(e->hwnd);
+ 
+ 	return e;
+ }
+diff --git a/windows/uipriv_windows.hpp b/windows/uipriv_windows.hpp
+index 0b72dfdc..bfbeb98b 100644
+--- a/windows/uipriv_windows.hpp
++++ b/windows/uipriv_windows.hpp
+@@ -171,6 +171,9 @@ extern D2D1_SIZE_F realGetSize(ID2D1RenderTarget *rt);
+ // draw.cpp
+ extern ID2D1DCRenderTarget *makeHDCRenderTarget(HDC dc, RECT *r);
+ 
++// entryemoji.cpp
++extern void uiprivEntryEnableColorEmoji(HWND hwnd);
++
+ // image.cpp
+ extern IWICImagingFactory *uiprivWICFactory;
+ extern HRESULT uiprivInitImage(void);

@@ -149,22 +149,26 @@ $preview = new class extends AreaDelegate {
     public ?Area $area = null;
     public array $blocks = [];
     public float $contentHeight = 0;
+    /** The width the area was sized to; a scrolling Area reports areaWidth as 0. */
+    private float $contentWidth = 460.0;
     private array $blockPositions = [];
 
     public function draw(DrawContext $ctx, AreaDrawParams $p): void
     {
-        $w = $p->areaWidth;
-        $h = $p->areaHeight;
-        $ctx->fillPath(Brush::rgb(0x0F_11_17), static fn (Path $bg) => $bg->addRectangle(0, 0, $w, $h));
+        // A *scrolling* Area draws on an unbounded canvas, so libui reports
+        // areaWidth/areaHeight as 0 — filling (0,0,w,h) would paint nothing and
+        // the scroll view's (light) background would show through. Paint the
+        // background over the clip rect (the region libui is asking us to redraw)
+        // and lay text out at the fixed width the area was sized to.
+        $ctx->fillPath(Brush::rgb(0x0F_11_17), static fn (Path $bg) => $bg->addRectangle($p->clipX, $p->clipY, $p->clipWidth, $p->clipHeight));
 
         $pad = 24.0;
         $x = $pad;
         $y = $pad;
-        $width = $w - (2 * $pad);
+        $width = $this->contentWidth - (2 * $pad);
 
-        $clipY = $p->clipY ?? 0;
-        $clipH = $p->clipHeight ?? $h;
-        $clipBottom = $clipY + $clipH;
+        $clipY = $p->clipY;
+        $clipBottom = $clipY + $p->clipHeight;
 
         foreach ($this->blocks as $i => $b) {
             $blockStartY = $this->blockPositions[$i]['y'] ?? $y;
@@ -245,6 +249,7 @@ $preview = new class extends AreaDelegate {
 
     public function measureContentHeight(float $width): float
     {
+        $this->contentWidth = $width;
         $pad = 24.0;
         $x = $pad;
         $y = $pad;
