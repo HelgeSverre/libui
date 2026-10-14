@@ -23,7 +23,8 @@ class Group extends Control
      */
     public function __construct(string $title)
     {
-        $this->handle = \Libui\Ffi::get()->uiNewGroup($title);
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewGroup($title));
     }
 
     /**
@@ -35,7 +36,7 @@ class Group extends Control
      */
     public function title(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiGroupTitle($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiGroupTitle($this->handle()));
     }
 
     /**
@@ -47,20 +48,22 @@ class Group extends Control
      */
     public function setTitle(string $title): static
     {
-        \Libui\Ffi::get()->uiGroupSetTitle($this->handle, $title);
+        \Libui\Ffi::get()->uiGroupSetTitle($this->handle(), $title);
         return $this;
     }
 
     /**
      * Sets the group's child.
      *
-     * @param \Libui\Control $c uiControl child instance, or `NULL`.
+     * @param ?\Libui\Control $c uiControl child instance, or `NULL`.
      *
      * libui: uiGroupSetChild
      */
-    public function setChild(\Libui\Control $c): static
+    public function setChild(?\Libui\Control $c): static
     {
-        \Libui\Ffi::get()->uiGroupSetChild($this->handle, \Libui\Ffi::control($c->handle()));
+        $this->assertCanAdopt($c, true);
+        \Libui\Ffi::get()->uiGroupSetChild($this->handle(), $c === null ? null : \Libui\Ffi::control($c->handle()));
+        $this->replaceChild($c);
         return $this;
     }
 
@@ -73,7 +76,7 @@ class Group extends Control
      */
     public function margined(): bool
     {
-        return \Libui\Ffi::get()->uiGroupMargined($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiGroupMargined($this->handle()) !== 0;
     }
 
     /**
@@ -85,7 +88,7 @@ class Group extends Control
      */
     public function setMargined(bool $margined): static
     {
-        \Libui\Ffi::get()->uiGroupSetMargined($this->handle, (int) $margined);
+        \Libui\Ffi::get()->uiGroupSetMargined($this->handle(), (int) $margined);
         return $this;
     }
 }

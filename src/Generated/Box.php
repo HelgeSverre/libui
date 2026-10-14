@@ -21,7 +21,8 @@ class Box extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewVerticalBox();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewVerticalBox());
     }
 
     /**
@@ -31,6 +32,7 @@ class Box extends Control
      */
     public static function horizontal(): static
     {
+        \Libui\Ffi::assertInitialized();
         return static::wrap(\Libui\Ffi::get()->uiNewHorizontalBox());
     }
 
@@ -44,7 +46,9 @@ class Box extends Control
      */
     public function append(\Libui\Control $child, int $stretchy): static
     {
-        \Libui\Ffi::get()->uiBoxAppend($this->handle, \Libui\Ffi::control($child->handle()), $stretchy);
+        $this->assertCanAdopt($child);
+        \Libui\Ffi::get()->uiBoxAppend($this->handle(), \Libui\Ffi::control($child->handle()), $stretchy);
+        $this->adoptChild($child);
         return $this;
     }
 
@@ -57,7 +61,7 @@ class Box extends Control
      */
     public function numChildren(): int
     {
-        return \Libui\Ffi::get()->uiBoxNumChildren($this->handle);
+        return \Libui\Ffi::get()->uiBoxNumChildren($this->handle());
     }
 
     /**
@@ -70,7 +74,9 @@ class Box extends Control
      */
     public function delete(int $index): static
     {
-        \Libui\Ffi::get()->uiBoxDelete($this->handle, $index);
+        $this->assertChildIndex($index);
+        \Libui\Ffi::get()->uiBoxDelete($this->handle(), $index);
+        $this->releaseChild($index);
         return $this;
     }
 
@@ -83,7 +89,7 @@ class Box extends Control
      */
     public function padded(): bool
     {
-        return \Libui\Ffi::get()->uiBoxPadded($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiBoxPadded($this->handle()) !== 0;
     }
 
     /**
@@ -95,7 +101,7 @@ class Box extends Control
      */
     public function setPadded(bool $padded): static
     {
-        \Libui\Ffi::get()->uiBoxSetPadded($this->handle, (int) $padded);
+        \Libui\Ffi::get()->uiBoxSetPadded($this->handle(), (int) $padded);
         return $this;
     }
 }

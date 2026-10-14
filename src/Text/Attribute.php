@@ -20,11 +20,16 @@ use Libui\Generated\Enum\UnderlineColor;
  * Each factory calls the matching uiNew*Attribute, which returns an owned
  * uiAttribute*. Once the attribute is handed to
  * AttributedString::setAttribute() the string takes ownership of it, so this
- * wrapper deliberately stays thin and does no freeing of its own.
+ * wrapper frees unused attributes and transfers each native pointer only once.
  */
 final class Attribute
 {
+    /** Native ownership cannot be duplicated by PHP object cloning. */
+    private function __clone(): void {}
+
     private readonly \FFI\CData $attr;
+    private bool $transferred = false;
+    private bool $freed = true;
     private readonly int $start;
     private readonly int $end;
 
@@ -44,6 +49,7 @@ final class Attribute
      */
     public function __construct(AttributeType $type, int $start, int $end, mixed ...$params)
     {
+        Ffi::assertInitialized();
         $ffi = Ffi::get();
         $this->start = $start;
         $this->end = $end;
@@ -105,11 +111,39 @@ final class Attribute
             default:
                 throw new \InvalidArgumentException("Unsupported attribute type: {$type->name}");
         }
+        $this->freed = false;
+        \Libui\Lifecycle::registerDrawingResource($this);
     }
 
     public function handle(): \FFI\CData
     {
+        if ($this->transferred || $this->freed) {
+            throw new \LogicException('This attribute has already been transferred or freed. Create a new attribute for each application.');
+        }
         return $this->attr;
+    }
+
+    /** Transfer ownership to an attributed string exactly once. @internal */
+    public function transferHandle(): \FFI\CData
+    {
+        $handle = $this->handle();
+        $this->transferred = true;
+        return $handle;
+    }
+
+    /** Release an attribute that has not been transferred to native text. */
+    public function free(): void
+    {
+        if ($this->freed || $this->transferred) {
+            return;
+        }
+        Ffi::get()->uiFreeAttribute($this->attr);
+        $this->freed = true;
+    }
+
+    public function __destruct()
+    {
+        $this->free();
     }
 
     public function getStart(): int
@@ -120,11 +154,6 @@ final class Attribute
     public function getEnd(): int
     {
         return $this->end;
-    }
-
-    public function free(): void
-    {
-        // Attributes are freed by the AttributedString when set, nothing to do here
     }
 
     // Static factory methods for backwards compatibility

@@ -21,7 +21,8 @@ class ProgressBar extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewProgressBar();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewProgressBar());
     }
 
     /**
@@ -33,7 +34,7 @@ class ProgressBar extends Control
      */
     public function value(): int
     {
-        return \Libui\Ffi::get()->uiProgressBarValue($this->handle);
+        return \Libui\Ffi::get()->uiProgressBarValue($this->handle());
     }
 
     /**
@@ -45,7 +46,7 @@ class ProgressBar extends Control
      */
     public function setValue(int $n): static
     {
-        \Libui\Ffi::get()->uiProgressBarSetValue($this->handle, $n);
+        \Libui\Ffi::get()->uiProgressBarSetValue($this->handle(), $n);
         return $this;
     }
 }

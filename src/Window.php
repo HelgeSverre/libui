@@ -16,6 +16,8 @@ class Window extends Generated\Window
     /** @var (callable():void)|null */
     private $onClose = null;
 
+    private bool $closeNotified = false;
+
     /** Content size requested at construction; the fallback for {@see getContentSize()}. */
     private int $width = 640;
 
@@ -102,7 +104,7 @@ class Window extends Generated\Window
     public function getContentSize(): array
     {
         $out = Ffi::get()->new('int[2]');
-        Ffi::get()->uiWindowContentSize($this->handle, \FFI::addr($out[0]), \FFI::addr($out[1]));
+        Ffi::get()->uiWindowContentSize($this->handle(), \FFI::addr($out[0]), \FFI::addr($out[1]));
 
         return [
             $out[0] > 0 ? $out[0] : $this->width,
@@ -120,7 +122,7 @@ class Window extends Generated\Window
     public function getPosition(): array
     {
         $out = Ffi::get()->new('int[2]');
-        Ffi::get()->uiWindowPosition($this->handle, \FFI::addr($out[0]), \FFI::addr($out[1]));
+        Ffi::get()->uiWindowPosition($this->handle(), \FFI::addr($out[0]), \FFI::addr($out[1]));
 
         return [$out[0], $out[1]];
     }
@@ -202,6 +204,18 @@ class Window extends Generated\Window
         return $this;
     }
 
+    /** Invoke the configured cleanup when Window or App accepts a close. @internal */
+    public function notifyClosing(): void
+    {
+        if ($this->closeNotified) {
+            return;
+        }
+        $this->closeNotified = true;
+        if ($this->onClose !== null) {
+            ($this->onClose)();
+        }
+    }
+
     /**
      * Show the window and run the event loop until it closes — the all-in-one
      * entry point for a single-window app. Initialises libui if needed, wires the
@@ -217,22 +231,18 @@ class Window extends Generated\Window
     public function run(?callable $afterClose = null): void
     {
         Ffi::init();
-
-        // Set when the loop ends via this window's own close handler: libui then
-        // destroys the window for us (onClosing returning true -> uiControlDestroy).
-        $closedViaHandler = false;
-        $this->onClosing(function () use (&$closedViaHandler) {
-            if ($this->onClose !== null) {
-                ($this->onClose)();
-            }
-            $closedViaHandler = true;
-            Ffi::quit();
-            return true;
-        });
-
-        $this->show();
-
         try {
+            // Set when the loop ends via this window's own close handler: libui then
+            // destroys the window for us (onClosing returning true -> uiControlDestroy).
+            $closedViaHandler = false;
+            $this->onClosing(function () use (&$closedViaHandler) {
+                $this->notifyClosing();
+                $closedViaHandler = true;
+                Ffi::quit();
+                return true;
+            });
+
+            $this->show();
             Ffi::main();
 
             // If the loop ended any other way (Ffi::quit() from a key/menu handler,
@@ -241,6 +251,7 @@ class Window extends Generated\Window
             // process reporting leaked controls. Destroying the window frees its
             // child box and area too.
             if (! $closedViaHandler) {
+                $this->notifyClosing();
                 $this->destroy();
             }
 

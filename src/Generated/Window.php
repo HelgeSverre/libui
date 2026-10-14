@@ -26,7 +26,8 @@ class Window extends Control
      */
     public function __construct(string $title, int $width, int $height, bool $hasMenubar)
     {
-        $this->handle = \Libui\Ffi::get()->uiNewWindow($title, $width, $height, (int) $hasMenubar);
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewWindow($title, $width, $height, (int) $hasMenubar));
     }
 
     /**
@@ -38,7 +39,7 @@ class Window extends Control
      */
     public function title(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiWindowTitle($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiWindowTitle($this->handle()));
     }
 
     /**
@@ -51,7 +52,7 @@ class Window extends Control
      */
     public function setTitle(string $title): static
     {
-        \Libui\Ffi::get()->uiWindowSetTitle($this->handle, $title);
+        \Libui\Ffi::get()->uiWindowSetTitle($this->handle(), $title);
         return $this;
     }
 
@@ -66,7 +67,7 @@ class Window extends Control
      */
     public function position(\FFI\CData $x, \FFI\CData $y): static
     {
-        \Libui\Ffi::get()->uiWindowPosition($this->handle, \FFI::addr($x), \FFI::addr($y));
+        \Libui\Ffi::get()->uiWindowPosition($this->handle(), \FFI::addr($x), \FFI::addr($y));
         return $this;
     }
 
@@ -81,7 +82,7 @@ class Window extends Control
      */
     public function setPosition(int $x, int $y): static
     {
-        \Libui\Ffi::get()->uiWindowSetPosition($this->handle, $x, $y);
+        \Libui\Ffi::get()->uiWindowSetPosition($this->handle(), $x, $y);
         return $this;
     }
 
@@ -104,7 +105,7 @@ class Window extends Control
                 \fwrite(\STDERR, "[onPositionChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiWindowOnPositionChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiWindowOnPositionChanged($this->handle(), $fn, null);
         return $this;
     }
 
@@ -119,7 +120,7 @@ class Window extends Control
      */
     public function contentSize(\FFI\CData $width, \FFI\CData $height): static
     {
-        \Libui\Ffi::get()->uiWindowContentSize($this->handle, \FFI::addr($width), \FFI::addr($height));
+        \Libui\Ffi::get()->uiWindowContentSize($this->handle(), \FFI::addr($width), \FFI::addr($height));
         return $this;
     }
 
@@ -135,7 +136,7 @@ class Window extends Control
      */
     public function setContentSize(int $width, int $height): static
     {
-        \Libui\Ffi::get()->uiWindowSetContentSize($this->handle, $width, $height);
+        \Libui\Ffi::get()->uiWindowSetContentSize($this->handle(), $width, $height);
         return $this;
     }
 
@@ -148,7 +149,7 @@ class Window extends Control
      */
     public function fullscreen(): bool
     {
-        return \Libui\Ffi::get()->uiWindowFullscreen($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiWindowFullscreen($this->handle()) !== 0;
     }
 
     /**
@@ -161,7 +162,7 @@ class Window extends Control
      */
     public function setFullscreen(bool $fullscreen): static
     {
-        \Libui\Ffi::get()->uiWindowSetFullscreen($this->handle, (int) $fullscreen);
+        \Libui\Ffi::get()->uiWindowSetFullscreen($this->handle(), (int) $fullscreen);
         return $this;
     }
 
@@ -184,7 +185,7 @@ class Window extends Control
                 \fwrite(\STDERR, "[onContentSizeChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiWindowOnContentSizeChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiWindowOnContentSizeChanged($this->handle(), $fn, null);
         return $this;
     }
 
@@ -208,7 +209,7 @@ class Window extends Control
                 return 0;
             }
         });
-        \Libui\Ffi::get()->uiWindowOnClosing($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiWindowOnClosing($this->handle(), $fn, null);
         return $this;
     }
 
@@ -230,7 +231,7 @@ class Window extends Control
                 \fwrite(\STDERR, "[onFocusChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiWindowOnFocusChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiWindowOnFocusChanged($this->handle(), $fn, null);
         return $this;
     }
 
@@ -243,7 +244,7 @@ class Window extends Control
      */
     public function focused(): bool
     {
-        return \Libui\Ffi::get()->uiWindowFocused($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiWindowFocused($this->handle()) !== 0;
     }
 
     /**
@@ -255,7 +256,7 @@ class Window extends Control
      */
     public function borderless(): bool
     {
-        return \Libui\Ffi::get()->uiWindowBorderless($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiWindowBorderless($this->handle()) !== 0;
     }
 
     /**
@@ -268,20 +269,22 @@ class Window extends Control
      */
     public function setBorderless(bool $borderless): static
     {
-        \Libui\Ffi::get()->uiWindowSetBorderless($this->handle, (int) $borderless);
+        \Libui\Ffi::get()->uiWindowSetBorderless($this->handle(), (int) $borderless);
         return $this;
     }
 
     /**
      * Sets the window's child.
      *
-     * @param \Libui\Control $child Control to be made child.
+     * @param ?\Libui\Control $child Control to be made child.
      *
      * libui: uiWindowSetChild
      */
-    public function setChild(\Libui\Control $child): static
+    public function setChild(?\Libui\Control $child): static
     {
-        \Libui\Ffi::get()->uiWindowSetChild($this->handle, \Libui\Ffi::control($child->handle()));
+        $this->assertCanAdopt($child, true);
+        \Libui\Ffi::get()->uiWindowSetChild($this->handle(), $child === null ? null : \Libui\Ffi::control($child->handle()));
+        $this->replaceChild($child);
         return $this;
     }
 
@@ -294,7 +297,7 @@ class Window extends Control
      */
     public function margined(): bool
     {
-        return \Libui\Ffi::get()->uiWindowMargined($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiWindowMargined($this->handle()) !== 0;
     }
 
     /**
@@ -306,7 +309,7 @@ class Window extends Control
      */
     public function setMargined(bool $margined): static
     {
-        \Libui\Ffi::get()->uiWindowSetMargined($this->handle, (int) $margined);
+        \Libui\Ffi::get()->uiWindowSetMargined($this->handle(), (int) $margined);
         return $this;
     }
 
@@ -319,7 +322,7 @@ class Window extends Control
      */
     public function resizeable(): bool
     {
-        return \Libui\Ffi::get()->uiWindowResizeable($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiWindowResizeable($this->handle()) !== 0;
     }
 
     /**
@@ -332,7 +335,7 @@ class Window extends Control
      */
     public function setResizeable(bool $resizeable): static
     {
-        \Libui\Ffi::get()->uiWindowSetResizeable($this->handle, (int) $resizeable);
+        \Libui\Ffi::get()->uiWindowSetResizeable($this->handle(), (int) $resizeable);
         return $this;
     }
 
@@ -345,7 +348,7 @@ class Window extends Control
      */
     public function keepAbove(): int
     {
-        return \Libui\Ffi::get()->uiWindowKeepAbove($this->handle);
+        return \Libui\Ffi::get()->uiWindowKeepAbove($this->handle());
     }
 
     /**
@@ -358,7 +361,7 @@ class Window extends Control
      */
     public function setKeepAbove(int $keepAbove): static
     {
-        \Libui\Ffi::get()->uiWindowSetKeepAbove($this->handle, $keepAbove);
+        \Libui\Ffi::get()->uiWindowSetKeepAbove($this->handle(), $keepAbove);
         return $this;
     }
 
@@ -371,7 +374,7 @@ class Window extends Control
      */
     public function setTitlebar(\Libui\Control $titlebar): static
     {
-        \Libui\Ffi::get()->uiWindowSetTitlebar($this->handle, \Libui\Ffi::control($titlebar->handle()));
+        \Libui\Ffi::get()->uiWindowSetTitlebar($this->handle(), \Libui\Ffi::control($titlebar->handle()));
         return $this;
     }
 
@@ -384,7 +387,7 @@ class Window extends Control
      */
     public function getCornerStyle(): \Libui\Generated\Enum\WindowCornerStyle
     {
-        return \Libui\Generated\Enum\WindowCornerStyle::from(\Libui\Ffi::get()->uiWindowGetCornerStyle($this->handle));
+        return \Libui\Generated\Enum\WindowCornerStyle::from(\Libui\Ffi::get()->uiWindowGetCornerStyle($this->handle()));
     }
 
     /**
@@ -397,7 +400,7 @@ class Window extends Control
      */
     public function setCornerStyle(\Libui\Generated\Enum\WindowCornerStyle $style): static
     {
-        \Libui\Ffi::get()->uiWindowSetCornerStyle($this->handle, $style->value);
+        \Libui\Ffi::get()->uiWindowSetCornerStyle($this->handle(), $style->value);
         return $this;
     }
 
@@ -410,7 +413,7 @@ class Window extends Control
      */
     public function shadow(): bool
     {
-        return \Libui\Ffi::get()->uiWindowShadow($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiWindowShadow($this->handle()) !== 0;
     }
 
     /**
@@ -422,7 +425,7 @@ class Window extends Control
      */
     public function setShadow(bool $shadow): static
     {
-        \Libui\Ffi::get()->uiWindowSetShadow($this->handle, (int) $shadow);
+        \Libui\Ffi::get()->uiWindowSetShadow($this->handle(), (int) $shadow);
         return $this;
     }
 }

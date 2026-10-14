@@ -34,6 +34,8 @@ final class Ffi
 
     /** Whether uiInit() has already run (it must run exactly once per process). */
     private static bool $initialized = false;
+    private static bool $terminated = false;
+    private static bool $mainRunning = false;
 
     /**
      * Returns the absolute path to the package root directory.
@@ -169,6 +171,9 @@ final class Ffi
      */
     public static function init(): void
     {
+        if (self::$terminated) {
+            throw new \LogicException('A native UI session cannot restart after uninit(). Start a fresh PHP process.');
+        }
         if (self::$initialized) {
             return;
         }
@@ -186,6 +191,14 @@ final class Ffi
         }
 
         self::$initialized = true;
+    }
+
+    /** Reject GUI operations before init() or after uninit() instead of entering native code. @internal */
+    public static function assertInitialized(): void
+    {
+        if (! self::$initialized) {
+            throw new \LogicException('Call Ffi::init() before creating native resources or running GUI operations.');
+        }
     }
 
     /**
@@ -208,7 +221,16 @@ final class Ffi
      */
     public static function main(): void
     {
-        self::get()->uiMain();
+        self::assertInitialized();
+        if (self::$mainRunning) {
+            throw new \LogicException('The native main loop cannot be entered recursively.');
+        }
+        self::$mainRunning = true;
+        try {
+            self::get()->uiMain();
+        } finally {
+            self::$mainRunning = false;
+        }
     }
 
     /**
@@ -218,27 +240,39 @@ final class Ffi
      */
     public static function quit(): void
     {
+        self::assertInitialized();
         self::get()->uiQuit();
     }
 
     /**
      * Shuts down the libui library.
      *
-     * This uninitializes libui and frees all resources. Must be called after
+     * This destroys tracked control trees, frees registered resources, and shuts
+     * down libui. Repeated calls are no-ops. Must be called after
      * Ffi::main() returns, typically via App::run() which handles this automatically.
      *
-     * Note: After calling uninit(), you must call init() again before using libui.
+     * After uninit(), this process cannot start another UI session. Native
+     * backends retain application/run-loop state; use a fresh PHP process.
      */
     public static function uninit(): void
     {
+        if (! self::$initialized) {
+            return;
+        }
+        if (self::$mainRunning) {
+            throw new \LogicException('Quit the main loop before calling uninit().');
+        }
+        Control::destroyAll();
         Lifecycle::freeAll(); // free any forgotten TableModels/Images before libui's leak check
         self::get()->uiUninit();
+        Control::invalidateMenus();
         self::$initialized = false;
-        Window::resetMenuLock(); // a fresh session after uninit() may build menus again
+        self::$terminated = true;
+        Window::resetMenuLock(); // discard menu-construction metadata at shutdown
 
         // The native trampolines libui held pointers to are dead once uiUninit()
         // has torn the loop down; drop our retainers (and the widget-level ones)
-        // so a fresh init() starts from a clean slate instead of leaking closures.
+        // so closed sessions do not keep application closures alive.
         self::$retained = [];
         Control::clearRetainedCallbacks();
     }
@@ -252,6 +286,7 @@ final class Ffi
      */
     public static function queueMain(callable $fn): void
     {
+        self::assertInitialized();
         $cb = static function ($data) use ($fn): void {
             try {
                 $fn();
@@ -271,6 +306,7 @@ final class Ffi
      */
     public static function timer(int $milliseconds, callable $fn): void
     {
+        self::assertInitialized();
         $cb = static function ($data) use ($fn): int {
             try {
                 return $fn() === false ? 0 : 1;
@@ -289,6 +325,7 @@ final class Ffi
      */
     public static function onShouldQuit(callable $fn): void
     {
+        self::assertInitialized();
         $cb = static function ($data) use ($fn): int {
             try {
                 return $fn() === false ? 0 : 1;

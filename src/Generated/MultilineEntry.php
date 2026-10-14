@@ -21,7 +21,8 @@ class MultilineEntry extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewMultilineEntry();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewMultilineEntry());
     }
 
     /**
@@ -31,6 +32,7 @@ class MultilineEntry extends Control
      */
     public static function nonWrapping(): static
     {
+        \Libui\Ffi::assertInitialized();
         return static::wrap(\Libui\Ffi::get()->uiNewNonWrappingMultilineEntry());
     }
 
@@ -43,7 +45,7 @@ class MultilineEntry extends Control
      */
     public function text(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiMultilineEntryText($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiMultilineEntryText($this->handle()));
     }
 
     /**
@@ -55,7 +57,7 @@ class MultilineEntry extends Control
      */
     public function setText(string $text): static
     {
-        \Libui\Ffi::get()->uiMultilineEntrySetText($this->handle, $text);
+        \Libui\Ffi::get()->uiMultilineEntrySetText($this->handle(), $text);
         return $this;
     }
 
@@ -68,7 +70,7 @@ class MultilineEntry extends Control
      */
     public function append(string $text): static
     {
-        \Libui\Ffi::get()->uiMultilineEntryAppend($this->handle, $text);
+        \Libui\Ffi::get()->uiMultilineEntryAppend($this->handle(), $text);
         return $this;
     }
 
@@ -91,7 +93,7 @@ class MultilineEntry extends Control
                 \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiMultilineEntryOnChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiMultilineEntryOnChanged($this->handle(), $fn, null);
         return $this;
     }
 
@@ -104,7 +106,7 @@ class MultilineEntry extends Control
      */
     public function readOnly(): bool
     {
-        return \Libui\Ffi::get()->uiMultilineEntryReadOnly($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiMultilineEntryReadOnly($this->handle()) !== 0;
     }
 
     /**
@@ -116,7 +118,7 @@ class MultilineEntry extends Control
      */
     public function setReadOnly(bool $readonly): static
     {
-        \Libui\Ffi::get()->uiMultilineEntrySetReadOnly($this->handle, (int) $readonly);
+        \Libui\Ffi::get()->uiMultilineEntrySetReadOnly($this->handle(), (int) $readonly);
         return $this;
     }
 }

@@ -18,9 +18,127 @@ abstract class Control
     /**
      * Whether destroy() has already freed this control. Guards against a double
      * uiControlDestroy() (which frees an already-freed pointer and crashes).
-     * Child controls destroyed by their native parent must not be used again.
+     * Descendants are invalidated recursively when their native parent is destroyed.
      */
     private bool $destroyed = false;
+
+    /** Copying this object would alias a native pointer and allow double destruction. */
+    final protected function __clone(): void
+    {
+        throw new \LogicException('Native controls cannot be cloned.');
+    }
+
+    /** @var \SplObjectStorage<Control,null>|null */
+    private static ?\SplObjectStorage $live = null;
+
+    /** @var list<Control> */
+    private array $children = [];
+
+    /** @var \WeakReference<Control>|null */
+    private ?\WeakReference $owner = null;
+
+    /** Register a native handle so its PHP owner outlives all native uses. */
+    protected function initializeHandle(\FFI\CData $handle): void
+    {
+        $this->handle = $handle;
+        self::$live ??= new \SplObjectStorage();
+        self::$live->offsetSet($this, null);
+    }
+
+    protected function assertAlive(): void
+    {
+        if ($this->destroyed) {
+            throw new \LogicException(static::class . ' has been destroyed.');
+        }
+    }
+
+    private function isNativeControl(): bool
+    {
+        return ! ($this instanceof Generated\Menu || $this instanceof Generated\MenuItem);
+    }
+
+    /** Validate an adoption before calling C; leave ownership unchanged on failure. */
+    protected function assertCanAdopt(?Control $child, bool $replacing = false): void
+    {
+        $this->assertAlive();
+        if ($child === null) {
+            return;
+        }
+        $child->asControl();
+        if ($child->owner !== null && ! ($replacing && $child->owner->get() === $this && ($this->children[0] ?? null) === $child) || $child instanceof Generated\Window) {
+            throw new \LogicException('The child must be detached and cannot be a top-level window.');
+        }
+        for ($ancestor = $this; $ancestor !== null; $ancestor = $ancestor->owner?->get()) {
+            if ($ancestor === $child) {
+                throw new \LogicException('A control cannot contain itself or an ancestor.');
+            }
+        }
+    }
+
+    protected function adoptChild(Control $child, ?int $index = null): void
+    {
+        $child->owner = \WeakReference::create($this);
+        \array_splice($this->children, $index ?? \count($this->children), 0, [$child]);
+    }
+
+    protected function replaceChild(?Control $child): void
+    {
+        foreach ($this->children as $old) {
+            $old->owner = null;
+        }
+        $this->children = [];
+        if ($child !== null) {
+            $this->adoptChild($child);
+        }
+    }
+
+    protected function assertChildIndex(int $index, bool $inserting = false): void
+    {
+        $this->assertAlive();
+        $this->assertIndex($index, \count($this->children), $inserting);
+    }
+
+    protected function assertIndex(int $index, int $count, bool $inserting = false): void
+    {
+        $this->assertAlive();
+        $limit = $count - ($inserting ? 0 : 1);
+        if ($index < 0 || $index > $limit) {
+            throw new \OutOfBoundsException('Container child index out of range: ' . $index);
+        }
+    }
+
+    protected function releaseChild(int $index): void
+    {
+        $this->children[$index]->owner = null;
+        \array_splice($this->children, $index, 1);
+    }
+
+    protected function assertOwnsChild(Control $child): void
+    {
+        $child->assertAlive();
+        if ($child->owner?->get() !== $this) {
+            throw new \LogicException('The reference control must belong to this container.');
+        }
+    }
+
+    /** Destroy control trees before their models/images and native library teardown. @internal */
+    public static function destroyAll(): void
+    {
+        foreach (self::$live === null ? [] : \iterator_to_array(self::$live) as $control) {
+            if (! $control->isNativeControl() || $control->owner !== null) {
+                continue;
+            }
+            $control->destroy();
+        }
+    }
+
+    /** Native menus are owned by libui and become invalid at uiUninit(). @internal */
+    public static function invalidateMenus(): void
+    {
+        foreach (self::$live === null ? [] : \iterator_to_array(self::$live) as $control) {
+            $control->markDestroyed();
+        }
+    }
 
     /**
      * Native callback trampolines, retained for the process lifetime.
@@ -44,6 +162,7 @@ abstract class Control
      */
     public function handle(): \FFI\CData
     {
+        $this->assertAlive();
         return $this->handle;
     }
 
@@ -57,7 +176,10 @@ abstract class Control
      */
     public function asControl(): \FFI\CData
     {
-        return Ffi::control($this->handle);
+        if (! $this->isNativeControl()) {
+            throw new \LogicException('Menus are owned by libui and are not uiControl widgets.');
+        }
+        return Ffi::control($this->handle());
     }
 
     /**
@@ -118,7 +240,7 @@ abstract class Control
     protected static function wrap(\FFI\CData $handle): static
     {
         $obj = new \ReflectionClass(static::class)->newInstanceWithoutConstructor();
-        $obj->handle = $handle;
+        $obj->initializeHandle($handle);
         return $obj;
     }
 
@@ -172,15 +294,20 @@ abstract class Control
      * Destroys the widget and frees its resources.
      *
      * After calling destroy(), the widget handle becomes invalid.
-     * Note: This does NOT remove the widget from its parent container.
+     * Attached widgets must first be detached with the owning container API.
+     * Parent destruction invalidates descendants; repeated destroy() is safe.
      */
     public function destroy(): void
     {
         if ($this->destroyed) {
             return;
         }
-        $this->destroyed = true;
-        Ffi::get()->uiControlDestroy($this->asControl());
+        $handle = $this->asControl();
+        if ($this->owner !== null) {
+            throw new \LogicException('Detach the control from its parent before destroying it.');
+        }
+        $this->markDestroyed();
+        Ffi::get()->uiControlDestroy($handle);
     }
 
     /** Whether this control has been destroyed explicitly or by its close callback. */
@@ -193,6 +320,14 @@ abstract class Control
     protected function markDestroyed(): void
     {
         $this->destroyed = true;
+        foreach ($this->children as $child) {
+            $child->markDestroyed();
+        }
+        $this->children = [];
+        $this->owner = null;
+        if (self::$live?->offsetExists($this)) {
+            self::$live->offsetUnset($this);
+        }
     }
 
     /**

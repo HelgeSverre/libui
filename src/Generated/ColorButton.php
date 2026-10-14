@@ -21,7 +21,8 @@ class ColorButton extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewColorButton();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewColorButton());
     }
 
     /**
@@ -36,7 +37,7 @@ class ColorButton extends Control
      */
     public function color(\FFI\CData $r, \FFI\CData $g, \FFI\CData $bl, \FFI\CData $a): static
     {
-        \Libui\Ffi::get()->uiColorButtonColor($this->handle, \FFI::addr($r), \FFI::addr($g), \FFI::addr($bl), \FFI::addr($a));
+        \Libui\Ffi::get()->uiColorButtonColor($this->handle(), \FFI::addr($r), \FFI::addr($g), \FFI::addr($bl), \FFI::addr($a));
         return $this;
     }
 
@@ -52,7 +53,7 @@ class ColorButton extends Control
      */
     public function setColor(float $r, float $g, float $bl, float $a): static
     {
-        \Libui\Ffi::get()->uiColorButtonSetColor($this->handle, $r, $g, $bl, $a);
+        \Libui\Ffi::get()->uiColorButtonSetColor($this->handle(), $r, $g, $bl, $a);
         return $this;
     }
 
@@ -75,7 +76,7 @@ class ColorButton extends Control
                 \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiColorButtonOnChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiColorButtonOnChanged($this->handle(), $fn, null);
         return $this;
     }
 }

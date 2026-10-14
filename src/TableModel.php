@@ -21,6 +21,9 @@ use Libui\Generated\Enum\TableValueType;
  */
 final class TableModel
 {
+    /** Native ownership cannot be duplicated by PHP object cloning. */
+    private function __clone(): void {}
+
     /** The uiTableModelHandler vtable; retained so libui's pointer stays valid. */
     private \FFI\CData $handler;
 
@@ -33,6 +36,16 @@ final class TableModel
     /** Trampolines for the five vtable fields, retained against GC. */
     private array $callbacks = [];
 
+    /** @var \WeakMap<Table,null>|null */
+    private ?\WeakMap $tables = null;
+
+    /** Keep native model teardown behind the last table using it. @internal */
+    public function registerTable(Table $table): void
+    {
+        $this->tables ??= new \WeakMap();
+        $this->tables[$table] = null;
+    }
+
     public static function fromDelegate(TableModelDelegate $delegate): self
     {
         return new self($delegate);
@@ -41,6 +54,7 @@ final class TableModel
     public function __construct(
         private readonly TableModelDelegate $delegate,
     ) {
+        Ffi::assertInitialized();
         $ffi = Ffi::get();
         $this->handler = $this->makeHandler();
         $this->model = $ffi->uiNewTableModel(\FFI::addr($this->handler));
@@ -50,6 +64,9 @@ final class TableModel
     /** The raw uiTableModel* — pass this into a {@see Table}. */
     public function handle(): \FFI\CData
     {
+        if ($this->freed) {
+            throw new \LogicException('The table model has been freed.');
+        }
         return $this->model;
     }
 
@@ -83,6 +100,11 @@ final class TableModel
         if ($this->freed) {
             return;
         }
+        foreach ($this->tables ?? [] as $table => $_) {
+            if (! $table->isDestroyed()) {
+                throw new \LogicException('Destroy every table using the model before freeing it.');
+            }
+        }
         Ffi::get()->uiFreeTableModel($this->model);
         $this->freed = true;
         Lifecycle::unregisterModel($this);
@@ -91,19 +113,19 @@ final class TableModel
     /** Notify libui that a new row appeared at $index so it can refresh. */
     public function rowInserted(int $index): void
     {
-        Ffi::get()->uiTableModelRowInserted($this->model, $index);
+        Ffi::get()->uiTableModelRowInserted($this->handle(), $index);
     }
 
     /** Notify libui that the row at $index changed so it can repaint it. */
     public function rowChanged(int $index): void
     {
-        Ffi::get()->uiTableModelRowChanged($this->model, $index);
+        Ffi::get()->uiTableModelRowChanged($this->handle(), $index);
     }
 
     /** Notify libui that the row at $index was removed. */
     public function rowDeleted(int $index): void
     {
-        Ffi::get()->uiTableModelRowDeleted($this->model, $index);
+        Ffi::get()->uiTableModelRowDeleted($this->handle(), $index);
     }
 
     private function makeHandler(): \FFI\CData

@@ -529,19 +529,7 @@ parameters:
 			path: src/Text/TextLayout.php
 
 		-
-			message: '#^Property Libui\\Text\\TextLayout\:\:\$font is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: src/Text/TextLayout.php
-
-		-
 			message: '#^Property Libui\\Text\\TextLayout\:\:\$params is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: src/Text/TextLayout.php
-
-		-
-			message: '#^Property Libui\\Text\\TextLayout\:\:\$string is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
 			path: src/Text/TextLayout.php
@@ -1097,12 +1085,6 @@ parameters:
 			identifier: method.void
 			count: 1
 			path: tests/TableFunctionalTest.php
-
-		-
-			message: '#^Call to method Libui\\Text\\TextLayout\:\:setFont\(\) on a separate line has no effect\.$#'
-			identifier: method.resultUnused
-			count: 1
-			path: tests/TextTest.php
 
 		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertContainsOnlyInstancesOf\(\) with ''Libui\\\\Text\\\\Attribute'' and list\<Libui\\Text\\Attribute\> will always evaluate to true\.$#'

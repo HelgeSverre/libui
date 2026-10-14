@@ -21,7 +21,8 @@ class DateTimePicker extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewDateTimePicker();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewDateTimePicker());
     }
 
     /**
@@ -31,6 +32,7 @@ class DateTimePicker extends Control
      */
     public static function dateOnly(): static
     {
+        \Libui\Ffi::assertInitialized();
         return static::wrap(\Libui\Ffi::get()->uiNewDatePicker());
     }
 
@@ -41,6 +43,7 @@ class DateTimePicker extends Control
      */
     public static function timeOnly(): static
     {
+        \Libui\Ffi::assertInitialized();
         return static::wrap(\Libui\Ffi::get()->uiNewTimePicker());
     }
 
@@ -53,7 +56,7 @@ class DateTimePicker extends Control
      */
     public function time(\FFI\CData $time): static
     {
-        \Libui\Ffi::get()->uiDateTimePickerTime($this->handle, $time);
+        \Libui\Ffi::get()->uiDateTimePickerTime($this->handle(), $time);
         return $this;
     }
 
@@ -67,7 +70,7 @@ class DateTimePicker extends Control
      */
     public function setTime(\FFI\CData $time): static
     {
-        \Libui\Ffi::get()->uiDateTimePickerSetTime($this->handle, $time);
+        \Libui\Ffi::get()->uiDateTimePickerSetTime($this->handle(), $time);
         return $this;
     }
 
@@ -90,7 +93,7 @@ class DateTimePicker extends Control
                 \fwrite(\STDERR, "[onChanged] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiDateTimePickerOnChanged($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiDateTimePickerOnChanged($this->handle(), $fn, null);
         return $this;
     }
 }

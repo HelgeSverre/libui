@@ -968,3 +968,40 @@ always fully qualified. If you `use Libui\Ffi;` don't also import `\FFI`.
 Override the library path at any time with the `$LIBUI_LIB` environment variable.
 See the README's [Platform support](../README.md#platform-support) table for the
 current status of prebuilt binaries.
+
+
+## Native ownership and safe teardown
+
+Call `Ffi::init()` before constructing native controls or resources. Constructors
+and loop helpers reject calls outside an initialized session. Call `uninit()`
+only after the main loop returns. A shut-down native UI session cannot restart
+in the same PHP process; use a fresh process for another session.
+
+A child belongs to one container. Remove it with `Box::delete()`, `Form::delete()`,
+`Tab::delete()`, or replace/clear a window/group child before reparenting or
+explicitly destroying it. These operations detach without destroying the child.
+Destroying a parent destroys and invalidates all descendants. Repeated
+`destroy()` is safe; other methods on destroyed objects throw `LogicException`.
+Menus are owned by libui and cannot be treated as `uiControl` widgets.
+Native owners cannot be cloned.
+
+`Ffi::uninit()` destroys tracked control trees before freeing models, images,
+and drawing resources. Models cannot be explicitly freed while a live table
+still uses them. Drawing contexts are valid only inside their Area draw callback.
+Finalize a path with `end()` before drawing it, and create a new path to change
+its geometry afterward.
+
+An attributed string stays alive while a `TextLayout` uses it and cannot be
+freed explicitly until those layouts are freed. `TextLayout::setWidth()` and
+`setFont()` rebuild the native layout so subsequent measurement and drawing use
+the new values.
+
+Text ranges use UTF-8 byte offsets on code-point boundaries. Invalid ranges,
+malformed UTF-8, and embedded NUL bytes are rejected before native calls. Create
+a new `Attribute` for each application: an attributed string takes ownership of
+its native attribute, and a native equal-value merge can release that pointer.
+Unused attributes are freed automatically.
+
+These protections cover managed wrappers. Direct ownership changes or destruction
+through `Ffi::get()` bypass tracking; do not mix raw native lifetime operations
+with managed control trees.

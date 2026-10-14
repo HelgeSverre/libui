@@ -21,7 +21,8 @@ class Grid extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewGrid();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewGrid());
     }
 
     /**
@@ -41,7 +42,9 @@ class Grid extends Control
      */
     public function append(\Libui\Control $c, int $left, int $top, int $xspan, int $yspan, int $hexpand, \Libui\Generated\Enum\Align $halign, int $vexpand, \Libui\Generated\Enum\Align $valign): static
     {
-        \Libui\Ffi::get()->uiGridAppend($this->handle, \Libui\Ffi::control($c->handle()), $left, $top, $xspan, $yspan, $hexpand, $halign->value, $vexpand, $valign->value);
+        $this->assertCanAdopt($c);
+        \Libui\Ffi::get()->uiGridAppend($this->handle(), \Libui\Ffi::control($c->handle()), $left, $top, $xspan, $yspan, $hexpand, $halign->value, $vexpand, $valign->value);
+        $this->adoptChild($c);
         return $this;
     }
 
@@ -62,7 +65,10 @@ class Grid extends Control
      */
     public function insertAt(\Libui\Control $c, \Libui\Control $existing, \Libui\Generated\Enum\At $at, int $xspan, int $yspan, int $hexpand, \Libui\Generated\Enum\Align $halign, int $vexpand, \Libui\Generated\Enum\Align $valign): static
     {
-        \Libui\Ffi::get()->uiGridInsertAt($this->handle, \Libui\Ffi::control($c->handle()), \Libui\Ffi::control($existing->handle()), $at->value, $xspan, $yspan, $hexpand, $halign->value, $vexpand, $valign->value);
+        $this->assertCanAdopt($c);
+        $this->assertOwnsChild($existing);
+        \Libui\Ffi::get()->uiGridInsertAt($this->handle(), \Libui\Ffi::control($c->handle()), \Libui\Ffi::control($existing->handle()), $at->value, $xspan, $yspan, $hexpand, $halign->value, $vexpand, $valign->value);
+        $this->adoptChild($c);
         return $this;
     }
 
@@ -75,7 +81,7 @@ class Grid extends Control
      */
     public function padded(): bool
     {
-        return \Libui\Ffi::get()->uiGridPadded($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiGridPadded($this->handle()) !== 0;
     }
 
     /**
@@ -87,7 +93,7 @@ class Grid extends Control
      */
     public function setPadded(bool $padded): static
     {
-        \Libui\Ffi::get()->uiGridSetPadded($this->handle, (int) $padded);
+        \Libui\Ffi::get()->uiGridSetPadded($this->handle(), (int) $padded);
         return $this;
     }
 }

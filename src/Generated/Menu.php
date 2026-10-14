@@ -23,7 +23,8 @@ class Menu extends Control
      */
     public function __construct(string $name)
     {
-        $this->handle = \Libui\Ffi::get()->uiNewMenu($name);
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewMenu($name));
     }
 
     /**
@@ -35,7 +36,7 @@ class Menu extends Control
      */
     public function appendItem(string $name): \Libui\Generated\MenuItem
     {
-        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendItem($this->handle, $name));
+        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendItem($this->handle(), $name));
     }
 
     /**
@@ -47,7 +48,7 @@ class Menu extends Control
      */
     public function appendCheckItem(string $name): \Libui\Generated\MenuItem
     {
-        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendCheckItem($this->handle, $name));
+        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendCheckItem($this->handle(), $name));
     }
 
     /**
@@ -59,7 +60,7 @@ class Menu extends Control
      */
     public function appendQuitItem(): \Libui\Generated\MenuItem
     {
-        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendQuitItem($this->handle));
+        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendQuitItem($this->handle()));
     }
 
     /**
@@ -71,7 +72,7 @@ class Menu extends Control
      */
     public function appendPreferencesItem(): \Libui\Generated\MenuItem
     {
-        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendPreferencesItem($this->handle));
+        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendPreferencesItem($this->handle()));
     }
 
     /**
@@ -83,7 +84,7 @@ class Menu extends Control
      */
     public function appendAboutItem(): \Libui\Generated\MenuItem
     {
-        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendAboutItem($this->handle));
+        return \Libui\Generated\MenuItem::wrap(\Libui\Ffi::get()->uiMenuAppendAboutItem($this->handle()));
     }
 
     /**
@@ -93,7 +94,7 @@ class Menu extends Control
      */
     public function appendSeparator(): static
     {
-        \Libui\Ffi::get()->uiMenuAppendSeparator($this->handle);
+        \Libui\Ffi::get()->uiMenuAppendSeparator($this->handle());
         return $this;
     }
 }

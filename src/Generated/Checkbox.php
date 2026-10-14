@@ -23,7 +23,8 @@ class Checkbox extends Control
      */
     public function __construct(string $text)
     {
-        $this->handle = \Libui\Ffi::get()->uiNewCheckbox($text);
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewCheckbox($text));
     }
 
     /**
@@ -35,7 +36,7 @@ class Checkbox extends Control
      */
     public function text(): string
     {
-        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiCheckboxText($this->handle));
+        return \Libui\Ffi::ownedString(\Libui\Ffi::get()->uiCheckboxText($this->handle()));
     }
 
     /**
@@ -47,7 +48,7 @@ class Checkbox extends Control
      */
     public function setText(string $text): static
     {
-        \Libui\Ffi::get()->uiCheckboxSetText($this->handle, $text);
+        \Libui\Ffi::get()->uiCheckboxSetText($this->handle(), $text);
         return $this;
     }
 
@@ -70,7 +71,7 @@ class Checkbox extends Control
                 \fwrite(\STDERR, "[onToggled] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiCheckboxOnToggled($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiCheckboxOnToggled($this->handle(), $fn, null);
         return $this;
     }
 
@@ -83,7 +84,7 @@ class Checkbox extends Control
      */
     public function checked(): bool
     {
-        return \Libui\Ffi::get()->uiCheckboxChecked($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiCheckboxChecked($this->handle()) !== 0;
     }
 
     /**
@@ -95,7 +96,7 @@ class Checkbox extends Control
      */
     public function setChecked(bool $checked): static
     {
-        \Libui\Ffi::get()->uiCheckboxSetChecked($this->handle, (int) $checked);
+        \Libui\Ffi::get()->uiCheckboxSetChecked($this->handle(), (int) $checked);
         return $this;
     }
 }

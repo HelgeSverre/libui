@@ -15,9 +15,13 @@ use Libui\Generated\Enum\DrawFillMode;
  */
 final class Path
 {
+    /** Native ownership cannot be duplicated by PHP object cloning. */
+    private function __clone(): void {}
+
     private \FFI\CData $path;
 
-    private bool $freed = false;
+    private bool $freed = true;
+    private bool $ended = false;
 
     /**
      * The current pen position after the last point-producing op, or null when
@@ -30,17 +34,42 @@ final class Path
 
     public function __construct(DrawFillMode $fillMode = DrawFillMode::Winding)
     {
+        Ffi::assertInitialized();
         $this->path = Ffi::get()->uiDrawNewPath($fillMode->value);
+        $this->freed = false;
+        \Libui\Lifecycle::registerDrawingResource($this);
     }
 
     public function handle(): \FFI\CData
     {
+        if ($this->freed) {
+            throw new \LogicException('This native resource has been freed.');
+        }
         return $this->path;
+    }
+
+    /** A finalized path safe to pass to native drawing operations. @internal */
+    public function drawingHandle(): \FFI\CData
+    {
+        $handle = $this->handle();
+        if (! $this->ended) {
+            throw new \LogicException('Call end() before drawing a path.');
+        }
+        return $handle;
+    }
+
+    private function mutableHandle(): \FFI\CData
+    {
+        $handle = $this->handle();
+        if ($this->ended) {
+            throw new \LogicException('A finalized path cannot be changed.');
+        }
+        return $handle;
     }
 
     public function newFigure(float $x, float $y): self
     {
-        Ffi::get()->uiDrawPathNewFigure($this->path, $x, $y);
+        Ffi::get()->uiDrawPathNewFigure($this->mutableHandle(), $x, $y);
         $this->curX = $x;
         $this->curY = $y;
         return $this;
@@ -48,7 +77,7 @@ final class Path
 
     public function lineTo(float $x, float $y): self
     {
-        Ffi::get()->uiDrawPathLineTo($this->path, $x, $y);
+        Ffi::get()->uiDrawPathLineTo($this->mutableHandle(), $x, $y);
         $this->curX = $x;
         $this->curY = $y;
         return $this;
@@ -56,14 +85,14 @@ final class Path
 
     public function closeFigure(): self
     {
-        Ffi::get()->uiDrawPathCloseFigure($this->path);
+        Ffi::get()->uiDrawPathCloseFigure($this->mutableHandle());
         $this->curX = $this->curY = null;
         return $this;
     }
 
     public function addRectangle(float $x, float $y, float $width, float $height): self
     {
-        Ffi::get()->uiDrawPathAddRectangle($this->path, $x, $y, $width, $height);
+        Ffi::get()->uiDrawPathAddRectangle($this->mutableHandle(), $x, $y, $width, $height);
         $this->curX = $this->curY = null;
         return $this;
     }
@@ -74,7 +103,7 @@ final class Path
      */
     public function newFigureWithArc(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): self
     {
-        Ffi::get()->uiDrawPathNewFigureWithArc($this->path, $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
+        Ffi::get()->uiDrawPathNewFigureWithArc($this->mutableHandle(), $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
         $this->curX = $this->curY = null;
         return $this;
     }
@@ -82,7 +111,7 @@ final class Path
     /** Line from the current point to the arc's start, then the arc itself. */
     public function arcTo(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): self
     {
-        Ffi::get()->uiDrawPathArcTo($this->path, $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
+        Ffi::get()->uiDrawPathArcTo($this->mutableHandle(), $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
         $this->curX = $this->curY = null;
         return $this;
     }
@@ -90,7 +119,7 @@ final class Path
     /** Cubic Bézier curve to (endX, endY) via the two control points. */
     public function bezierTo(float $c1x, float $c1y, float $c2x, float $c2y, float $endX, float $endY): self
     {
-        Ffi::get()->uiDrawPathBezierTo($this->path, $c1x, $c1y, $c2x, $c2y, $endX, $endY);
+        Ffi::get()->uiDrawPathBezierTo($this->mutableHandle(), $c1x, $c1y, $c2x, $c2y, $endX, $endY);
         $this->curX = $endX;
         $this->curY = $endY;
         return $this;
@@ -102,7 +131,7 @@ final class Path
      */
     public function arc(float $xCenter, float $yCenter, float $radius, float $startAngle, float $sweep, bool $negative = false): self
     {
-        Ffi::get()->uiDrawPathNewFigureWithArc($this->path, $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
+        Ffi::get()->uiDrawPathNewFigureWithArc($this->mutableHandle(), $xCenter, $yCenter, $radius, $startAngle, $sweep, (int) $negative);
         $this->curX = $this->curY = null;
         return $this;
     }
@@ -212,7 +241,12 @@ final class Path
     /** Finalise the path; required before it can be drawn. */
     public function end(): self
     {
-        Ffi::get()->uiDrawPathEnd($this->path);
+        $this->handle();
+        if ($this->ended) {
+            return $this;
+        }
+        Ffi::get()->uiDrawPathEnd($this->mutableHandle());
+        $this->ended = true;
         return $this;
     }
 

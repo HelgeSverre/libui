@@ -21,7 +21,8 @@ class Form extends Control
      */
     public function __construct()
     {
-        $this->handle = \Libui\Ffi::get()->uiNewForm();
+        \Libui\Ffi::assertInitialized();
+        $this->initializeHandle(\Libui\Ffi::get()->uiNewForm());
     }
 
     /**
@@ -35,7 +36,9 @@ class Form extends Control
      */
     public function append(string $label, \Libui\Control $c, int $stretchy): static
     {
-        \Libui\Ffi::get()->uiFormAppend($this->handle, $label, \Libui\Ffi::control($c->handle()), $stretchy);
+        $this->assertCanAdopt($c);
+        \Libui\Ffi::get()->uiFormAppend($this->handle(), $label, \Libui\Ffi::control($c->handle()), $stretchy);
+        $this->adoptChild($c);
         return $this;
     }
 
@@ -46,7 +49,7 @@ class Form extends Control
      */
     public function numChildren(): int
     {
-        return \Libui\Ffi::get()->uiFormNumChildren($this->handle);
+        return \Libui\Ffi::get()->uiFormNumChildren($this->handle());
     }
 
     /**
@@ -59,7 +62,9 @@ class Form extends Control
      */
     public function delete(int $index): static
     {
-        \Libui\Ffi::get()->uiFormDelete($this->handle, $index);
+        $this->assertChildIndex($index);
+        \Libui\Ffi::get()->uiFormDelete($this->handle(), $index);
+        $this->releaseChild($index);
         return $this;
     }
 
@@ -72,7 +77,7 @@ class Form extends Control
      */
     public function padded(): bool
     {
-        return \Libui\Ffi::get()->uiFormPadded($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiFormPadded($this->handle()) !== 0;
     }
 
     /**
@@ -84,7 +89,7 @@ class Form extends Control
      */
     public function setPadded(bool $padded): static
     {
-        \Libui\Ffi::get()->uiFormSetPadded($this->handle, (int) $padded);
+        \Libui\Ffi::get()->uiFormSetPadded($this->handle(), (int) $padded);
         return $this;
     }
 }

@@ -21,7 +21,7 @@ class MenuItem extends Control
      */
     public function enable(): static
     {
-        \Libui\Ffi::get()->uiMenuItemEnable($this->handle);
+        \Libui\Ffi::get()->uiMenuItemEnable($this->handle());
         return $this;
     }
 
@@ -32,7 +32,7 @@ class MenuItem extends Control
      */
     public function disable(): static
     {
-        \Libui\Ffi::get()->uiMenuItemDisable($this->handle);
+        \Libui\Ffi::get()->uiMenuItemDisable($this->handle());
         return $this;
     }
 
@@ -54,7 +54,7 @@ class MenuItem extends Control
                 \fwrite(\STDERR, "[onClicked] {$exception->getMessage()}\n");
             }
         });
-        \Libui\Ffi::get()->uiMenuItemOnClicked($this->handle, $fn, null);
+        \Libui\Ffi::get()->uiMenuItemOnClicked($this->handle(), $fn, null);
         return $this;
     }
 
@@ -67,7 +67,7 @@ class MenuItem extends Control
      */
     public function checked(): bool
     {
-        return \Libui\Ffi::get()->uiMenuItemChecked($this->handle) !== 0;
+        return \Libui\Ffi::get()->uiMenuItemChecked($this->handle()) !== 0;
     }
 
     /**
@@ -79,7 +79,7 @@ class MenuItem extends Control
      */
     public function setChecked(bool $checked): static
     {
-        \Libui\Ffi::get()->uiMenuItemSetChecked($this->handle, (int) $checked);
+        \Libui\Ffi::get()->uiMenuItemSetChecked($this->handle(), (int) $checked);
         return $this;
     }
 }
